@@ -1,4 +1,4 @@
-package org.opensourcebim.levelout;
+package org.opensourcebim.levelout.samples;
 
 import java.io.IOException;
 

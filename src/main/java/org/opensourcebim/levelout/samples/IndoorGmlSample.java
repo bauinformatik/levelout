@@ -1,4 +1,4 @@
-package org.opensourcebim.levelout;
+package org.opensourcebim.levelout.samples;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
