@@ -6,16 +6,22 @@ import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
+import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
+import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
+import net.opengis.indoorgml.core.v_1_0.NodesType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
+import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
+import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
 import net.opengis.gml.v_3_2_1.BoundingShapeType;
 import net.opengis.gml.v_3_2_1.DirectPositionType;
 import net.opengis.gml.v_3_2_1.PointPropertyType;
 import net.opengis.gml.v_3_2_1.PointType;
 import net.opengis.gml.v_3_2_1.AbstractGeometryType;
+import net.opengis.gml.v_3_2_1.AbstractSolidType;
 import net.opengis.gml.v_3_2_1.SolidPropertyType;
 import net.opengis.gml.v_3_2_1.SolidType;
 
@@ -30,9 +36,13 @@ import org.xmlobjects.gml.model.geometry.primitives.Solid;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,243 +51,216 @@ import java.util.List;
 import java.util.Map;
 
 public class IndoorGmlBuilding {
-	public static void main(String[] args) throws JAXBException, ParseException {
-		
-		
+	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
+
+		String fileName = "output/outindoor3.gml";
+		FileOutputStream fout = new FileOutputStream(fileName);
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
 		indoorFeatures.setId("if1");
-		
+
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
 		primalSpaceFeature.setId("pf1");
-		
-		
+
+
 		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
 		multiLayeredGraph.setId("mlg1");
-		
+
 		SpaceLayersType spaceLayers = new SpaceLayersType();
 		spaceLayers.setId("slayers1");
-		
+		List<SpaceLayersType> spaceLayerslist = new ArrayList<SpaceLayersType>();
+		spaceLayerslist.add(spaceLayers);
+
 		SpaceLayerType spaceLayer = new SpaceLayerType();
 		spaceLayer.setId("sl1");
+		List<SpaceLayerMemberType> spaceLayermemberlist = new ArrayList<SpaceLayerMemberType>();
+		SpaceLayerMemberType sLayermember = new SpaceLayerMemberType();
+		sLayermember.setSpaceLayer(spaceLayer);
+		spaceLayermemberlist.add(sLayermember);
 		
+
+		NodesType nodes  = new NodesType();
+		nodes.setId("n1");
+		List<NodesType> nodesList = new ArrayList<NodesType>();
+		nodesList.add(nodes);
 		
+
+
 		PrimalSpaceFeaturesPropertyType primalspacefeaturesProp = new PrimalSpaceFeaturesPropertyType();
 		primalspacefeaturesProp.setPrimalSpaceFeatures(primalSpaceFeature);
-		
+
 		indoorFeatures.setPrimalSpaceFeatures(primalspacefeaturesProp);
-		
+
 		MultiLayeredGraphPropertyType  multilayergraphProp = new MultiLayeredGraphPropertyType();
 		multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
-		
+
 		indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
 		
+		multiLayeredGraph.setSpaceLayers(spaceLayerslist);
 		
+		spaceLayers.setSpaceLayerMember(spaceLayermemberlist);
 		
-		
-		
+		spaceLayer.setNodes(nodesList);
+
+
 		List<CellSpaceMemberType> cellspacemember = new ArrayList<CellSpaceMemberType>();
 		CellSpaceMemberType c1 = new CellSpaceMemberType();
-				cellspacemember.add(c1);		
+		cellspacemember.add(c1);	
+		//c1.setCellSpace(cs1);
 		CellSpaceMemberType c2 = new CellSpaceMemberType();
-				cellspacemember.add(c2);
+		cellspacemember.add(c2);
 		CellSpaceMemberType c3 = new CellSpaceMemberType();
-				cellspacemember.add(c3);
+		cellspacemember.add(c3);
 		CellSpaceMemberType c4 = new CellSpaceMemberType();
-				cellspacemember.add(c4);
+		cellspacemember.add(c4);
 		CellSpaceMemberType c5 = new CellSpaceMemberType();
-				cellspacemember.add(c5);
+		cellspacemember.add(c5);
 		CellSpaceMemberType c6 = new CellSpaceMemberType();
-			cellspacemember.add(c6);
-
-		List<String> states = new ArrayList<String>();
-		state.add("s1");
-		state.add("s2");
-		state.add("s3");
-		state.add("s4");
-		state.add("s5");
-		state.add("s6");
+		cellspacemember.add(c6);
 		
-		/* PRIMAL SPACE FEATURES*/
 
-		
+
 		primalSpaceFeature.setCellSpaceMember(cellspacemember);
-		primalSpaceFeature.setCellSpaceBoundaryMember(null);
-		primalSpaceFeature.setDescription("yes"); // JAXB`
-		
-		
-		
-		
-		
-		/*MULTI LAYERED GRAPH AND SPACE LAYERS */
-		
-	 // how to set parent 
 
 		
-		
-		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeatureProperty);
-		
-		/* GEOMETRY */ 
-		
-		String wktsolid = "SOLID (( ((0 0 0, 0 0 10, 0 10 10, 0 10 0, 0 0 0)), ((0 0 0, 10 0 0, 10 0 10, 0 0 10, 0 0 0)), ((10 10 0, 10 10 10, 10 0 10, 10 0 0, 10 10 0)), ((0 10 0, 0 10 10, 10 10 10, 10 10 0, 0 10 0)),((0 0 0, 0 10 0, 10 10 0, 10 0 0, 0 0 0)), ((0 0 10, 10 0 10, 10 10 10, 0 10 10, 0 0 10)) ))";
-		String wktsolid2 = "SOLID (( ((10 0 0, 20 0 0, 20 0 10, 10 0 10, 10 0 0)),((10 0 0, 10 0 10, 10 5 10, 10 5 0, 10 0 0)), ((10 5 0, 20 5 0, 20 5 10, 10 5 10, 10 5 0)), ((20 5 0, 20 5 10, 20 0 10, 20 0 0, 20 5 0)), ((10 0 0, 10 5 0, 20 5 0, 20 0 0, 10 0 0)), ((10 0 10, 20 0 10, 20 5 10, 10 5 10, 10 0 10)) ))";
-		String wktsolid3 = "SOLID (( ((10 5 0, 20 5 0, 20 5 10, 10 5 10, 10 5 0)), ((10 5 0, 10 5 10, 10 10 10, 10 10 0, 10 5 0)), ((10 10 0, 20 10 0, 20 10 10, 10 10 10, 10 10 0)), ((20 10 0, 20 10 10, 20 5 10, 20 5 0, 20 10 0)), ((10 5 0, 10 10 0, 20 10 0, 20 5 0, 10 5 0)), ((10 5 10, 20 5 10, 20 10 10, 10 10 10, 10 5 10)) ))";
-		String wktsolid4 = "SOLID (( ((0 0 10, 0 0 20, 0 10 20, 0 10 10, 0 0 10)), ((0 0 10, 10 0 10, 10 0 20, 0 0 20, 0 0 10)), ((10 10 10, 10 10 20, 10 0 20, 10 0 10, 10 10 10)), ((0 10 10, 0 10 20, 10 10 20, 10 10 10, 0 10 10)),((0 0 10, 0 10 10, 10 10 10, 10 0 10, 0 0 10)), ((0 0 20, 10 0 20, 10 10 20, 0 10 20, 0 0 20)) ))";
-		String wktsolid5 = "SOLID (( ((10 0 10, 20 0 10, 20 0 20, 10 0 20, 10 0 10)),((10 0 10, 10 0 20, 10 5 20, 10 5 10, 10 0 10)), ((10 5 10, 20 5 10, 20 5 20, 10 5 20, 10 5 10)), ((20 5 10, 20 5 20, 20 0 20, 20 0 10, 20 5 10)), ((10 0 10, 10 5 10, 20 5 10, 20 0 10, 10 0 10)), ((10 0 20, 20 0 20, 20 5 20, 10 5 20, 10 0 20)) ))";
-		String wktsolid6 = "SOLID (( ((10 5 10, 20 5 10, 20 5 20, 10 5 20, 10 5 10)), ((10 5 10, 10 5 20, 10 10 20, 10 10 10, 10 5 10)), ((10 10 10, 20 10 10, 20 10 20, 10 10 20, 10 10 10)), ((20 10 10, 20 10 20, 20 5 20, 20 5 10, 20 10 10)), ((10 5 10, 10 10 10, 20 10 10, 20 5 10, 10 5 10)), ((10 5 20, 20 5 20, 20 10 20, 10 10 20, 10 5 20)) ))";
-		
-		 WKTReader3D wktReader = new WKTReader3D();
-		
-		
-		CellSpaceGeometryType cg1 = new CellSpaceGeometryType();
-		cg1.setGeometry3D(null);
-		cg1.s
-				wkt.read(wktsolid);
-		Geometry cg2 = wkt.read(wktsolid2);
-		Geometry cg3 = wkt.read(wktsolid3);
-		Geometry cg4 = wkt.read(wktsolid4);
-		Geometry cg5 = wkt.read(wktsolid5);
-		Geometry cg6 = wkt.read(wktsolid6);
-		
-		CellSpaceGeometryType cSGeomType = new CellSpaceGeometryType();
-		
-		
-		double x =5.0;
-		double y =5.0;
-		double z = 5.0;
-		StateType state = new StateType();
-		state.setId("s1");
-		
-		setStatepos(state, x, y, z);
+
+		/* PRIMAL SPACE FEATURES*/
+		//primalSpaceFeature.setCellSpaceBoundaryMember(null);
+		//primalSpaceFeature.withDescription("yes"); // JAXB`
+
+
+
+
+
+
+
+		//CELLSPACE 
+
+		CellSpaceType cs1 = createCellspace("c1",null);
+		CellSpaceType cs2 = createCellspace("c2",null);
+		CellSpaceType cs3 = createCellspace("c3",null);
+		CellSpaceType cs4 = createCellspace("c4",null);
+		CellSpaceType cs5 = createCellspace("c5",null);
+		CellSpaceType cs6 = createCellspace("c6",null);
 		
 
-		
-		pt.setPoint(null);
-		
-		
-		String point1 = "POINT (5 5 5)";
-		String point2 = "POINT (5 5 15)";
-		String point3 = "POINT (15 2.5 5)";
-		String point4 = "POINT (15 2.5 15)";
-		String point5 = "POINT (15 7.5 5)";
-		String point6 = "POINT (15 7.5 15)";
-
-		 Geometry sg1 = wkt.read(point1);
-		 Geometry sg2 = wkt.read(point2);
-		 Geometry sg3 = wkt.read(point3);
-		 Geometry sg4 = wkt.read(point4);
-		 Geometry sg5 = wkt.read(point5);
-		 Geometry sg6 = wkt.read(point6);
-		 
-			setMetadata(cg1, "id", "cg1");
-			setMetadata(cg2, "id", "cg2");
-			setMetadata(cg3, "id", "cg3");
-			setMetadata(cg4, "id", "cg4");
-			setMetadata(cg5, "id", "cg5");
-			setMetadata(cg6, "id", "cg6");
-		 
-			
-			setMetadata(sg1, "id", "sg1");
-			setMetadata(sg2, "id", "sg2");
-			setMetadata(sg3, "id", "sg3");
-			setMetadata(sg4, "id", "sg4");
-			setMetadata(sg5, "id", "sg5");
-			setMetadata(sg6, "id", "sg6");
-			
-			
-			//CELLSPACE 
-			
-			CellSpaceType cellspace = new CellSpaceType();
-			cellspace.setId("c1");
-			cellspace.setCellSpaceGeometry(cSGeomType);
-			cellspace.setCellSpaceGeometry(cg1);
-			cellspace.setExternalReference(null);// geometry external reference can be set
-			cellspace.setex
-			// State 
-			
-			
-			state.setge
-			
-			
-			
-		
-			
-			
-			
-			
-			
-			
 	
-		 
-		 
-		
-		// List<String>transition = new ArrayList<String>();
+		//State 
 
-		// List<String>spacelayer = new ArrayList<String>();
-		// spacelayer.add("1");
+		StateType st1 = createState("s1");
+		StateType st2 = createState("s2");
+		StateType st3 = createState("s3");
+		StateType st4 = createState("s4");
+		StateType st5 = createState("s5");
+		StateType st6 = createState("s6");
 
-		List<String> cellspaceboundarymember = new ArrayList<String>();
-		cellspaceboundarymember.add("csb1");
-		// cellspaceboundarymember.add("csb2");
-		// cellspaceboundarymember.add("csb3");
-		
+
+
+		setStatepos(st1, 5.0, 5.0, 5.0);
+		setStatepos(st2,5.0,5.0,15.0);
+		setStatepos(st3,15.0,2.5,5.0);
+		setStatepos(st4,15.0,2.5,15.0);
+		setStatepos(st5,15.0,7.5,5.0);
+		setStatepos(st6,15.0,7.5,15.0);
+
+		List<StateMemberType> states = new ArrayList<StateMemberType>();
+		StateMemberType s1 = new StateMemberType();
+		states.add(s1);
+		s1.setState(st1);
+		StateMemberType s2 = new StateMemberType();
+		states.add(s2);
+		s2.setState(st2);
+		StateMemberType s3 = new StateMemberType();
+		states.add(s3);
+		s3.setState(st3);
+		StateMemberType s4 = new StateMemberType();
+		states.add(s4);
+		s4.setState(st4);
+		StateMemberType s5 = new StateMemberType();
+		states.add(s5);
+		s5.setState(st5);
+		StateMemberType s6 = new StateMemberType();
+		states.add(s6);
+		s6.setState(st6);
+
+
+		nodes.setStateMember(states);
+
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 				IndoorGMLNameSpaceMapper.DEFAULT_URI + " http://schemas.opengis.net/indoorgml/1.0/indoorgmlcore.xsd " +
-				IndoorGMLNameSpaceMapper.NAVIGATION_URI + " http://schemas.opengis.net/indoorgml/1.0/indoorgmlnavi.xsd" +
-				IndoorGMLNameSpaceMapper.XLINK_URI + " https://www.w3.org/XML/2008/06/xlink.xsd");
+						IndoorGMLNameSpaceMapper.NAVIGATION_URI + " http://schemas.opengis.net/indoorgml/1.0/indoorgmlnavi.xsd" +
+						IndoorGMLNameSpaceMapper.XLINK_URI + " https://www.w3.org/XML/2008/06/xlink.xsd");
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
-		marshaller.marshal(new net.opengis.indoorgml.core.v_1_0.ObjectFactory().createIndoorFeatures(indoorFeatures), System.out);
+		marshaller.marshal(new net.opengis.indoorgml.core.v_1_0.ObjectFactory().createIndoorFeatures(indoorFeatures), fout);
 
 
+	}
+
+	private static CellSpaceType createCellspace(String id, String uri) {
+		CellSpaceType cellspace = new CellSpaceType();
+		cellspace.setId(id);
+		ExternalObjectReferenceType extrefobj = new ExternalObjectReferenceType();
+		extrefobj.setUri(uri);
+		ExternalReferenceType extreftyp = new ExternalReferenceType();
+		extreftyp.setExternalObject(extrefobj);
+		List<ExternalReferenceType> extreflist = new ArrayList<ExternalReferenceType>();
+		cellspace.setExternalReference(extreflist);
+		return cellspace;
+	}
+
+	private static StateType createState(String id) {
+		StateType name = new StateType();
+		name.setId(id);
+		return name;
 	}
 
 	private static void setStatepos(StateType state, double x, double y, double z) {
 		PointPropertyType pointProp = new PointPropertyType();
-		
+
 		PointType point = new PointType();
-		
-		
+
+
 		DirectPositionType dirPos = new DirectPositionType();
-		
-	//	dirPos.setValue(Arrays.asList(5.0,5.0,5.0));
-	//	dirPos.setSrsDimension(BigInteger.valueOf(3));
-		
-		
+
+		//	dirPos.setValue(Arrays.asList(5.0,5.0,5.0));
+		//	dirPos.setSrsDimension(BigInteger.valueOf(3));
+
+
 		dirPos.withValue(x,y,z).withSrsDimension(BigInteger.valueOf(3));
-		
+
 		point.setPos(dirPos);
 		pointProp.setPoint(point);
-		
-		
+
+
 		state.setGeometry(pointProp);
 	}
 
 	private static void setMetadata(Geometry g, String metadata, Object value) {
-		
-		// SET METADATA GEOMETRY
-		
-			Map userData = null;
-			
-			if (g.getUserData() != null) {
-		        if (g.getUserData() instanceof Map) {
-		            userData = (Map) g.getUserData();
-		        } else {
-		            userData = new HashMap();
-		            userData.put(g.getUserData().getClass(), g.getUserData());
-		        }
-		    } else {
-		        userData = new HashMap();
-		    }
-			
-			userData.put(metadata, value);
-			g.setUserData(userData);
-		}
-	
 
-	
+		// SET METADATA GEOMETRY
+
+		Map userData = null;
+
+		if (g.getUserData() != null) {
+			if (g.getUserData() instanceof Map) {
+				userData = (Map) g.getUserData();
+			} else {
+				userData = new HashMap();
+				userData.put(g.getUserData().getClass(), g.getUserData());
+			}
+		} else {
+			userData = new HashMap();
+		}
+
+		userData.put(metadata, value);
+		g.setUserData(userData);
+	}
+
+
+
 
 	public static class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {
 		private static final String DEFAULT_URI = "http://www.opengis.net/indoorgml/1.0/core";
@@ -305,25 +288,25 @@ public class IndoorGmlBuilding {
 		}
 
 
-	
+
 	}
 
 
 
 
-public static void old() {
-	/*
+	public static void old() {
+		/*
 	final GeometryFactory geometryFactory = new GeometryFactory();
 	WKTReader3D wkt = new WKTReader3D();
 	IndoorGMLMap map = Container.createDocument("testing");
-	
+
 	edu.pnu.stem.dao.IndoorFeaturesDAO.createIndoorFeatures(map, "if1", "indoorfeatures", "testdata", null,
 			null, "pf1");
-	
+
 
 	edu.pnu.stem.dao.PrimalSpaceFeaturesDAO.createPrimalSpaceFeatures(map, "if1", "pf1", null, null,
 			cellspacemember, cellspaceboundarymember);
-	
+
 	edu.pnu.stem.dao.MultiLayeredGraphDAO.createMultiLayeredGraph(map, "if1", "mlg1", null, null, null, null);
 	edu.pnu.stem.dao.SpaceLayersDAO.createSpaceLayers(map, "mlg1", "slayers1", null, null, null);
 	edu.pnu.stem.dao.SpaceLayerDAO.createSpaceLayer(map, "slayers1", "sl1", null, null, null, null);
@@ -332,7 +315,7 @@ public static void old() {
 	List<String> partialboundedby = new ArrayList<String>();
 	partialboundedby.add("csb1");
 
-	
+
 	// Define the WKT geometry in String.
 	String wktsolid = "SOLID (( ((0 0 0, 0 0 10, 0 10 10, 0 10 0, 0 0 0)), ((0 0 0, 10 0 0, 10 0 10, 0 0 10, 0 0 0)), ((10 10 0, 10 10 10, 10 0 10, 10 0 0, 10 10 0)), ((0 10 0, 0 10 10, 10 10 10, 10 10 0, 0 10 0)),((0 0 0, 0 10 0, 10 10 0, 10 0 0, 0 0 0)), ((0 0 10, 10 0 10, 10 10 10, 0 10 10, 0 0 10)) ))";
 	String wktsolid2 = "SOLID (( ((10 0 0, 20 0 0, 20 0 10, 10 0 10, 10 0 0)),((10 0 0, 10 0 10, 10 5 10, 10 5 0, 10 0 0)), ((10 5 0, 20 5 0, 20 5 10, 10 5 10, 10 5 0)), ((20 5 0, 20 5 10, 20 0 10, 20 0 0, 20 5 0)), ((10 0 0, 10 5 0, 20 5 0, 20 0 0, 10 0 0)), ((10 0 10, 20 0 10, 20 5 10, 10 5 10, 10 0 10)) ))";
@@ -408,6 +391,80 @@ public static void old() {
 
 	edu.pnu.stem.binder.Mashaller.marshalDocument(null, Container.getDocument("testing"));
 
-*/
-}
+		 */
+
+		/*MULTI LAYERED GRAPH AND SPACE LAYERS */
+
+		// how to set parent 
+
+
+
+		//indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeatureProperty);
+
+		/* GEOMETRY */ 
+
+		/*String wktsolid = "SOLID (( ((0 0 0, 0 0 10, 0 10 10, 0 10 0, 0 0 0)), ((0 0 0, 10 0 0, 10 0 10, 0 0 10, 0 0 0)), ((10 10 0, 10 10 10, 10 0 10, 10 0 0, 10 10 0)), ((0 10 0, 0 10 10, 10 10 10, 10 10 0, 0 10 0)),((0 0 0, 0 10 0, 10 10 0, 10 0 0, 0 0 0)), ((0 0 10, 10 0 10, 10 10 10, 0 10 10, 0 0 10)) ))";
+		String wktsolid2 = "SOLID (( ((10 0 0, 20 0 0, 20 0 10, 10 0 10, 10 0 0)),((10 0 0, 10 0 10, 10 5 10, 10 5 0, 10 0 0)), ((10 5 0, 20 5 0, 20 5 10, 10 5 10, 10 5 0)), ((20 5 0, 20 5 10, 20 0 10, 20 0 0, 20 5 0)), ((10 0 0, 10 5 0, 20 5 0, 20 0 0, 10 0 0)), ((10 0 10, 20 0 10, 20 5 10, 10 5 10, 10 0 10)) ))";
+		String wktsolid3 = "SOLID (( ((10 5 0, 20 5 0, 20 5 10, 10 5 10, 10 5 0)), ((10 5 0, 10 5 10, 10 10 10, 10 10 0, 10 5 0)), ((10 10 0, 20 10 0, 20 10 10, 10 10 10, 10 10 0)), ((20 10 0, 20 10 10, 20 5 10, 20 5 0, 20 10 0)), ((10 5 0, 10 10 0, 20 10 0, 20 5 0, 10 5 0)), ((10 5 10, 20 5 10, 20 10 10, 10 10 10, 10 5 10)) ))";
+		String wktsolid4 = "SOLID (( ((0 0 10, 0 0 20, 0 10 20, 0 10 10, 0 0 10)), ((0 0 10, 10 0 10, 10 0 20, 0 0 20, 0 0 10)), ((10 10 10, 10 10 20, 10 0 20, 10 0 10, 10 10 10)), ((0 10 10, 0 10 20, 10 10 20, 10 10 10, 0 10 10)),((0 0 10, 0 10 10, 10 10 10, 10 0 10, 0 0 10)), ((0 0 20, 10 0 20, 10 10 20, 0 10 20, 0 0 20)) ))";
+		String wktsolid5 = "SOLID (( ((10 0 10, 20 0 10, 20 0 20, 10 0 20, 10 0 10)),((10 0 10, 10 0 20, 10 5 20, 10 5 10, 10 0 10)), ((10 5 10, 20 5 10, 20 5 20, 10 5 20, 10 5 10)), ((20 5 10, 20 5 20, 20 0 20, 20 0 10, 20 5 10)), ((10 0 10, 10 5 10, 20 5 10, 20 0 10, 10 0 10)), ((10 0 20, 20 0 20, 20 5 20, 10 5 20, 10 0 20)) ))";
+		String wktsolid6 = "SOLID (( ((10 5 10, 20 5 10, 20 5 20, 10 5 20, 10 5 10)), ((10 5 10, 10 5 20, 10 10 20, 10 10 10, 10 5 10)), ((10 10 10, 20 10 10, 20 10 20, 10 10 20, 10 10 10)), ((20 10 10, 20 10 20, 20 5 20, 20 5 10, 20 10 10)), ((10 5 10, 10 10 10, 20 10 10, 20 5 10, 10 5 10)), ((10 5 20, 20 5 20, 20 10 20, 10 10 20, 10 5 20)) ))";
+
+		 WKTReader wktReader = new WKTReader();
+
+
+		CellSpaceGeometryType cg1 = new CellSpaceGeometryType();
+		cg1.setGeometry3D(null);
+		cg1.s
+				wkt.read(wktsolid);
+		Geometry cg2 = wkt.read(wktsolid2);
+		Geometry cg3 = wkt.read(wktsolid3);
+		Geometry cg4 = wkt.read(wktsolid4);
+		Geometry cg5 = wkt.read(wktsolid5);
+		Geometry cg6 = wkt.read(wktsolid6);*/
+
+
+
+
+
+		/*	double x =5.0;
+		double y =5.0;
+		double z = 5.0;
+		StateType state = new StateType();
+		state.setId("s1");*/
+
+
+
+
+
+
+		/*String point1 = "POINT (5 5 5)";
+		String point2 = "POINT (5 5 15)";
+		String point3 = "POINT (15 2.5 5)";
+		String point4 = "POINT (15 2.5 15)";
+		String point5 = "POINT (15 7.5 5)";
+		String point6 = "POINT (15 7.5 15)";
+
+		 Geometry sg1 = wkt.read(point1);
+		 Geometry sg2 = wkt.read(point2);
+		 Geometry sg3 = wkt.read(point3);
+		 Geometry sg4 = wkt.read(point4);
+		 Geometry sg5 = wkt.read(point5);
+		 Geometry sg6 = wkt.read(point6);
+
+			setMetadata(cg1, "id", "cg1");
+			setMetadata(cg2, "id", "cg2");
+			setMetadata(cg3, "id", "cg3");
+			setMetadata(cg4, "id", "cg4");
+			setMetadata(cg5, "id", "cg5");
+			setMetadata(cg6, "id", "cg6");
+
+
+			setMetadata(sg1, "id", "sg1");
+			setMetadata(sg2, "id", "sg2");
+			setMetadata(sg3, "id", "sg3");
+			setMetadata(sg4, "id", "sg4");
+			setMetadata(sg5, "id", "sg5");
+			setMetadata(sg6, "id", "sg6");*/
+	}
 }
