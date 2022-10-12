@@ -2,6 +2,7 @@ package org.opensourcebim.levelout.samples;
 
 import net.opengis.indoorgml.core.v_1_0.CellSpaceGeometryType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
+import net.opengis.indoorgml.core.v_1_0.CellSpacePropertyType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
@@ -10,9 +11,11 @@ import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
+import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
+import net.opengis.indoorgml.core.v_1_0.ObjectFactory;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
@@ -53,7 +56,7 @@ import java.util.Map;
 public class IndoorGmlBuilding {
 	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
 
-		String fileName = "output/outindoor3.gml";
+		String fileName = "output/outindoor5.gml";
 		FileOutputStream fout = new FileOutputStream(fileName);
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
 		indoorFeatures.setId("if1");
@@ -102,25 +105,7 @@ public class IndoorGmlBuilding {
 		spaceLayer.setNodes(nodesList);
 
 
-		List<CellSpaceMemberType> cellspacemember = new ArrayList<CellSpaceMemberType>();
-		CellSpaceMemberType c1 = new CellSpaceMemberType();
-		cellspacemember.add(c1);	
-		//c1.setCellSpace(cs1);
-		CellSpaceMemberType c2 = new CellSpaceMemberType();
-		cellspacemember.add(c2);
-		CellSpaceMemberType c3 = new CellSpaceMemberType();
-		cellspacemember.add(c3);
-		CellSpaceMemberType c4 = new CellSpaceMemberType();
-		cellspacemember.add(c4);
-		CellSpaceMemberType c5 = new CellSpaceMemberType();
-		cellspacemember.add(c5);
-		CellSpaceMemberType c6 = new CellSpaceMemberType();
-		cellspacemember.add(c6);
 		
-
-
-		primalSpaceFeature.setCellSpaceMember(cellspacemember);
-
 		
 
 		/* PRIMAL SPACE FEATURES*/
@@ -142,6 +127,19 @@ public class IndoorGmlBuilding {
 		CellSpaceType cs5 = createCellspace("c5",null);
 		CellSpaceType cs6 = createCellspace("c6",null);
 		
+		List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
+		createCellspaceMember(cs1,cellspacemembers);
+		createCellspaceMember(cs2,cellspacemembers);
+		createCellspaceMember(cs3,cellspacemembers);
+		createCellspaceMember(cs4,cellspacemembers);
+		createCellspaceMember(cs5,cellspacemembers);
+		createCellspaceMember(cs6,cellspacemembers);
+		
+		
+		
+
+
+		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
 
 	
 		//State 
@@ -153,8 +151,7 @@ public class IndoorGmlBuilding {
 		StateType st5 = createState("s5");
 		StateType st6 = createState("s6");
 
-
-
+				
 		setStatepos(st1, 5.0, 5.0, 5.0);
 		setStatepos(st2,5.0,5.0,15.0);
 		setStatepos(st3,15.0,2.5,5.0);
@@ -163,28 +160,35 @@ public class IndoorGmlBuilding {
 		setStatepos(st6,15.0,7.5,15.0);
 
 		List<StateMemberType> states = new ArrayList<StateMemberType>();
-		StateMemberType s1 = new StateMemberType();
-		states.add(s1);
-		s1.setState(st1);
-		StateMemberType s2 = new StateMemberType();
-		states.add(s2);
-		s2.setState(st2);
-		StateMemberType s3 = new StateMemberType();
-		states.add(s3);
-		s3.setState(st3);
-		StateMemberType s4 = new StateMemberType();
-		states.add(s4);
-		s4.setState(st4);
-		StateMemberType s5 = new StateMemberType();
-		states.add(s5);
-		s5.setState(st5);
-		StateMemberType s6 = new StateMemberType();
-		states.add(s6);
-		s6.setState(st6);
+		createStateMember(st1, states);
+		createStateMember(st2, states);
+		createStateMember(st3, states);
+		createStateMember(st4, states);
+		createStateMember(st5, states);
+		createStateMember(st6, states);
+		
+		// set duality - cellspace
 
-
+		setDualitycellspace(cs1, st1);
+		setDualitycellspace(cs2, st2);
+		setDualitycellspace(cs3, st3);
+		setDualitycellspace(cs4, st4);
+		setDualitycellspace(cs5, st5);
+		setDualitycellspace(cs6, st6);
+		
+		// set duality - state
+		
+		/*setdualityState(cs1, st1);
+		setdualityState(cs2, st2);
+		setdualityState(cs3, st3);
+		setdualityState(cs4, st4);
+		setdualityState(cs5, st5);
+		setdualityState(cs6, st6);*/
+		
 		nodes.setStateMember(states);
 
+		
+		
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
@@ -197,6 +201,32 @@ public class IndoorGmlBuilding {
 		marshaller.marshal(new net.opengis.indoorgml.core.v_1_0.ObjectFactory().createIndoorFeatures(indoorFeatures), fout);
 
 
+	}
+
+	private static void setdualityState(CellSpaceType cellspace, StateType state) {
+		CellSpacePropertyType cellspaceProp = new CellSpacePropertyType();
+		ObjectFactory objectFactory2 = new ObjectFactory();
+		cellspaceProp.setCellSpace(objectFactory2.createCellSpace(cellspace));
+		state.setDuality(cellspaceProp);
+	}
+
+	private static void setDualitycellspace(CellSpaceType cellspace, StateType state) {
+		StatePropertyType stateProp = new StatePropertyType();
+		stateProp.setState(state);
+		cellspace.setDuality(stateProp);
+	}
+
+	private static void createCellspaceMember(CellSpaceType cellspace, List<CellSpaceMemberType> cellspacemembers) {
+		ObjectFactory objectFactory = new ObjectFactory();
+		CellSpaceMemberType cellspacemember1 = new CellSpaceMemberType();
+		cellspacemembers.add(cellspacemember1);	
+		cellspacemember1.setCellSpace(objectFactory.createCellSpace(cellspace));
+	}
+
+	private static void createStateMember(StateType state, List<StateMemberType> states) {
+		StateMemberType statemember1 = new StateMemberType();
+		states.add(statemember1);
+		statemember1.setState(state);
 	}
 
 	private static CellSpaceType createCellspace(String id, String uri) {
@@ -436,7 +466,16 @@ public class IndoorGmlBuilding {
 
 
 
-
+		/*CellSpaceMemberType c2 = new CellSpaceMemberType();
+		cellspacemember.add(c2);
+		CellSpaceMemberType c3 = new CellSpaceMemberType();
+		cellspacemember.add(c3);
+		CellSpaceMemberType c4 = new CellSpaceMemberType();
+		cellspacemember.add(c4);
+		CellSpaceMemberType c5 = new CellSpaceMemberType();
+		cellspacemember.add(c5);
+		CellSpaceMemberType c6 = new CellSpaceMemberType();
+		cellspacemember.add(c6);*/
 
 		/*String point1 = "POINT (5 5 5)";
 		String point2 = "POINT (5 5 15)";
