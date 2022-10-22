@@ -178,12 +178,12 @@ public class IndoorGmlBuilding {
 		
 		// set duality - state
 		
-		/*setdualityState(cs1, st1);
+		setdualityState(cs1, st1);
 		setdualityState(cs2, st2);
 		setdualityState(cs3, st3);
 		setdualityState(cs4, st4);
 		setdualityState(cs5, st5);
-		setdualityState(cs6, st6);*/
+		setdualityState(cs6, st6);
 		
 		nodes.setStateMember(states);
 
@@ -205,14 +205,13 @@ public class IndoorGmlBuilding {
 
 	private static void setdualityState(CellSpaceType cellspace, StateType state) {
 		CellSpacePropertyType cellspaceProp = new CellSpacePropertyType();
-		ObjectFactory objectFactory2 = new ObjectFactory();
-		cellspaceProp.setCellSpace(objectFactory2.createCellSpace(cellspace));
+		cellspaceProp.setHref("#"+cellspace.getId());
 		state.setDuality(cellspaceProp);
 	}
 
 	private static void setDualitycellspace(CellSpaceType cellspace, StateType state) {
 		StatePropertyType stateProp = new StatePropertyType();
-		stateProp.setState(state);
+		stateProp.setHref("#"+state.getId());
 		cellspace.setDuality(stateProp);
 	}
 
