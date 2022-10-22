@@ -54,6 +54,9 @@ import java.util.List;
 import java.util.Map;
 
 public class IndoorGmlBuilding {
+	
+	private static ObjectFactory objectFactory = new ObjectFactory();
+	
 	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
 
 		String fileName = "output/outindoor5.gml";
@@ -101,7 +104,6 @@ public class IndoorGmlBuilding {
 		multiLayeredGraph.setSpaceLayers(spaceLayerslist);
 		
 		spaceLayers.setSpaceLayerMember(spaceLayermemberlist);
-		
 		spaceLayer.setNodes(nodesList);
 
 
@@ -198,7 +200,7 @@ public class IndoorGmlBuilding {
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
-		marshaller.marshal(new net.opengis.indoorgml.core.v_1_0.ObjectFactory().createIndoorFeatures(indoorFeatures), fout);
+		marshaller.marshal(objectFactory.createIndoorFeatures(indoorFeatures), fout);
 
 
 	}
@@ -216,7 +218,6 @@ public class IndoorGmlBuilding {
 	}
 
 	private static void createCellspaceMember(CellSpaceType cellspace, List<CellSpaceMemberType> cellspacemembers) {
-		ObjectFactory objectFactory = new ObjectFactory();
 		CellSpaceMemberType cellspacemember1 = new CellSpaceMemberType();
 		cellspacemembers.add(cellspacemember1);	
 		cellspacemember1.setCellSpace(objectFactory.createCellSpace(cellspace));
