@@ -26,17 +26,17 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
-public class CitygmlBuilding {
+public class newClass {
 
 	private IdCreator id;
 	private GeometryFactory geom;
 
 	public static void main(String[] args) throws Exception {
-		new CitygmlBuilding().doMain();
+		new newClass().doMain();
 	}
 
 	public void doMain() throws Exception {
-		String fileName = "output/out10.gml";
+		String fileName = "output/out250.gml";
 		
 		CityGMLContext context = CityGMLContext.newInstance();
 
@@ -155,11 +155,12 @@ public class CitygmlBuilding {
 	}
 	
 	
-	public double[] createDouble() {
-		double[] doubleList = new double[12];
+	public ArrayList<Double> createDouble() {
+		ArrayList<Double> doubleList=new ArrayList<Double>();  
+		//double[] doubleList = new double[12];
 		Scanner sc2 = new Scanner(System.in);
 		for(int i = 0; i < 12; i++) {
-		   doubleList[i] = sc2.nextDouble();
+		   doubleList.add(i, sc2.nextDouble());
 		}
 		
 		return doubleList;
@@ -188,10 +189,10 @@ public class CitygmlBuilding {
 
 	}
 	
-	private Polygon createPoly(double[] coordinates, int dimension) {
+	private Polygon createPoly(ArrayList<Double> arrayList, int dimension) {
 		//System.out.println("Input the dimensions of the Polygon ");
 		
-		return geom.createPolygon(coordinates, dimension);
+		return geom.createPolygon(arrayList, dimension);
 	}
 	
 	

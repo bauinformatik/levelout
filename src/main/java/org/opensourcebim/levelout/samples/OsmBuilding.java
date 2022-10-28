@@ -36,18 +36,7 @@ public class OsmBuilding {
 		OutputStream output = new FileOutputStream(fileName);
 		OsmOutputStream osmOutput = new OsmXmlOutputStream(output, true);	
 
-		for  (int i=0;i<num;i++)
-		{
-			System.out.println("Enter the node details in the following order : id, longitude, latitude");
-
-			long id = sc.nextLong();
-			double lon = sc.nextDouble();
-			double lat = sc.nextDouble();
-
-			OsmNode n1 = createOsmnode(id, lon,lat);
-			osmOutput.write(n1);
-
-		}
+		setNodedetails(sc, num, osmOutput);
 
 		Map<String, List<OsmTag>> alltags = createTags();
 
@@ -55,13 +44,24 @@ public class OsmBuilding {
 
 
 
+		setWaydetails(sc, osmOutput, alltags);
+
+		osmOutput.complete();
+
+
+	}
+
+
+
+	private static void setWaydetails(Scanner sc, OsmOutputStream osmOutput, Map<String, List<OsmTag>> alltags)
+			throws IOException {
 		System.out.println("Enter the number of ways of the way list");
 
 		int waynum = sc.nextInt();
 		List<long[]> wayList = new ArrayList<long[]>();
 		for (int j=0;j<waynum;j++)
 		{
-			System.out.println("Enter the lsit of node id's constituting the ways");
+			System.out.println("Enter the list of node id's constituting the ways");
 			long[] nodelis = nodeList();
 			System.out.println(nodelis);
 			wayList.add(nodelis);
@@ -80,7 +80,7 @@ public class OsmBuilding {
 				{
 					System.out.println(e);
 				}
-				System.out.println("craeting ways");
+				System.out.println("creating ways");
 				OsmWay w1 = createosmWay(wayid,nodelis,osmtags);
 				System.out.println(w1);
 				System.out.println("writing ways");
@@ -89,10 +89,23 @@ public class OsmBuilding {
 			}
 
 		}
+	}
 
-		osmOutput.complete();
 
 
+	private static void setNodedetails(Scanner sc, int num, OsmOutputStream osmOutput) throws IOException {
+		for  (int i=0;i<num;i++)
+		{
+			System.out.println("Enter the node details in the following order : id, longitude, latitude");
+
+			long id = sc.nextLong();
+			double lon = sc.nextDouble();
+			double lat = sc.nextDouble();
+
+			OsmNode n1 = createOsmnode(id, lon,lat);
+			osmOutput.write(n1);
+
+		}
 	}
 
 
@@ -149,7 +162,7 @@ public class OsmBuilding {
 
 		List <OsmWay> wayList = new ArrayList<OsmWay>();
 		OsmWay ways = new Way(id, TLongArrayList.wrap(nodes), tags);
-
+		long[] nodeList = new long[5];
 		wayList.add(ways);
 		return ways;
 
