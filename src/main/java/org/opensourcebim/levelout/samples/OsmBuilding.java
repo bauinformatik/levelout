@@ -162,7 +162,7 @@ public class OsmBuilding {
 
 		List <OsmWay> wayList = new ArrayList<OsmWay>();
 		OsmWay ways = new Way(id, TLongArrayList.wrap(nodes), tags);
-		long[] nodeList = new long[5];
+		//long[] nodeList = new long[5];
 		wayList.add(ways);
 		return ways;
 

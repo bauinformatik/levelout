@@ -165,7 +165,7 @@ public class CitygmlBuilding {
 		return doubleList;
 	}
 	
-	public AbstractSpaceBoundaryProperty createBoundary(String name,  Polygon polygons) {
+	public  AbstractSpaceBoundaryProperty createBoundary(String name,  Polygon polygons) {
 		
 		AbstractSpaceBoundaryProperty bsp = null;
 	if (name.contains("ground"))

@@ -205,31 +205,31 @@ public class IndoorGmlBuilding {
 
 	}
 
-	private static void setdualityState(CellSpaceType cellspace, StateType state) {
+	public static void setdualityState(CellSpaceType cellspace, StateType state) {
 		CellSpacePropertyType cellspaceProp = new CellSpacePropertyType();
 		cellspaceProp.setHref("#"+cellspace.getId());
 		state.setDuality(cellspaceProp);
 	}
 
-	private static void setDualitycellspace(CellSpaceType cellspace, StateType state) {
+	public static void setDualitycellspace(CellSpaceType cellspace, StateType state) {
 		StatePropertyType stateProp = new StatePropertyType();
 		stateProp.setHref("#"+state.getId());
 		cellspace.setDuality(stateProp);
 	}
 
-	private static void createCellspaceMember(CellSpaceType cellspace, List<CellSpaceMemberType> cellspacemembers) {
+	public static void createCellspaceMember(CellSpaceType cellspace, List<CellSpaceMemberType> cellspacemembers) {
 		CellSpaceMemberType cellspacemember1 = new CellSpaceMemberType();
 		cellspacemembers.add(cellspacemember1);	
 		cellspacemember1.setCellSpace(objectFactory.createCellSpace(cellspace));
 	}
 
-	private static void createStateMember(StateType state, List<StateMemberType> states) {
+	public static void createStateMember(StateType state, List<StateMemberType> states) {
 		StateMemberType statemember1 = new StateMemberType();
 		states.add(statemember1);
 		statemember1.setState(state);
 	}
 
-	private static CellSpaceType createCellspace(String id, String uri) {
+	public static CellSpaceType createCellspace(String id, String uri) {
 		CellSpaceType cellspace = new CellSpaceType();
 		cellspace.setId(id);
 		ExternalObjectReferenceType extrefobj = new ExternalObjectReferenceType();
@@ -241,13 +241,13 @@ public class IndoorGmlBuilding {
 		return cellspace;
 	}
 
-	private static StateType createState(String id) {
+	public static StateType createState(String id) {
 		StateType name = new StateType();
 		name.setId(id);
 		return name;
 	}
 
-	private static void setStatepos(StateType state, double x, double y, double z) {
+	public static void setStatepos(StateType state, double x, double y, double z) {
 		PointPropertyType pointProp = new PointPropertyType();
 
 		PointType point = new PointType();
@@ -268,7 +268,7 @@ public class IndoorGmlBuilding {
 		state.setGeometry(pointProp);
 	}
 
-	private static void setMetadata(Geometry g, String metadata, Object value) {
+	public static void setMetadata(Geometry g, String metadata, Object value) {
 
 		// SET METADATA GEOMETRY
 
