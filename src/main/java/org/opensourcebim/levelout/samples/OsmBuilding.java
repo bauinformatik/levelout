@@ -26,7 +26,7 @@ public class OsmBuilding {
 
 	public static void main(String[] args) throws IOException {
 
-		String fileName = "output/osmoutput4.osm";
+		String fileName = "output/osmoutput7.osm";
 		Scanner sc = new Scanner (System.in);
 
 
@@ -69,7 +69,7 @@ public class OsmBuilding {
 			System.out.println("Enter way id ");
 			long wayid = sc.nextLong();
 			sc.nextLine();
-			System.out.println("Enter the name of the tag");
+			/*System.out.println("Enter the name of the tag");
 			String tagname = sc.nextLine();
 
 			if(alltags.containsKey(tagname))
@@ -80,13 +80,13 @@ public class OsmBuilding {
 				{
 					System.out.println(e);
 				}
-				System.out.println("creating ways");
-				OsmWay w1 = createosmWay(wayid,nodelis,osmtags);
+				System.out.println("creating ways");*/
+				OsmWay w1 = createosmWay(wayid,nodelis);
 				System.out.println(w1);
 				System.out.println("writing ways");
 
 				osmOutput.write(w1);
-			}
+			//}
 
 		}
 	}
@@ -103,7 +103,7 @@ public class OsmBuilding {
 			double lat = sc.nextDouble();
 
 			OsmNode n1 = createOsmnode(id, lon,lat);
-			osmOutput.write(n1);
+			//osmOutput.write(n1);
 
 		}
 	}
@@ -158,10 +158,10 @@ public class OsmBuilding {
 
 	}
 
-	public static OsmWay createosmWay(long id, long[] nodes, List<? extends OsmTag> tags) throws IOException {
+	public static OsmWay createosmWay(long id, long[] nodes) throws IOException {
 
 		List <OsmWay> wayList = new ArrayList<OsmWay>();
-		OsmWay ways = new Way(id, TLongArrayList.wrap(nodes), tags);
+		OsmWay ways = new Way(id, TLongArrayList.wrap(nodes));
 		//long[] nodeList = new long[5];
 		wayList.add(ways);
 		return ways;

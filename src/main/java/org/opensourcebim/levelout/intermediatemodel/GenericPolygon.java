@@ -1,5 +1,9 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +23,11 @@ import org.xmlobjects.gml.util.id.IdCreator;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 
+import de.topobyte.osm4j.core.access.OsmOutputStream;
+import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Way;
+import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import net.opengis.gml.v_3_2_1.DirectPositionType;
 import net.opengis.gml.v_3_2_1.PointPropertyType;
 import net.opengis.gml.v_3_2_1.PointType;
@@ -58,22 +65,39 @@ public class GenericPolygon {
 		// TODO Auto-generated constructor stub
 	}
 
-	public OsmWay createosmWay()
+	public OsmWay createosmWay() throws IOException
 	{
-		long id = getId()*-1;
+		GenericBuilding gb = new GenericBuilding();
+		String fileName = gb.fileName2;
+	OutputStream output2 = new FileOutputStream(fileName);
+	OsmOutputStream osmOutput = new OsmXmlOutputStream(output2, true);
+	
+		long idosm = (long)id*-1;
 		long[] nodes =  new long[5];
-		for (int i=0;i<5;i++)
+		for (int i=0;i<4;i++)
 		{
-			nodeList.get(i).createOsmnode();
-			nodes[i]= (long) nodeList.get(i).getId(); // assuming we pass 5 coordinates for a polygon
+			OsmNode node = nodeList.get(i).createOsmnode();
+			osmOutput.write(node);
+			//System.out.println(node.getId());
+			nodes[i]= node.getId(); // assuming we pass 5 coordinates for a polygon
+			//System.out.printf("Executed");
 		}
+		System.out.println(nodes[0]);
+		Array.set(nodes, 4, nodes[0]);
+		
+		for (long a : nodes)
+		System.out.println(a);
 		
 		
 	//	List <OsmWay> wayList = new ArrayList<OsmWay>();
-		OsmWay ways = new Way(id, TLongArrayList.wrap(nodes));//, tags); // how to create and set tags , the name of the polygon is just one part of the tag 
-		long[] nodeList = new long[5];
+		OsmWay ways = new Way(idosm, TLongArrayList.wrap(nodes));//, tags); // how to create and set tags , the name of the polygon is just one part of the tag 
+	//	long[] nodeList = new long[5];
 	//	wayList.add(ways);
+		System.out.println(ways);
+		osmOutput.write(ways);
+		osmOutput.complete();
 		return ways;
+		
 	}
 	
 	

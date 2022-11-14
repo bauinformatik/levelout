@@ -22,6 +22,7 @@ import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
+import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
 public class GenericBuilding {
@@ -29,6 +30,10 @@ public class GenericBuilding {
 	 
 	
 	 static FootPrint fp;
+	 String fileName2 = "output/osmoutputnew.osm";
+	
+	 
+		OsmOutputStream osmOutput;
 	//static GenericNode gn;
 	//static GenericPolygon pn;
 		
@@ -37,12 +42,18 @@ public class GenericBuilding {
 		this.fp = fp;
 	}
 	
+
+	public GenericBuilding() {
+		// TODO Auto-generated constructor stub
+	}
+
+
 	public static void main(String[] args) throws Exception {
 		new GenericBuilding(fp).createCitygmlBuilding();
 	}
 	public void createCitygmlBuilding()  throws Exception {
 	
-		String fileName = "output/out11.gml";
+		String fileName = "output/out12.gml";
 		CityGMLContext context = CityGMLContext.newInstance();
 		Building b = fp.setLodgeom();
 		Envelope envelope = b.computeEnvelope();
@@ -65,15 +76,23 @@ public class GenericBuilding {
 		}
 	}
 	
-	/*public void createOsmBuilding() throws IOException
+	
+	public  void createOsmBuilding() throws IOException
 	{
-		String fileName = "output/osmoutput4.osm";
-		OutputStream output = new FileOutputStream(fileName);
-		OsmOutputStream osmOutput = new OsmXmlOutputStream(output, true);
-		osmOutput.write(gn.createOsmnode());
-		osmOutput.write(pn.createosmWay());
+		
+		
+		System.out.println("written");
+		for (int i=0;i<fp.getPolygonList().size();i++)
+		{
+		OsmWay way = fp.getPolygonList().get(i).createosmWay();
+		}
+		
+		//osmOutput.write(way); // do we need to write both ways and nodes?
+		//osmOutput.write(pn.createosmWay());
 
 	}
+	
+	/*
 	
 	public void createIndoorgmlBuilding() throws FileNotFoundException
 	{

@@ -1,6 +1,7 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,8 @@ public class FootPrint {
 
 	public Building setLodgeom()
 	{
-		GenericPolygon gp = new GenericPolygon();
-		CitygmlBuilding cg = new CitygmlBuilding();
+		GenericPolygon gp = new GenericPolygon(); // is calling a default constructor ok?
+		//CitygmlBuilding cg = new CitygmlBuilding();
 		Building building = new Building();
 		List<Polygon> listOfpolyValues = new ArrayList<>(); 
 		for (int i =0;i<polygonList.size();i++)
@@ -71,7 +72,7 @@ public class FootPrint {
 
 	
 	
-	public void writeTagswaysOsm() {
+	public void writeTagswaysOsm() throws IOException{
 
 		OsmBuilding os = new OsmBuilding();
 		for (int i =0;i<polygonList.size();i++)
