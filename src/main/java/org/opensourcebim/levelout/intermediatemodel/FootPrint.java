@@ -33,6 +33,7 @@ public class FootPrint {
 	private int level;
 	private int id;
 	private List<GenericPolygon> polygonList;
+	//private GenericPolygon gp;
 
 	public FootPrint(int level, int id, List<GenericPolygon> polygonList) {
 		super();
@@ -47,7 +48,7 @@ public class FootPrint {
 
 	public Building setLodgeom()
 	{
-		
+		GenericPolygon gp = new GenericPolygon();
 		CitygmlBuilding cg = new CitygmlBuilding();
 		Building building = new Building();
 		List<Polygon> listOfpolyValues = new ArrayList<>(); 
@@ -55,7 +56,7 @@ public class FootPrint {
 		{
 			Polygon poly = polygonList.get(i).createCitygmlPoly(); // to use for shell
 			listOfpolyValues.add(poly);
-			building.addBoundary(cg.createBoundary(polygonList.get(i).getName(), poly));  
+			building.addBoundary(gp.createBoundary(polygonList.get(i).getName(), poly));  
 		}
 		Shell shell = new Shell();
 		for (int j=0;j<listOfpolyValues.size();j++)
@@ -68,6 +69,8 @@ public class FootPrint {
 		return building;
 	}
 
+	
+	
 	public void writeTagswaysOsm() {
 
 		OsmBuilding os = new OsmBuilding();

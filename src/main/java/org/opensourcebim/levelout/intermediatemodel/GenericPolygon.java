@@ -4,8 +4,15 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.citygml4j.core.model.construction.CeilingSurface;
+import org.citygml4j.core.model.construction.GroundSurface;
+import org.citygml4j.core.model.construction.RoofSurface;
+import org.citygml4j.core.model.construction.WallSurface;
+import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
+import org.citygml4j.core.model.core.AbstractThematicSurface;
 import org.citygml4j.core.util.geometry.GeometryFactory;
 import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
+import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
@@ -30,8 +37,8 @@ public class GenericPolygon {
 	private int dimension;
 	private List<GenericNode> nodeList;
 	//private GenericNode gn;  
-	private IdCreator id2;
-	private GeometryFactory geom;
+	private IdCreator id2 = DefaultIdCreator.getInstance(); 
+	private GeometryFactory geom = GeometryFactory.newInstance().withIdCreator(id2); ;
 	public GenericPolygon(int id, String name, int dimension, List<GenericNode> nodeList) {
 		super();
 		this.id = id;
@@ -47,6 +54,10 @@ public class GenericPolygon {
 		this.nodeList = nodeList;
 	}*/
 	
+	public GenericPolygon() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public OsmWay createosmWay()
 	{
 		long id = getId()*-1;
@@ -68,8 +79,8 @@ public class GenericPolygon {
 	
 public Polygon createCitygmlPoly()
 {
-	id2 = DefaultIdCreator.getInstance(); // citygml id generator 
-	geom = GeometryFactory.newInstance().withIdCreator(id2);
+	//id2 = DefaultIdCreator.getInstance(); // citygml id generator 
+	//geom = GeometryFactory.newInstance().withIdCreator(id2);
 
 	
 	List<Double> doubleList2 = new ArrayList<Double>();
@@ -81,6 +92,37 @@ public Polygon createCitygmlPoly()
 	return p;
 
 	
+}
+
+
+private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
+		Polygon... polygons) {
+	thematicSurface.setId(id2.createId());
+	thematicSurface.setLod2MultiSurface(new MultiSurfaceProperty(geom.createMultiSurface(polygons)));
+	return new AbstractSpaceBoundaryProperty(thematicSurface);
+}
+
+public  AbstractSpaceBoundaryProperty createBoundary(String name,  Polygon polygons) {
+	
+	AbstractSpaceBoundaryProperty bsp = null;
+if (name.contains("ground"))
+{
+	bsp = processBoundarySurface(new GroundSurface(), polygons);
+}
+else if (name.contains("wall"))
+{
+	bsp=  processBoundarySurface(new WallSurface(), polygons);
+}
+else if (name.contains("roof"))
+{
+	bsp= processBoundarySurface(new RoofSurface(), polygons);
+}
+else if (name.contains("ceiling"))
+{
+	bsp= processBoundarySurface(new CeilingSurface(), polygons);
+}
+return bsp;
+
 }
 
 public void createIndoorgmlCellspace()

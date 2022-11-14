@@ -39,10 +39,11 @@ public class GenericNode {
 	
 	public List<Double> createCitygmlnode()
 	{
+		
 		List<Double> doubleList = new ArrayList<Double>();
-		doubleList.add( (double)x);
-		doubleList.add( (double)y);
-		doubleList.add( (double)z);
+		doubleList.add(x.doubleValue());                                        // Number cannot be cast to a primitive, use Number.doubleValue()
+		doubleList.add(y.doubleValue());
+		doubleList.add(z.doubleValue());
 		return doubleList;
 		
 	}

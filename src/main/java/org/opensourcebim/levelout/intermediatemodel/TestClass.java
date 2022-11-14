@@ -22,6 +22,7 @@ public class TestClass {
 		GenericPolygon gp = new GenericPolygon(1, "ground", 3, genericnodesList);
 		
 		List <GenericPolygon> genericPolygonList = new ArrayList<GenericPolygon>();
+		genericPolygonList.add(gp);
 		
 		FootPrint fp = new FootPrint(1, 1, genericPolygonList);
 		

@@ -28,7 +28,7 @@ public class GenericBuilding {
 
 	 
 	
-	static FootPrint fp;
+	 static FootPrint fp;
 	//static GenericNode gn;
 	//static GenericPolygon pn;
 		
@@ -42,7 +42,7 @@ public class GenericBuilding {
 	}
 	public void createCitygmlBuilding()  throws Exception {
 	
-		String fileName = "output/out10gbldg.gml";
+		String fileName = "output/out11.gml";
 		CityGMLContext context = CityGMLContext.newInstance();
 		Building b = fp.setLodgeom();
 		Envelope envelope = b.computeEnvelope();
