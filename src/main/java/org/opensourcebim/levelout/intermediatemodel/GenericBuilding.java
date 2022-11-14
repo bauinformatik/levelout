@@ -26,16 +26,23 @@ import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
 public class GenericBuilding {
 
-	FootPrint fp;
-	GenericNode gn;
-	GenericPolygon pn;
+	 
+	
+	static FootPrint fp;
+	//static GenericNode gn;
+	//static GenericPolygon pn;
+		
+	public GenericBuilding(FootPrint fp) {
+		super();
+		this.fp = fp;
+	}
 	
 	public static void main(String[] args) throws Exception {
-		new GenericBuilding().createCitygmlBuilding();
+		new GenericBuilding(fp).createCitygmlBuilding();
 	}
 	public void createCitygmlBuilding()  throws Exception {
 	
-		String fileName = "output/out10.gml";
+		String fileName = "output/out10gbldg.gml";
 		CityGMLContext context = CityGMLContext.newInstance();
 		Building b = fp.setLodgeom();
 		Envelope envelope = b.computeEnvelope();
@@ -58,7 +65,7 @@ public class GenericBuilding {
 		}
 	}
 	
-	public void createOsmBuilding() throws IOException
+	/*public void createOsmBuilding() throws IOException
 	{
 		String fileName = "output/osmoutput4.osm";
 		OutputStream output = new FileOutputStream(fileName);
@@ -72,5 +79,5 @@ public class GenericBuilding {
 	{
 		String fileName = "output/outindoor5.gml";
 		FileOutputStream fout = new FileOutputStream(fileName);
-	}
+	}*/
 }
