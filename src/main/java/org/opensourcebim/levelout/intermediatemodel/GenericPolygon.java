@@ -184,10 +184,12 @@ public StateType setStatePos()
 	double miny = nodeList.get(0).getY().doubleValue();
 	double minz = nodeList.get(0).getZ().doubleValue();
 	
-	
 	double maxx = nodeList.get(0).getX().doubleValue();
 	double maxy = nodeList.get(0).getY().doubleValue();
 	double maxz = nodeList.get(0).getZ().doubleValue();
+	
+	
+	// check formula for state calculation 
 	
 	PointPropertyType pointProp = new PointPropertyType();
 	 PointType point = new PointType();
@@ -198,35 +200,39 @@ public StateType setStatePos()
 	
 	for (int i =0;i<3;i++)
 		{
-		if (nodeList.get(i).getX().doubleValue()<= minx)
+		if (nodeList.get(i).getX().doubleValue()< minx)
 		{
 			minx= nodeList.get(i).getX().doubleValue();
+			System.out.println(minx);
 		}
-		else if (nodeList.get(i).getX().doubleValue()>= maxx)
+		else if (nodeList.get(i).getX().doubleValue()> maxx)
 		{
 			maxx= nodeList.get(i).getX().doubleValue();
 		}
-		if (nodeList.get(i).getY().doubleValue()<= miny)
+		if (nodeList.get(i).getY().doubleValue()<miny)
 		{
-			minx= nodeList.get(i).getY().doubleValue();
+			miny= nodeList.get(i).getY().doubleValue();
 		}
-		else if (nodeList.get(i).getY().doubleValue()>= maxy)
+		else if (nodeList.get(i).getY().doubleValue()> maxy)
 		{
-			maxx= nodeList.get(i).getY().doubleValue();
+			maxy= nodeList.get(i).getY().doubleValue();
 		}
-		if (nodeList.get(i).getZ().doubleValue()<= minz)
+		if (nodeList.get(i).getZ().doubleValue()< minz)
 		{
-			minx= nodeList.get(i).getZ().doubleValue();
+			minz= nodeList.get(i).getZ().doubleValue();
 		}
-		else if (nodeList.get(i).getZ().doubleValue()>= maxz)
+		else if (nodeList.get(i).getZ().doubleValue()> maxz)
 		{
-			maxx=nodeList.get(i).getZ().doubleValue();
+			maxz=nodeList.get(i).getZ().doubleValue();
 		}
 				
 		}
+	
 		double centroidx = (minx+maxx)/2;
 		double centroidy = (miny+maxy)/2;
 		double centroidz = (minz+maxz)/2;
+		
+		
 	
 	 dirPos.withValue(centroidx,centroidy,centroidz).withSrsDimension(BigInteger.valueOf(3));
 
