@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.citygml4j.core.model.building.Building;
 import org.opensourcebim.levelout.samples.CitygmlBuilding;
+import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
 import org.opensourcebim.levelout.samples.OsmBuilding;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.model.geometry.primitives.Shell;
@@ -19,6 +20,8 @@ import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
+import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
+import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
@@ -28,6 +31,8 @@ import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
+import net.opengis.indoorgml.core.v_1_0.StateMemberType;
+import net.opengis.indoorgml.core.v_1_0.StateType;
 
 public class FootPrint {
 
@@ -81,25 +86,27 @@ public class FootPrint {
 		}
 	}
 	
-	public void setIndoorFeatures()
+	public IndoorFeaturesType setIndoorFeatures()
 	{
+		IndoorGmlBuilding inb = new IndoorGmlBuilding();
+		
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
-		indoorFeatures.setId("if1");
+		indoorFeatures.setId("if"+ String.valueOf(id));
 
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
-		primalSpaceFeature.setId("pf1");
+		primalSpaceFeature.setId("pf"+ String.valueOf(id));
 
 
 		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg1");
+		multiLayeredGraph.setId("mlg"+ String.valueOf(id));
 
 		SpaceLayersType spaceLayers = new SpaceLayersType();
-		spaceLayers.setId("slayers1");
+		spaceLayers.setId("slayers"+ String.valueOf(id));
 		List<SpaceLayersType> spaceLayerslist = new ArrayList<SpaceLayersType>();
 		spaceLayerslist.add(spaceLayers);
 
 		SpaceLayerType spaceLayer = new SpaceLayerType();
-		spaceLayer.setId("sl1");
+		spaceLayer.setId("sl"+ String.valueOf(id));
 		List<SpaceLayerMemberType> spaceLayermemberlist = new ArrayList<SpaceLayerMemberType>();
 		SpaceLayerMemberType sLayermember = new SpaceLayerMemberType();
 		sLayermember.setSpaceLayer(spaceLayer);
@@ -107,7 +114,7 @@ public class FootPrint {
 		
 
 		NodesType nodes  = new NodesType();
-		nodes.setId("n1");
+		nodes.setId("n"+ String.valueOf(id));
 		List<NodesType> nodesList = new ArrayList<NodesType>();
 		nodesList.add(nodes);
 		
@@ -127,6 +134,30 @@ public class FootPrint {
 		
 		spaceLayers.setSpaceLayerMember(spaceLayermemberlist);
 		spaceLayer.setNodes(nodesList);
+		
+		List<StateMemberType> states = new ArrayList<StateMemberType>();
+		
+		List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
+		
+		for (int i =0;i<polygonList.size();i++)
+		{
+		 
+			CellSpaceType cs = polygonList.get(i).createIndoorgmlCellspace();
+			StateType st =polygonList.get(i).setStatePos();
+			
+			inb.createCellspaceMember(cs, cellspacemembers);
+			inb.createStateMember(st, states);
+			
+			inb.setDualitycellspace(cs, st);
+			inb.setdualityState(cs, st);
+			
+		}
+		
+		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
+		nodes.setStateMember(states);
+		
+		return indoorFeatures;
+		
 
 	}
 	

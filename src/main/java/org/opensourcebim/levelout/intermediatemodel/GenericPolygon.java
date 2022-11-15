@@ -35,6 +35,8 @@ import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
+import net.opengis.indoorgml.core.v_1_0.NodesType;
+import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 
@@ -45,7 +47,9 @@ public class GenericPolygon {
 	private List<GenericNode> nodeList;
 	//private GenericNode gn;  
 	private IdCreator id2 = DefaultIdCreator.getInstance(); 
-	private GeometryFactory geom = GeometryFactory.newInstance().withIdCreator(id2); ;
+	private GeometryFactory geom = GeometryFactory.newInstance().withIdCreator(id2); 
+	
+	
 	public GenericPolygon(int id, String name, int dimension, List<GenericNode> nodeList) {
 		super();
 		this.id = id;
@@ -111,6 +115,7 @@ public Polygon createCitygmlPoly()
 	for (int i=0;i< nodeList.size();i++)
 	{
 		 doubleList2.addAll(nodeList.get(i).createCitygmlnode()); // adding the list generated from citygmlnode
+		
 	}
 		Polygon p= geom.createPolygon(doubleList2, getDimension());
 	return p;
@@ -149,12 +154,12 @@ return bsp;
 
 }
 
-public void createIndoorgmlCellspace()
+public CellSpaceType createIndoorgmlCellspace()
 {
 	IndoorGmlBuilding inb = new IndoorGmlBuilding();
 	
-	List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
 	
+	//List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
 	CellSpaceType cellspace = new CellSpaceType();
 	cellspace.setId("cs"+ String.valueOf(id));
 	ExternalObjectReferenceType extrefobj = new ExternalObjectReferenceType();
@@ -165,25 +170,24 @@ public void createIndoorgmlCellspace()
 	List<ExternalReferenceType> extreflist = new ArrayList<ExternalReferenceType>();
 	cellspace.setExternalReference(extreflist);
 	
-	inb.createCellspaceMember(cellspace, cellspacemembers);
+	//inb.createCellspaceMember(cellspace, cellspacemembers);
 	
-	
-	
-	
+	return cellspace;
+
 }
 
-public void setStatePos()
+public StateType setStatePos()
 {
 	IndoorGmlBuilding inb = new IndoorGmlBuilding();
 	// computing centroid from nodeslist 
-	double minx = (double) nodeList.get(0).getX();
-	double miny = (double) nodeList.get(0).getY();
-	double minz = (double) nodeList.get(0).getZ();
+	double minx = nodeList.get(0).getX().doubleValue();
+	double miny = nodeList.get(0).getY().doubleValue();
+	double minz = nodeList.get(0).getZ().doubleValue();
 	
 	
-	double maxx = (double) nodeList.get(0).getX();
-	double maxy = (double) nodeList.get(0).getY();
-	double maxz = (double) nodeList.get(0).getZ();
+	double maxx = nodeList.get(0).getX().doubleValue();
+	double maxy = nodeList.get(0).getY().doubleValue();
+	double maxz = nodeList.get(0).getZ().doubleValue();
 	
 	PointPropertyType pointProp = new PointPropertyType();
 	 PointType point = new PointType();
@@ -194,29 +198,29 @@ public void setStatePos()
 	
 	for (int i =0;i<3;i++)
 		{
-		if ((double)nodeList.get(i).getX()<= minx)
+		if (nodeList.get(i).getX().doubleValue()<= minx)
 		{
-			minx= (double)nodeList.get(i).getX();
+			minx= nodeList.get(i).getX().doubleValue();
 		}
-		else if ((double)nodeList.get(i).getX()>= maxx)
+		else if (nodeList.get(i).getX().doubleValue()>= maxx)
 		{
-			maxx=(double)nodeList.get(i).getX();
+			maxx= nodeList.get(i).getX().doubleValue();
 		}
-		if ((double)nodeList.get(i).getY()<= miny)
+		if (nodeList.get(i).getY().doubleValue()<= miny)
 		{
-			minx= (double)nodeList.get(i).getY();
+			minx= nodeList.get(i).getY().doubleValue();
 		}
-		else if ((double)nodeList.get(i).getY()>= maxy)
+		else if (nodeList.get(i).getY().doubleValue()>= maxy)
 		{
-			maxx=(double)nodeList.get(i).getY();
+			maxx= nodeList.get(i).getY().doubleValue();
 		}
-		if ((double)nodeList.get(i).getZ()<= minz)
+		if (nodeList.get(i).getZ().doubleValue()<= minz)
 		{
-			minx= (double)nodeList.get(i).getZ();
+			minx= nodeList.get(i).getZ().doubleValue();
 		}
-		else if ((double)nodeList.get(i).getZ()>= maxz)
+		else if (nodeList.get(i).getZ().doubleValue()>= maxz)
 		{
-			maxx=(double)nodeList.get(i).getZ();
+			maxx=nodeList.get(i).getZ().doubleValue();
 		}
 				
 		}
@@ -237,9 +241,11 @@ public void setStatePos()
 		
 		// creating state member 
 		
-		List<StateMemberType> states = new ArrayList<StateMemberType>();
 		
-		inb.createStateMember(state, states);
+		
+		NodesType nodes  = new NodesType();
+		
+		return state;
 		
 }
 

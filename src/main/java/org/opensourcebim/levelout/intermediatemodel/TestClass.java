@@ -29,6 +29,8 @@ public class TestClass {
 		GenericBuilding gbld = new GenericBuilding(fp);
 		//gbld.createCitygmlBuilding();
 		
-		gbld.createOsmBuilding();
+	//	gbld.createOsmBuilding();
+		
+		gbld.createIndoorGmlBuilding();
 	}
 }
