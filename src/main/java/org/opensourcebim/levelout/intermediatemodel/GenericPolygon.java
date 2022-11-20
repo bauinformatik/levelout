@@ -1,8 +1,6 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -27,17 +25,13 @@ import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Way;
-import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import net.opengis.gml.v_3_2_1.DirectPositionType;
 import net.opengis.gml.v_3_2_1.PointPropertyType;
 import net.opengis.gml.v_3_2_1.PointType;
-import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 
 public class GenericPolygon {
@@ -69,17 +63,10 @@ public class GenericPolygon {
 		// TODO Auto-generated constructor stub
 	}
 
-	public OsmWay createosmWay() throws IOException
-	{
-		GenericBuilding gb = new GenericBuilding();
-		String fileName = gb.fileName2;
-	OutputStream output2 = new FileOutputStream(fileName);
-	OsmOutputStream osmOutput = new OsmXmlOutputStream(output2, true);
-	
+	public OsmWay createosmWay(OsmOutputStream osmOutput) throws IOException {
 		long idosm = (long)id*-1;
 		long[] nodes =  new long[5];
-		for (int i=0;i<4;i++)
-		{
+		for (int i=0;i<4;i++) {
 			OsmNode node = nodeList.get(i).createOsmnode();
 			osmOutput.write(node);
 			//System.out.println(node.getId());

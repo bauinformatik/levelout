@@ -1,14 +1,13 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import de.topobyte.osm4j.core.access.OsmOutputStream;
+import de.topobyte.osm4j.core.model.impl.Way;
 import org.citygml4j.core.model.building.Building;
-import org.opensourcebim.levelout.samples.CitygmlBuilding;
 import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
 import org.opensourcebim.levelout.samples.OsmBuilding;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
@@ -17,9 +16,7 @@ import org.xmlobjects.gml.model.geometry.primitives.Solid;
 import org.xmlobjects.gml.model.geometry.primitives.SolidProperty;
 import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 
-import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
-import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
@@ -77,12 +74,9 @@ public class FootPrint {
 
 	
 	
-	public void writeTagswaysOsm() throws IOException{
-
-		OsmBuilding os = new OsmBuilding();
-		for (int i =0;i<polygonList.size();i++)
-		{
-			OsmWay way = polygonList.get(i).createosmWay(); // how to set tags 
+	public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException{
+		for (int i =0;i<polygonList.size();i++) {
+			OsmWay way = polygonList.get(i).createosmWay(osmOutput); // how to set tags
 		}
 	}
 	

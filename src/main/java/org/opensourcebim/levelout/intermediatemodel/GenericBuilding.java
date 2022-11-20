@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,17 +12,14 @@ import java.nio.file.Paths;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 
+import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.Building;
 import org.citygml4j.xml.CityGMLContext;
-import org.citygml4j.xml.CityGMLContextException;
 import org.citygml4j.xml.module.citygml.CoreModule;
 import org.citygml4j.xml.writer.CityGMLChunkWriter;
 import org.citygml4j.xml.writer.CityGMLOutputFactory;
-import org.opensourcebim.levelout.samples.CitygmlBuilding;
-import org.opensourcebim.levelout.samples.IndoorGmlBuilding.IndoorGMLNameSpaceMapper;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 
@@ -31,7 +27,6 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
-import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.ObjectFactory;
 public class GenericBuilding {
@@ -40,15 +35,17 @@ public class GenericBuilding {
 	
 	 static FootPrint fp;
 	 String fileName2 = "output/osmoutputnew.osm";
+	 private String name = "default";
 	 private static ObjectFactory objectFactory = new ObjectFactory();
 	 
 		OsmOutputStream osmOutput;
 	//static GenericNode gn;
 	//static GenericPolygon pn;
 		
-	public GenericBuilding(FootPrint fp) {
+	public GenericBuilding(FootPrint fp, String name) {
 		super();
 		this.fp = fp;
+		this.name = name;
 	}
 	
 
@@ -58,18 +55,16 @@ public class GenericBuilding {
 
 
 	public static void main(String[] args) throws Exception {
-		new GenericBuilding(fp).createCitygmlBuilding();
+		new GenericBuilding(fp, "test").createCitygmlBuilding();
 	}
 	public void createCitygmlBuilding()  throws Exception {
-	
-		String fileName = "output/out12.gml";
 		CityGMLContext context = CityGMLContext.newInstance();
 		Building b = fp.setLodgeom();
 		Envelope envelope = b.computeEnvelope();
 
 		CityGMLVersion version = CityGMLVersion.v2_0;
 		CityGMLOutputFactory out = context.createCityGMLOutputFactory(version);
-		Path output = Paths.get(fileName);
+		Path output = Paths.get("output", name + "-city.gml");
 		Files.createDirectories(output.getParent());
 		System.out.print(output.getParent());
 		Files.createFile(output);
@@ -86,16 +81,12 @@ public class GenericBuilding {
 	}
 	
 	
-	public  void createOsmBuilding() throws IOException
-	{
-		
-		
-		System.out.println("written");
-		for (int i=0;i<fp.getPolygonList().size();i++)
-		{
-		OsmWay way = fp.getPolygonList().get(i).createosmWay(); // how to write tags 
+	public  void createOsmBuilding() throws IOException {
+		OutputStream output2 = new FileOutputStream("output/" + name + ".osm");
+		OsmOutputStream osmOutput = new OsmXmlOutputStream(output2, true);
+		for (int i=0;i<fp.getPolygonList().size();i++) {
+			fp.getPolygonList().get(i).createosmWay(osmOutput); // how to write tags
 		}
-		
 		//osmOutput.write(way); // do we need to write both ways and nodes?
 		//osmOutput.write(pn.createosmWay());
 
@@ -103,11 +94,7 @@ public class GenericBuilding {
 
 
 	public void createIndoorGmlBuilding() throws FileNotFoundException, JAXBException {
-		
-		String fileName = "output/outindoor6.gml";
-		FileOutputStream fout = new FileOutputStream(fileName);
-		
-		
+		FileOutputStream fout = new FileOutputStream("output/" + name + "-indoor.gml");
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
@@ -118,9 +105,6 @@ public class GenericBuilding {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
 		marshaller.marshal(objectFactory.createIndoorFeatures(fp.setIndoorFeatures()), fout);
-		
-		
-		
 	}
 	
 	public class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {

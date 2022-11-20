@@ -26,11 +26,9 @@ public class TestClass {
 		
 		FootPrint fp = new FootPrint(1, 1, genericPolygonList);
 		
-		GenericBuilding gbld = new GenericBuilding(fp);
-		//gbld.createCitygmlBuilding();
-		
-	//	gbld.createOsmBuilding();
-		
+		GenericBuilding gbld = new GenericBuilding(fp,"test");
+		gbld.createCitygmlBuilding();
+		gbld.createOsmBuilding();
 		gbld.createIndoorGmlBuilding();
 	}
 }
