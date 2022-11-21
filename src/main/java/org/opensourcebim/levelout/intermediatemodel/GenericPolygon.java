@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.citygml4j.core.model.construction.CeilingSurface;
+import org.citygml4j.core.model.construction.FloorSurface;
 import org.citygml4j.core.model.construction.GroundSurface;
 import org.citygml4j.core.model.construction.RoofSurface;
 import org.citygml4j.core.model.construction.WallSurface;
@@ -70,12 +71,14 @@ public class GenericPolygon {
 	public OsmWay createosmWay(OsmOutputStream osmOutput) throws IOException {
 		long idosm = (long)id*-1;
 		long[] nodes =  new long[5];
-		for (int i=0;i<4;i++) {
+		for (int i=0;i<nodeList.size();i++)
+		{
+			int n = nodeList.size();
+			System.out.println(n);
 			OsmNode node = nodeList.get(i).createOsmnode();
+			System.out.println(osmOutput);
 			osmOutput.write(node);
-			//System.out.println(node.getId());
 			nodes[i]= node.getId(); // assuming we pass 5 coordinates for a polygon
-			//System.out.printf("Executed");
 		}
 		System.out.println(nodes[0]);
 		Array.set(nodes, 4, nodes[0]);
@@ -84,13 +87,10 @@ public class GenericPolygon {
 		System.out.println(a);
 		
 		
-	//	List <OsmWay> wayList = new ArrayList<OsmWay>();
 		OsmWay ways = new Way(idosm, TLongArrayList.wrap(nodes));//, tags); // how to create and set tags , the name of the polygon is just one part of the tag 
-	//	long[] nodeList = new long[5];
-	//	wayList.add(ways);
 		System.out.println(ways);
 		osmOutput.write(ways);
-		osmOutput.complete();
+		//osmOutput.complete();
 		return ways;
 		
 	}
@@ -138,6 +138,10 @@ public class GenericPolygon {
 	else if (name.contains("ceiling"))
 	{
 		bsp= processBoundarySurface(new CeilingSurface(), polygons);
+	}
+	else if (name.contains("floor"))
+	{
+		bsp= processBoundarySurface(new FloorSurface(), polygons);
 	}
 	return bsp;
 
