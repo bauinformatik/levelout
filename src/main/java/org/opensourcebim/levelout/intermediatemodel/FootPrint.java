@@ -3,13 +3,10 @@ package org.opensourcebim.levelout.intermediatemodel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
-import de.topobyte.osm4j.core.model.impl.Way;
 import org.citygml4j.core.model.building.Building;
 import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
-import org.opensourcebim.levelout.samples.OsmBuilding;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.model.geometry.primitives.Shell;
 import org.xmlobjects.gml.model.geometry.primitives.Solid;
@@ -19,15 +16,6 @@ import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
-import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
-import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
-import net.opengis.indoorgml.core.v_1_0.NodesType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 
@@ -35,11 +23,10 @@ public class FootPrint {
 
 	private int level;
 	private int id;
-	private List<GenericPolygon> polygonList;
+	private final List<GenericPolygon> polygonList;
 	//private GenericPolygon gp;
 
 	public FootPrint(int level, int id, List<GenericPolygon> polygonList) {
-		super();
 		this.level = level;
 		this.id = id;
 		this.polygonList = polygonList;
@@ -49,87 +36,52 @@ public class FootPrint {
 
 	}
 
-	public Building setLodgeom(Building b)
-	{
+	public Building setLodgeom(Building building) {
 		GenericPolygon gp = new GenericPolygon(); // is calling a default constructor ok?
 		//CitygmlBuilding cg = new CitygmlBuilding();
 		//Building building = new Building();
-		List<Polygon> listOfpolyValues = new ArrayList<>(); 
-		for (int i =0;i<polygonList.size();i++)
-		{
-			Polygon poly = polygonList.get(i).createCitygmlPoly(); // to use for shell
-			listOfpolyValues.add(poly);
-			b.addBoundary(gp.createBoundary(polygonList.get(i).getName(), poly));  
+		List<Polygon> polygonList = new ArrayList<>();
+		for (GenericPolygon genericPolygon : this.polygonList) {
+			Polygon poly = genericPolygon.createCitygmlPoly(); // to use for shell
+			polygonList.add(poly);
+			building.addBoundary(gp.createBoundary(genericPolygon.getName(), poly));
 		}
 		Shell shell = new Shell();
-		for (int j=0;j<listOfpolyValues.size();j++)
-		{
-		Stream.of(listOfpolyValues.get(j)).map(p -> new SurfaceProperty("#" + p.getId()))
-				.forEach(shell.getSurfaceMembers()::add);
+		for (Polygon polygon : polygonList) {
+			shell.getSurfaceMembers().add(new SurfaceProperty("#" + polygon.getId()));
 		}
-		b.setLod2Solid(new SolidProperty(new Solid(shell)));
-		
-		return b;
-		}
-
-		
-		
-		public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException{
-			for (int i =0;i<polygonList.size();i++) {
-				OsmWay way = polygonList.get(i).createosmWay(osmOutput); // how to set tags
-			}
-		}
-		public List<List> createIndoorFeatures()
-		{
-			IndoorGmlBuilding inb = new IndoorGmlBuilding();
-	List<StateMemberType> states = new ArrayList<StateMemberType>();
-			
-			List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
-			List <List> totallist = new ArrayList<>();
-			for (int i =0;i<polygonList.size();i++)
-			{
-			 
-				CellSpaceType cs = polygonList.get(i).createIndoorgmlCellspace();
-				System.out.println(polygonList.isEmpty());
-				StateType st =polygonList.get(i).setStatePos();
-				
-				inb.createCellspaceMember(cs, cellspacemembers);
-				inb.createStateMember(st, states);
-				
-				inb.setDualitycellspace(cs, st);
-				inb.setdualityState(cs, st);
-
-				totallist.add(cellspacemembers);
-				totallist.add(states);
-			}
-			return totallist;
-		}
-		
-		
-		
-
-		public int getLevel() {
-			return level;
-		}
-
-		public void setLevel(int level) {
-			this.level = level;
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
-		}
-
-		public List<GenericPolygon> getPolygonList() {
-			return polygonList;
-		}
-
-		public void setPolygonList(List<GenericPolygon> polygonList) {
-			this.polygonList = polygonList;
-		}
-
+		// polygonList.stream().map( p -> new SurfaceProperty("#" + p.getId())).forEach(shell.getSurfaceMembers()::add);
+		building.setLod2Solid(new SolidProperty(new Solid(shell)));
+		return building;
 	}
+
+	public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException {
+		for (GenericPolygon genericPolygon : polygonList) {
+			OsmWay way = genericPolygon.createosmWay(osmOutput); // how to set tags
+		}
+	}
+
+	public List<List> createIndoorFeatures() {
+		List<StateMemberType> states = new ArrayList<>();
+		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
+		List<List> totallist = new ArrayList<>();
+		for (GenericPolygon genericPolygon : polygonList) {
+			CellSpaceType cs = genericPolygon.createIndoorGmlCellSpace();
+			StateType st = genericPolygon.setStatePos();
+
+			IndoorGmlBuilding.createCellspaceMember(cs, cellSpaceMembers);
+			IndoorGmlBuilding.createStateMember(st, states);
+			IndoorGmlBuilding.setDualitycellspace(cs, st);
+			IndoorGmlBuilding.setdualityState(cs, st);
+
+			totallist.add(cellSpaceMembers);
+			totallist.add(states);
+		}
+		return totallist;
+	}
+
+	public List<GenericPolygon> getPolygonList() {
+		return polygonList;
+	}
+
+}

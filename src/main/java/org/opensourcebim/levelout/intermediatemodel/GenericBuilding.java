@@ -43,121 +43,91 @@ import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 public class GenericBuilding {
 
-	private List<FootPrint> fp;
-	 String fileName2 = "output/osmoutputnew8.osm";
-	 private String name = "default";
-	private static ObjectFactory objectFactory = new ObjectFactory();
-	 
-		
-	 public GenericBuilding(List<FootPrint> fp, String name) {
-			super();
-			this.fp = fp;
-			this.name = name;
-		}
-		
-	public GenericBuilding() {
-		// TODO Auto-generated constructor stub
-	}
+	private final List<FootPrint> fp;
+	private final String name;
+	private static final ObjectFactory objectFactory = new ObjectFactory();
 
-
-	public static void main(String[] args) throws Exception {
-		new GenericBuilding().createCitygmlBuilding();
+	public GenericBuilding(List<FootPrint> fp, String name) {
+		this.fp = fp;
+		this.name = name;
 	}
+		
 	public void createCitygmlBuilding()  throws Exception {
-		
 		CityGMLContext context = CityGMLContext.newInstance();
-		Building b = new Building();
-		for(int i=0;i<fp.size();i++)
-		{
-		 b = fp.get(i).setLodgeom(b);
+		Building building = new Building();
+		for (FootPrint footPrint : fp) {
+			building = footPrint.setLodgeom(building);
 		}
-		
-		Envelope envelope = b.computeEnvelope();
+		Envelope envelope = building.computeEnvelope();
 
 		CityGMLVersion version = CityGMLVersion.v2_0;
-		CityGMLOutputFactory out = context.createCityGMLOutputFactory(version);
-		Path output = Paths.get("output", name + "-city.gml");
-		Files.createDirectories(output.getParent());
-		System.out.print(output.getParent());
-		Files.createFile(output);
+		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
+		Path path = Paths.get("output", name + "-city.gml");
+		Files.createDirectories(path.getParent());
 
-		try (CityGMLChunkWriter writer = out.createCityGMLChunkWriter(output, StandardCharsets.UTF_8.name())) {
+		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(path, StandardCharsets.UTF_8.name())) {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
 					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 					.withHeaderComment("File created with citygml4j");
-
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
+			writer.writeMember(building);
+		}
+	}
 
-			writer.writeMember(b);
+	public void createOsmBuilding() throws IOException {
+		OutputStream outStream = new FileOutputStream("output/" + name + ".osm");
+		OsmOutputStream osmOutStream = new OsmXmlOutputStream(outStream, true);
+		for (FootPrint footPrint : fp) {
+			for (GenericPolygon polygon: footPrint.getPolygonList()) {
+				OsmWay way = polygon.createosmWay(osmOutStream); // how to write tags
+			}
 		}
+		osmOutStream.complete();
 	}
-	
-	public  void createOsmBuilding() throws IOException {
-		OutputStream output2 = new FileOutputStream("output/" + name + ".osm");
-		OsmOutputStream osmOutput = new OsmXmlOutputStream(output2, true);
-		System.out.println("written");
-		for(int j=0;j<fp.size();j++)
-		{
-		for (int i=0;i<fp.get(j).getPolygonList().size();i++)
-		{
-		OsmWay way = fp.get(j).getPolygonList().get(i).createosmWay(osmOutput); // how to write tags 
-		}
-		}
-		
-		osmOutput.complete();
-	}
+
 	public void createIndoorGmlBuilding() throws FileNotFoundException, JAXBException {
-		
-		
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
+		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
 		indoorFeatures.setId("if");
-
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
 		primalSpaceFeature.setId("pf");
-
-
 		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg");
-	//	multiLayeredGraph.setId("mlg"+ String.valueOf(id));
+		multiLayeredGraph.setId("mlg"); //	+ String.valueOf(id);
 
 		SpaceLayersType spaceLayers = new SpaceLayersType();
 		spaceLayers.setId("slayers");
-		List<SpaceLayersType> spaceLayerslist = new ArrayList<SpaceLayersType>();
+		List<SpaceLayersType> spaceLayerslist = new ArrayList<>();
 		spaceLayerslist.add(spaceLayers);
 
 		SpaceLayerType spaceLayer = new SpaceLayerType();
 		spaceLayer.setId("sl");
-		List<SpaceLayerMemberType> spaceLayermemberlist = new ArrayList<SpaceLayerMemberType>();
-		SpaceLayerMemberType sLayermember = new SpaceLayerMemberType();
-		sLayermember.setSpaceLayer(spaceLayer);
-		spaceLayermemberlist.add(sLayermember);
-		
+		List<SpaceLayerMemberType> spaceLayerMemberList = new ArrayList<>();
+		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
+		spaceLayerMember.setSpaceLayer(spaceLayer);
+		spaceLayerMemberList.add(spaceLayerMember);
 
-		NodesType nodes  = new NodesType();
+		NodesType nodes = new NodesType();
 		nodes.setId("n");
-		List<NodesType> nodesList = new ArrayList<NodesType>();
+		List<NodesType> nodesList = new ArrayList<>();
 		nodesList.add(nodes);
-		
-		PrimalSpaceFeaturesPropertyType primalspacefeaturesProp = new PrimalSpaceFeaturesPropertyType();
-		primalspacefeaturesProp.setPrimalSpaceFeatures(primalSpaceFeature);
 
-		indoorFeatures.setPrimalSpaceFeatures(primalspacefeaturesProp);
+		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProp = new PrimalSpaceFeaturesPropertyType();
+		primalSpaceFeaturesProp.setPrimalSpaceFeatures(primalSpaceFeature);
+		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProp);
 
-		MultiLayeredGraphPropertyType  multilayergraphProp = new MultiLayeredGraphPropertyType();
+		MultiLayeredGraphPropertyType multilayergraphProp = new MultiLayeredGraphPropertyType();
 		multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
-
 		indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
-		
+
 		multiLayeredGraph.setSpaceLayers(spaceLayerslist);
-		
-		spaceLayers.setSpaceLayerMember(spaceLayermemberlist);
+
+		spaceLayers.setSpaceLayerMember(spaceLayerMemberList);
 		spaceLayer.setNodes(nodesList);
-		
-List<StateMemberType> states = new ArrayList<StateMemberType>();
-		
-		List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
-		
-		FileOutputStream fout = new FileOutputStream("output/" + name + "-indoor.gml", true);
+
+		List<StateMemberType> states = new ArrayList<>();
+
+		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
+
+		FileOutputStream outStream = new FileOutputStream("output/" + name + "-indoor.gml", true);
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
@@ -167,25 +137,20 @@ List<StateMemberType> states = new ArrayList<StateMemberType>();
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
-		
-		for (int i=0;i<fp.size();i++)
-		{
-			int n = fp.size();
-			System.out.println(n);
-		    List<List>  a = fp.get(i).createIndoorFeatures();
-		  	cellspacemembers.addAll(a.get(0));
+
+		for (FootPrint footPrint : fp) {
+			List<List> a = footPrint.createIndoorFeatures();
+			cellSpaceMembers.addAll(a.get(0));
 			states.addAll(a.get(1));
 		}
-		
-		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
+
+		primalSpaceFeature.setCellSpaceMember(cellSpaceMembers);
 		nodes.setStateMember(states);
-		
-		
-		 marshaller.marshal(objectFactory.createIndoorFeatures(indoorFeatures), fout);
+
+		marshaller.marshal(objectFactory.createIndoorFeatures(indoorFeatures), outStream);
 	}
-		
-	
-	public class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {
+
+	public static class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {
 		private static final String DEFAULT_URI = "http://www.opengis.net/indoorgml/1.0/core";
 		private static final String NAVIGATION_URI = "http://www.opengis.net/indoorgml/1.0/navigation";
 		private static final String GML_URI = "http://www.opengis.net/gml/3.2";
@@ -207,7 +172,7 @@ List<StateMemberType> states = new ArrayList<StateMemberType>();
 
 		@Override
 		public String[] getPreDeclaredNamespaceUris() {
-			return new String[] { DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI };
+			return new String[]{DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI};
 		}
 	}
 }
