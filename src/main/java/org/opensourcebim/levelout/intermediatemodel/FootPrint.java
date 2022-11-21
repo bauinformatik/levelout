@@ -13,7 +13,6 @@ import org.xmlobjects.gml.model.geometry.primitives.Solid;
 import org.xmlobjects.gml.model.geometry.primitives.SolidProperty;
 import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 
-import de.topobyte.osm4j.core.model.iface.OsmWay;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
@@ -36,15 +35,12 @@ public class FootPrint {
 
 	}
 
-	public Building setLodgeom(Building building) {
-		GenericPolygon gp = new GenericPolygon(); // is calling a default constructor ok?
-		//CitygmlBuilding cg = new CitygmlBuilding();
-		//Building building = new Building();
+	public void setLodgeom(Building building) {
 		List<Polygon> polygonList = new ArrayList<>();
 		for (GenericPolygon genericPolygon : this.polygonList) {
 			Polygon poly = genericPolygon.createCitygmlPoly(); // to use for shell
 			polygonList.add(poly);
-			building.addBoundary(gp.createBoundary(genericPolygon.getName(), poly));
+			building.addBoundary(genericPolygon.createBoundary(poly));
 		}
 		Shell shell = new Shell();
 		for (Polygon polygon : polygonList) {
@@ -52,36 +48,28 @@ public class FootPrint {
 		}
 		// polygonList.stream().map( p -> new SurfaceProperty("#" + p.getId())).forEach(shell.getSurfaceMembers()::add);
 		building.setLod2Solid(new SolidProperty(new Solid(shell)));
-		return building;
 	}
 
 	public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException {
 		for (GenericPolygon genericPolygon : polygonList) {
-			OsmWay way = genericPolygon.createosmWay(osmOutput); // how to set tags
+			genericPolygon.createosmWay(osmOutput); // how to set tags
 		}
 	}
 
-	public List<List> createIndoorFeatures() {
-		List<StateMemberType> states = new ArrayList<>();
-		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
-		List<List> totallist = new ArrayList<>();
+	public void createIndoorFeatures(List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
 		for (GenericPolygon genericPolygon : polygonList) {
 			CellSpaceType cs = genericPolygon.createIndoorGmlCellSpace();
-			StateType st = genericPolygon.setStatePos();
-
 			IndoorGmlBuilding.createCellspaceMember(cs, cellSpaceMembers);
-			IndoorGmlBuilding.createStateMember(st, states);
+
+			StateType st = genericPolygon.createIndoorGmlState();
+			IndoorGmlBuilding.createStateMember(st, stateMembers);
+
 			IndoorGmlBuilding.setDualitycellspace(cs, st);
 			IndoorGmlBuilding.setdualityState(cs, st);
-
-			totallist.add(cellSpaceMembers);
-			totallist.add(states);
 		}
-		return totallist;
 	}
 
 	public List<GenericPolygon> getPolygonList() {
 		return polygonList;
 	}
-
 }

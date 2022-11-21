@@ -1,6 +1,6 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.topobyte.osm4j.core.model.iface.OsmNode;
@@ -8,12 +8,12 @@ import de.topobyte.osm4j.core.model.impl.Node;
 
 public class GenericNode {
 
-	private final Number id;
-	private final Number x;
-	private final Number y;
-	private final Number z;
+	private final long id;
+	private final double x;
+	private final double y;
+	private final double z;
 
-	public GenericNode(Number id, Number x, Number y, Number z) {
+	public GenericNode(long id, double x, double y, double z) {
 		this.id = id;
 		this.x = x;
 		this.y = y;
@@ -21,26 +21,22 @@ public class GenericNode {
 	}
 
 	public OsmNode createOsmNode() {
-		return new Node((id.longValue() * -1), x.longValue(), y.longValue());
+		return new Node(id * -1, x, y);
 	}
 
 	public List<Double> createCityGmlNode() {
-		List<Double> doubleList = new ArrayList<>();
-		doubleList.add(x.doubleValue());                                        // Number cannot be cast to a primitive, use Number.doubleValue()
-		doubleList.add(y.doubleValue());
-		doubleList.add(z.doubleValue());
-		return doubleList;
+		return Arrays.asList(x, y, z);
 	}
 
-	public Number getX() {
+	public double getX() {
 		return x;
 	}
 
-	public Number getY() {
+	public double getY() {
 		return y;
 	}
 
-	public Number getZ() {
+	public double getZ() {
 		return z;
 	}
 }

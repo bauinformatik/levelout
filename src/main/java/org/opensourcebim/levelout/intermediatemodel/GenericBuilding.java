@@ -28,7 +28,6 @@ import org.xmlobjects.gml.model.geometry.Envelope;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
-import de.topobyte.osm4j.core.model.iface.OsmWay;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
@@ -43,20 +42,20 @@ import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 public class GenericBuilding {
 
-	private final List<FootPrint> fp;
+	private final List<FootPrint> footPrints;
 	private final String name;
 	private static final ObjectFactory objectFactory = new ObjectFactory();
 
-	public GenericBuilding(List<FootPrint> fp, String name) {
-		this.fp = fp;
+	public GenericBuilding(List<FootPrint> footPrints, String name) {
+		this.footPrints = footPrints;
 		this.name = name;
 	}
 		
 	public void createCitygmlBuilding()  throws Exception {
 		CityGMLContext context = CityGMLContext.newInstance();
 		Building building = new Building();
-		for (FootPrint footPrint : fp) {
-			building = footPrint.setLodgeom(building);
+		for (FootPrint footPrint : footPrints) {
+			footPrint.setLodgeom(building);
 		}
 		Envelope envelope = building.computeEnvelope();
 
@@ -77,9 +76,9 @@ public class GenericBuilding {
 	public void createOsmBuilding() throws IOException {
 		OutputStream outStream = new FileOutputStream("output/" + name + ".osm");
 		OsmOutputStream osmOutStream = new OsmXmlOutputStream(outStream, true);
-		for (FootPrint footPrint : fp) {
+		for (FootPrint footPrint : footPrints) {
 			for (GenericPolygon polygon: footPrint.getPolygonList()) {
-				OsmWay way = polygon.createosmWay(osmOutStream); // how to write tags
+				polygon.createosmWay(osmOutStream); // how to write tags
 			}
 		}
 		osmOutStream.complete();
@@ -123,10 +122,6 @@ public class GenericBuilding {
 		spaceLayers.setSpaceLayerMember(spaceLayerMemberList);
 		spaceLayer.setNodes(nodesList);
 
-		List<StateMemberType> states = new ArrayList<>();
-
-		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
-
 		FileOutputStream outStream = new FileOutputStream("output/" + name + "-indoor.gml", true);
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
@@ -138,10 +133,11 @@ public class GenericBuilding {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
 
-		for (FootPrint footPrint : fp) {
-			List<List> a = footPrint.createIndoorFeatures();
-			cellSpaceMembers.addAll(a.get(0));
-			states.addAll(a.get(1));
+		List<StateMemberType> states = new ArrayList<>();
+		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
+
+		for (FootPrint footPrint : footPrints) {
+			footPrint.createIndoorFeatures(states, cellSpaceMembers);
 		}
 
 		primalSpaceFeature.setCellSpaceMember(cellSpaceMembers);
@@ -176,4 +172,3 @@ public class GenericBuilding {
 		}
 	}
 }
-

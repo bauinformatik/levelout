@@ -2,11 +2,11 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.primitives.Longs;
 import org.citygml4j.core.model.construction.CeilingSurface;
 import org.citygml4j.core.model.construction.FloorSurface;
 import org.citygml4j.core.model.construction.GroundSurface;
@@ -35,35 +35,31 @@ import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 
 public class GenericPolygon {
-	private int id;
-	private String name;
-	private int dimension;
-	private List<GenericNode> nodeList;
+	private final long id;
+	private final String type;
+	private final int dimension;
+	private final List<GenericNode> nodeList;
 	private final IdCreator idCreator = DefaultIdCreator.getInstance();
 	private final GeometryFactory geometryFactory = GeometryFactory.newInstance().withIdCreator(idCreator);
 
-	public GenericPolygon(int id, String type, int dimension, List<GenericNode> nodeList) {
-		this.id = id;
-		this.name = type; // TODO change to enum if needed at all
-		this.dimension = dimension;
+	public GenericPolygon(long id, String type, int dimension, List<GenericNode> nodeList) {
+		this.id = id; // TODO auto-increment
+		this.type = type; // TODO change to enum if needed at all
+		this.dimension = dimension; // TODO static value, always 3
 		this.nodeList = nodeList;
 	}
 
-	public GenericPolygon() {
-	}
-
-	public OsmWay createosmWay(OsmOutputStream osmOutput) throws IOException {
-		long id = (long) this.id * -1;
-		long[] nodes = new long[5];
-		for (int i = 0; i < nodeList.size(); i++) {
-			OsmNode node = nodeList.get(i).createOsmNode();
+	public void createosmWay(OsmOutputStream osmOutput) throws IOException {
+		long id = this.id * -1;
+		List<Long>nodes = new ArrayList<>();
+		for (GenericNode genericNode : nodeList) {
+			OsmNode node = genericNode.createOsmNode();
 			osmOutput.write(node);
-			nodes[i] = node.getId(); // assuming we pass 5 coordinates for a polygon
+			nodes.add(node.getId());
 		}
-		Array.set(nodes, 4, nodes[0]);
-		OsmWay way = new Way(id, TLongArrayList.wrap(nodes)); // how to create and set tags, the name of the polygon is just one part of the tag
+		nodes.add(nodes.get(0));
+		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes))); // how to create and set tags, the name of the polygon is just one part of the tag
 		osmOutput.write(way);
-		return way;
 	}
 
 	public Polygon createCitygmlPoly() {
@@ -81,16 +77,16 @@ public class GenericPolygon {
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 
-	public AbstractSpaceBoundaryProperty createBoundary(String name, Polygon polygon) {
-		if (name.contains("ground")) {
+	public AbstractSpaceBoundaryProperty createBoundary(Polygon polygon) {
+		if (type.contains("ground")) {
 			return processBoundarySurface(new GroundSurface(), polygon);
-		} else if (name.contains("wall")) {
+		} else if (type.contains("wall")) {
 			return processBoundarySurface(new WallSurface(), polygon);
-		} else if (name.contains("roof")) {
+		} else if (type.contains("roof")) {
 			return processBoundarySurface(new RoofSurface(), polygon);
-		} else if (name.contains("ceiling")) {
+		} else if (type.contains("ceiling")) {
 			return processBoundarySurface(new CeilingSurface(), polygon);
-		} else if (name.contains("floor")) {
+		} else if (type.contains("floor")) {
 			return processBoundarySurface(new FloorSurface(), polygon);
 		} else return null;  // TODO: not nice
 	}
@@ -108,15 +104,12 @@ public class GenericPolygon {
 		return cellspace;
 	}
 
-	public StateType setStatePos() {
+	public StateType createIndoorGmlState() {
 		// computing centroid from nodeslist
-		double minX = nodeList.get(0).getX().doubleValue();
-		double minY = nodeList.get(0).getY().doubleValue();
-		double minZ = nodeList.get(0).getZ().doubleValue();
-
-		double maxX = nodeList.get(0).getX().doubleValue();
-		double maxY = nodeList.get(0).getY().doubleValue();
-		double maxZ = nodeList.get(0).getZ().doubleValue();
+		double minX = nodeList.get(0).getX();
+		double minY = nodeList.get(0).getY();
+		double minZ = nodeList.get(0).getZ();
+		double maxX = minX, maxY = minY, maxZ = minZ;
 
 		// TODO: check formula for centroid calculation
 
@@ -124,20 +117,20 @@ public class GenericPolygon {
 		PointType point = new PointType();
 		DirectPositionType dirPos = new DirectPositionType();
 		for (GenericNode node : nodeList) {
-			if (node.getX().doubleValue() < minX) {
-				minX = node.getX().doubleValue();
-			} else if (node.getX().doubleValue() > maxX) {
-				maxX = node.getX().doubleValue();
+			if (node.getX() < minX) {
+				minX = node.getX();
+			} else if (node.getX() > maxX) {
+				maxX = node.getX();
 			}
-			if (node.getY().doubleValue() < minY) {
-				minY = node.getY().doubleValue();
-			} else if (node.getY().doubleValue() > maxY) {
-				maxY = node.getY().doubleValue();
+			if (node.getY() < minY) {
+				minY = node.getY();
+			} else if (node.getY() > maxY) {
+				maxY = node.getY();
 			}
-			if (node.getZ().doubleValue() < minZ) {
-				minZ = node.getZ().doubleValue();
-			} else if (node.getZ().doubleValue() > maxZ) {
-				maxZ = node.getZ().doubleValue();
+			if (node.getZ() < minZ) {
+				minZ = node.getZ();
+			} else if (node.getZ() > maxZ) {
+				maxZ = node.getZ();
 			}
 		}
 
@@ -155,41 +148,7 @@ public class GenericPolygon {
 		return state;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public int getDimension() {
 		return dimension;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
