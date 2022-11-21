@@ -184,6 +184,10 @@ public class CitygmlBuilding {
 	{
 		bsp= processBoundarySurface(new CeilingSurface(), polygons);
 	}
+	else if (name.contains("floor"))
+	{
+		bsp= processBoundarySurface(new FloorSurface(), polygons);
+	}
 	return bsp;
 
 	}

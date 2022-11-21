@@ -52,17 +52,17 @@ public class FootPrint {
 
 	}
 
-	public Building setLodgeom()
+	public Building setLodgeom(Building b)
 	{
 		GenericPolygon gp = new GenericPolygon(); // is calling a default constructor ok?
 		//CitygmlBuilding cg = new CitygmlBuilding();
-		Building building = new Building();
+		//Building building = new Building();
 		List<Polygon> listOfpolyValues = new ArrayList<>(); 
 		for (int i =0;i<polygonList.size();i++)
 		{
 			Polygon poly = polygonList.get(i).createCitygmlPoly(); // to use for shell
 			listOfpolyValues.add(poly);
-			building.addBoundary(gp.createBoundary(polygonList.get(i).getName(), poly));  
+			b.addBoundary(gp.createBoundary(polygonList.get(i).getName(), poly));  
 		}
 		Shell shell = new Shell();
 		for (int j=0;j<listOfpolyValues.size();j++)
@@ -70,9 +70,9 @@ public class FootPrint {
 		Stream.of(listOfpolyValues.get(j)).map(p -> new SurfaceProperty("#" + p.getId()))
 				.forEach(shell.getSurfaceMembers()::add);
 		}
-		building.setLod2Solid(new SolidProperty(new Solid(shell)));
+		b.setLod2Solid(new SolidProperty(new Solid(shell)));
 		
-		return building;
+		return b;
 	}
 
 	
@@ -82,67 +82,24 @@ public class FootPrint {
 		OsmBuilding os = new OsmBuilding();
 		for (int i =0;i<polygonList.size();i++)
 		{
-			OsmWay way = polygonList.get(i).createosmWay(); // how to set tags 
+			//OsmWay way = polygonList.get(i).createosmWay(); // how to set tags 
 		}
 	}
 	
-	public IndoorFeaturesType setIndoorFeatures()
+	
+	
+	public List<List> createIndoorFeatures()
 	{
 		IndoorGmlBuilding inb = new IndoorGmlBuilding();
-		
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
-		indoorFeatures.setId("if"+ String.valueOf(id));
-
-		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
-		primalSpaceFeature.setId("pf"+ String.valueOf(id));
-
-
-		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg"+ String.valueOf(id));
-
-		SpaceLayersType spaceLayers = new SpaceLayersType();
-		spaceLayers.setId("slayers"+ String.valueOf(id));
-		List<SpaceLayersType> spaceLayerslist = new ArrayList<SpaceLayersType>();
-		spaceLayerslist.add(spaceLayers);
-
-		SpaceLayerType spaceLayer = new SpaceLayerType();
-		spaceLayer.setId("sl"+ String.valueOf(id));
-		List<SpaceLayerMemberType> spaceLayermemberlist = new ArrayList<SpaceLayerMemberType>();
-		SpaceLayerMemberType sLayermember = new SpaceLayerMemberType();
-		sLayermember.setSpaceLayer(spaceLayer);
-		spaceLayermemberlist.add(sLayermember);
-		
-
-		NodesType nodes  = new NodesType();
-		nodes.setId("n"+ String.valueOf(id));
-		List<NodesType> nodesList = new ArrayList<NodesType>();
-		nodesList.add(nodes);
-		
-
-
-		PrimalSpaceFeaturesPropertyType primalspacefeaturesProp = new PrimalSpaceFeaturesPropertyType();
-		primalspacefeaturesProp.setPrimalSpaceFeatures(primalSpaceFeature);
-
-		indoorFeatures.setPrimalSpaceFeatures(primalspacefeaturesProp);
-
-		MultiLayeredGraphPropertyType  multilayergraphProp = new MultiLayeredGraphPropertyType();
-		multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
-
-		indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
-		
-		multiLayeredGraph.setSpaceLayers(spaceLayerslist);
-		
-		spaceLayers.setSpaceLayerMember(spaceLayermemberlist);
-		spaceLayer.setNodes(nodesList);
-		
-		List<StateMemberType> states = new ArrayList<StateMemberType>();
+List<StateMemberType> states = new ArrayList<StateMemberType>();
 		
 		List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
-		
+		List <List> totallist = new ArrayList<>();
 		for (int i =0;i<polygonList.size();i++)
 		{
 		 
 			CellSpaceType cs = polygonList.get(i).createIndoorgmlCellspace();
+			System.out.println(polygonList.isEmpty());
 			StateType st =polygonList.get(i).setStatePos();
 			
 			inb.createCellspaceMember(cs, cellspacemembers);
@@ -150,17 +107,12 @@ public class FootPrint {
 			
 			inb.setDualitycellspace(cs, st);
 			inb.setdualityState(cs, st);
-			
-		}
-		
-		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
-		nodes.setStateMember(states);
-		
-		return indoorFeatures;
-		
 
+			totallist.add(cellspacemembers);
+			totallist.add(states);
+		}
+		return totallist;
 	}
-	
 	
 
 	public int getLevel() {
@@ -187,4 +139,5 @@ public class FootPrint {
 		this.polygonList = polygonList;
 	}
 
+	
 }

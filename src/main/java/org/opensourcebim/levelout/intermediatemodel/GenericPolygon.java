@@ -1,5 +1,6 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.citygml4j.core.model.construction.CeilingSurface;
+import org.citygml4j.core.model.construction.FloorSurface;
 import org.citygml4j.core.model.construction.GroundSurface;
 import org.citygml4j.core.model.construction.RoofSurface;
 import org.citygml4j.core.model.construction.WallSurface;
@@ -49,7 +51,7 @@ public class GenericPolygon {
 	private IdCreator id2 = DefaultIdCreator.getInstance(); 
 	private GeometryFactory geom = GeometryFactory.newInstance().withIdCreator(id2); 
 	
-	
+	 
 	public GenericPolygon(int id, String name, int dimension, List<GenericNode> nodeList) {
 		super();
 		this.id = id;
@@ -58,33 +60,26 @@ public class GenericPolygon {
 		this.nodeList = nodeList;
 	}
 	
-	/*public GenericPolygon(int id, String name, List<GenericNode> nodeList) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.nodeList = nodeList;
-	}*/
-	
+
 	public GenericPolygon() {
 		// TODO Auto-generated constructor stub
 	}
-
-	public OsmWay createosmWay() throws IOException
-	{
-		GenericBuilding gb = new GenericBuilding();
-		String fileName = gb.fileName2;
-	OutputStream output2 = new FileOutputStream(fileName);
-	OsmOutputStream osmOutput = new OsmXmlOutputStream(output2, true);
 	
+	
+	
+	public  OsmWay createosmWay(OsmOutputStream  osmOutput ) throws IOException
+	{
+		
 		long idosm = (long)id*-1;
 		long[] nodes =  new long[5];
-		for (int i=0;i<4;i++)
+		for (int i=0;i<nodeList.size();i++)
 		{
+			int n = nodeList.size();
+			System.out.println(n);
 			OsmNode node = nodeList.get(i).createOsmnode();
+			System.out.println(osmOutput);
 			osmOutput.write(node);
-			//System.out.println(node.getId());
 			nodes[i]= node.getId(); // assuming we pass 5 coordinates for a polygon
-			//System.out.printf("Executed");
 		}
 		System.out.println(nodes[0]);
 		Array.set(nodes, 4, nodes[0]);
@@ -93,13 +88,11 @@ public class GenericPolygon {
 		System.out.println(a);
 		
 		
-	//	List <OsmWay> wayList = new ArrayList<OsmWay>();
+	
 		OsmWay ways = new Way(idosm, TLongArrayList.wrap(nodes));//, tags); // how to create and set tags , the name of the polygon is just one part of the tag 
-	//	long[] nodeList = new long[5];
-	//	wayList.add(ways);
 		System.out.println(ways);
 		osmOutput.write(ways);
-		osmOutput.complete();
+		//osmOutput.complete();
 		return ways;
 		
 	}
@@ -149,6 +142,10 @@ else if (name.contains("roof"))
 else if (name.contains("ceiling"))
 {
 	bsp= processBoundarySurface(new CeilingSurface(), polygons);
+}
+else if (name.contains("floor"))
+{
+	bsp= processBoundarySurface(new FloorSurface(), polygons);
 }
 return bsp;
 
