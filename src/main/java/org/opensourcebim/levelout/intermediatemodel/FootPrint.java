@@ -1,14 +1,13 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import de.topobyte.osm4j.core.access.OsmOutputStream;
+import de.topobyte.osm4j.core.model.impl.Way;
 import org.citygml4j.core.model.building.Building;
-import org.opensourcebim.levelout.samples.CitygmlBuilding;
 import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
 import org.opensourcebim.levelout.samples.OsmBuilding;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
@@ -17,9 +16,7 @@ import org.xmlobjects.gml.model.geometry.primitives.Solid;
 import org.xmlobjects.gml.model.geometry.primitives.SolidProperty;
 import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 
-import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
-import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
@@ -52,17 +49,17 @@ public class FootPrint {
 
 	}
 
-	public Building setLodgeom(Building b)
+	public Building setLodgeom()
 	{
 		GenericPolygon gp = new GenericPolygon(); // is calling a default constructor ok?
 		//CitygmlBuilding cg = new CitygmlBuilding();
-		//Building building = new Building();
+		Building building = new Building();
 		List<Polygon> listOfpolyValues = new ArrayList<>(); 
 		for (int i =0;i<polygonList.size();i++)
 		{
 			Polygon poly = polygonList.get(i).createCitygmlPoly(); // to use for shell
 			listOfpolyValues.add(poly);
-			b.addBoundary(gp.createBoundary(polygonList.get(i).getName(), poly));  
+			building.addBoundary(gp.createBoundary(polygonList.get(i).getName(), poly));  
 		}
 		Shell shell = new Shell();
 		for (int j=0;j<listOfpolyValues.size();j++)
@@ -70,74 +67,117 @@ public class FootPrint {
 		Stream.of(listOfpolyValues.get(j)).map(p -> new SurfaceProperty("#" + p.getId()))
 				.forEach(shell.getSurfaceMembers()::add);
 		}
-		b.setLod2Solid(new SolidProperty(new Solid(shell)));
-		
-		return b;
-	}
-
-	
-	
-	public void writeTagswaysOsm() throws IOException{
-
-		OsmBuilding os = new OsmBuilding();
-		for (int i =0;i<polygonList.size();i++)
-		{
-			//OsmWay way = polygonList.get(i).createosmWay(); // how to set tags 
+		building.setLod2Solid(new SolidProperty(new Solid(shell)));
+		return building;
 		}
-	}
-	
-	
-	
-	public List<List> createIndoorFeatures()
-	{
-		IndoorGmlBuilding inb = new IndoorGmlBuilding();
-List<StateMemberType> states = new ArrayList<StateMemberType>();
+
 		
-		List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
-		List <List> totallist = new ArrayList<>();
-		for (int i =0;i<polygonList.size();i++)
-		{
-		 
-			CellSpaceType cs = polygonList.get(i).createIndoorgmlCellspace();
-			System.out.println(polygonList.isEmpty());
-			StateType st =polygonList.get(i).setStatePos();
-			
-			inb.createCellspaceMember(cs, cellspacemembers);
-			inb.createStateMember(st, states);
-			
-			inb.setDualitycellspace(cs, st);
-			inb.setdualityState(cs, st);
-
-			totallist.add(cellspacemembers);
-			totallist.add(states);
+		
+		public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException{
+			for (int i =0;i<polygonList.size();i++) {
+				OsmWay way = polygonList.get(i).createosmWay(osmOutput); // how to set tags
+			}
 		}
-		return totallist;
-	}
-	
+		
+		public IndoorFeaturesType setIndoorFeatures()
+		{
+			IndoorGmlBuilding inb = new IndoorGmlBuilding();
+			
+			IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
+			indoorFeatures.setId("if"+ String.valueOf(id));
 
-	public int getLevel() {
-		return level;
-	}
+			PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
+			primalSpaceFeature.setId("pf"+ String.valueOf(id));
 
-	public void setLevel(int level) {
-		this.level = level;
-	}
 
-	public int getId() {
-		return id;
-	}
+			MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
+			multiLayeredGraph.setId("mlg"+ String.valueOf(id));
 
-	public void setId(int id) {
-		this.id = id;
-	}
+			SpaceLayersType spaceLayers = new SpaceLayersType();
+			spaceLayers.setId("slayers"+ String.valueOf(id));
+			List<SpaceLayersType> spaceLayerslist = new ArrayList<SpaceLayersType>();
+			spaceLayerslist.add(spaceLayers);
 
-	public List<GenericPolygon> getPolygonList() {
-		return polygonList;
-	}
+			SpaceLayerType spaceLayer = new SpaceLayerType();
+			spaceLayer.setId("sl"+ String.valueOf(id));
+			List<SpaceLayerMemberType> spaceLayermemberlist = new ArrayList<SpaceLayerMemberType>();
+			SpaceLayerMemberType sLayermember = new SpaceLayerMemberType();
+			sLayermember.setSpaceLayer(spaceLayer);
+			spaceLayermemberlist.add(sLayermember);
+			
 
-	public void setPolygonList(List<GenericPolygon> polygonList) {
-		this.polygonList = polygonList;
-	}
+			NodesType nodes  = new NodesType();
+			nodes.setId("n"+ String.valueOf(id));
+			List<NodesType> nodesList = new ArrayList<NodesType>();
+			nodesList.add(nodes);
+			
 
-	
-}
+
+			PrimalSpaceFeaturesPropertyType primalspacefeaturesProp = new PrimalSpaceFeaturesPropertyType();
+			primalspacefeaturesProp.setPrimalSpaceFeatures(primalSpaceFeature);
+
+			indoorFeatures.setPrimalSpaceFeatures(primalspacefeaturesProp);
+
+			MultiLayeredGraphPropertyType  multilayergraphProp = new MultiLayeredGraphPropertyType();
+			multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
+
+			indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
+			
+			multiLayeredGraph.setSpaceLayers(spaceLayerslist);
+			
+			spaceLayers.setSpaceLayerMember(spaceLayermemberlist);
+			spaceLayer.setNodes(nodesList);
+			
+			List<StateMemberType> states = new ArrayList<StateMemberType>();
+			
+			List<CellSpaceMemberType> cellspacemembers = new ArrayList<CellSpaceMemberType>();
+			
+			for (int i =0;i<polygonList.size();i++)
+			{
+			 
+				CellSpaceType cs = polygonList.get(i).createIndoorgmlCellspace();
+				StateType st =polygonList.get(i).setStatePos();
+				
+				inb.createCellspaceMember(cs, cellspacemembers);
+				inb.createStateMember(st, states);
+				
+				inb.setDualitycellspace(cs, st);
+				inb.setdualityState(cs, st);
+				
+			}
+			
+			primalSpaceFeature.setCellSpaceMember(cellspacemembers);
+			nodes.setStateMember(states);
+			
+			return indoorFeatures;
+			
+
+		}
+		
+		
+
+		public int getLevel() {
+			return level;
+		}
+
+		public void setLevel(int level) {
+			this.level = level;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public List<GenericPolygon> getPolygonList() {
+			return polygonList;
+		}
+
+		public void setPolygonList(List<GenericPolygon> polygonList) {
+			this.polygonList = polygonList;
+		}
+
+	}
