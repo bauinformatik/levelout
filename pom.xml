@@ -79,6 +79,13 @@
 			<artifactId>xlink-v_1_0</artifactId>
 			<version>1.4.0</version>
 		</dependency>
+		<dependency>
+	<groupId>com.google.guava</groupId>
+	<artifactId>guava</artifactId>
+	<version>31.1-jre</version>
+</dependency>
+<!-- Thanks for using https://jar-download.com -->
+
 		<!-- https://mvnrepository.com/artifact/org.wololo/jts2geojson -->
 		<!--   dependency>
 			<groupId>org.wololo</groupId>

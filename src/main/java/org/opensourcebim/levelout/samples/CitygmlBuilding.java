@@ -36,7 +36,7 @@ public class CitygmlBuilding {
 	}
 
 	public void doMain() throws Exception {
-		String fileName = "output/out10.gml";
+		String fileName = "output/out120.gml";
 		
 		CityGMLContext context = CityGMLContext.newInstance();
 
@@ -203,7 +203,7 @@ public class CitygmlBuilding {
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 			Polygon... polygons) {
 		thematicSurface.setId(id.createId());
-		thematicSurface.setLod2MultiSurface(new MultiSurfaceProperty(geom.createMultiSurface(polygons)));
+		thematicSurface.setLod0MultiSurface(new MultiSurfaceProperty(geom.createMultiSurface(polygons)));
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 

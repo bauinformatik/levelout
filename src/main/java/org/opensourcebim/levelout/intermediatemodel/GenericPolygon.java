@@ -58,8 +58,8 @@ public class GenericPolygon {
 			nodes.add(node.getId());
 		}
 		nodes.add(nodes.get(0));
-		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes))); // how to create and set tags, the name of the polygon is just one part of the tag
-		osmOutput.write(way);
+	//	OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes))); // how to create and set tags, the name of the polygon is just one part of the tag
+	//	osmOutput.write(way);
 	}
 
 	public Polygon createCitygmlPoly() {
