@@ -90,7 +90,7 @@ public class TestClass {
 
 		List<FootPrint> footPrints = Arrays.asList(fp1, fp2, fp3);
 
-		GenericBuilding gbld = new GenericBuilding(footPrints, "test");
+		GenericBuilding gbld = new GenericBuilding(footPrints, "test2");
 		gbld.createCitygmlBuilding();
 		gbld.createOsmBuilding();
 		gbld.createIndoorGmlBuilding();

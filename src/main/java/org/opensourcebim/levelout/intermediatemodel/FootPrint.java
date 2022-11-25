@@ -3,14 +3,18 @@ package org.opensourcebim.levelout.intermediatemodel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import org.citygml4j.core.model.building.Building;
 import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
+import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface;
+import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.model.geometry.primitives.Shell;
 import org.xmlobjects.gml.model.geometry.primitives.Solid;
 import org.xmlobjects.gml.model.geometry.primitives.SolidProperty;
+import org.xmlobjects.gml.model.geometry.primitives.Surface;
 import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
@@ -42,13 +46,31 @@ public class FootPrint {
 			polygonList.add(poly);
 			building.addBoundary(genericPolygon.createBoundary(poly));
 		}
-		Shell shell = new Shell();
+		
+		
+		
+	
+	   
+	        List<SurfaceProperty> surfaceMember = new ArrayList<>();
+	        for (Polygon polygon : polygonList) {
+
+	        	surfaceMember.add(new SurfaceProperty("#" + polygon.getId()));
+			}
+	      
+	        	building. setLod0MultiSurface(new MultiSurfaceProperty(new MultiSurface(surfaceMember)));
+	       
+	}
+	        
+
+	       
+	       
+	/*	Shell shell = new Shell();
 		for (Polygon polygon : polygonList) {
 			shell.getSurfaceMembers().add(new SurfaceProperty("#" + polygon.getId()));
 		}
 		// polygonList.stream().map( p -> new SurfaceProperty("#" + p.getId())).forEach(shell.getSurfaceMembers()::add);
 		building.setLod2Solid(new SolidProperty(new Solid(shell)));
-	}
+	}*/
 
 	public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException {
 		for (GenericPolygon genericPolygon : polygonList) {

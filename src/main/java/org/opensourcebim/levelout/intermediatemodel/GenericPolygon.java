@@ -73,7 +73,7 @@ public class GenericPolygon {
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 																 Polygon polygon) {
 		thematicSurface.setId(idCreator.createId());
-		thematicSurface.setLod2MultiSurface(new MultiSurfaceProperty(geometryFactory.createMultiSurface(polygon)));
+		thematicSurface.setLod0MultiSurface(new MultiSurfaceProperty(geometryFactory.createMultiSurface(polygon)));
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 

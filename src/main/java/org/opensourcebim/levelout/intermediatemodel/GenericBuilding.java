@@ -59,7 +59,7 @@ public class GenericBuilding {
 		}
 		Envelope envelope = building.computeEnvelope();
 
-		CityGMLVersion version = CityGMLVersion.v2_0;
+		CityGMLVersion version = CityGMLVersion.v3_0;
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
 		Path path = Paths.get("output", name + "-city.gml");
 		Files.createDirectories(path.getParent());
