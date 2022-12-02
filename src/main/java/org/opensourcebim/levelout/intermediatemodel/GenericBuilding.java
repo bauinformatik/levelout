@@ -1,13 +1,9 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,15 +39,13 @@ import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 public class GenericBuilding {
 
 	private final List<FootPrint> footPrints;
-	private final String name;
 	private static final ObjectFactory objectFactory = new ObjectFactory();
 
-	public GenericBuilding(List<FootPrint> footPrints, String name) {
+	public GenericBuilding(List<FootPrint> footPrints) {
 		this.footPrints = footPrints;
-		this.name = name;
 	}
 		
-	public void createCitygmlBuilding()  throws Exception {
+	public void createCitygmlBuilding(OutputStream outStream)  throws Exception {
 		CityGMLContext context = CityGMLContext.newInstance();
 		Building building = new Building();
 		for (FootPrint footPrint : footPrints) {
@@ -61,10 +55,8 @@ public class GenericBuilding {
 
 		CityGMLVersion version = CityGMLVersion.v3_0;
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
-		Path path = Paths.get("output", name + "-city.gml");
-		Files.createDirectories(path.getParent());
 
-		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(path, StandardCharsets.UTF_8.name())) {
+		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream, StandardCharsets.UTF_8.name())) {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
 					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 					.withHeaderComment("File created with citygml4j");
@@ -73,8 +65,7 @@ public class GenericBuilding {
 		}
 	}
 
-	public void createOsmBuilding() throws IOException {
-		OutputStream outStream = new FileOutputStream("output/" + name + ".osm");
+	public void createOsmBuilding(OutputStream outStream) throws IOException {
 		OsmOutputStream osmOutStream = new OsmXmlOutputStream(outStream, true);
 		for (FootPrint footPrint : footPrints) {
 			for (GenericPolygon polygon: footPrint.getPolygonList()) {
@@ -84,7 +75,7 @@ public class GenericBuilding {
 		osmOutStream.complete();
 	}
 
-	public void createIndoorGmlBuilding() throws FileNotFoundException, JAXBException {
+	public void createIndoorGmlBuilding(OutputStream outStream) throws FileNotFoundException, JAXBException {
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
 		indoorFeatures.setId("if");
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
@@ -122,7 +113,6 @@ public class GenericBuilding {
 		spaceLayers.setSpaceLayerMember(spaceLayerMemberList);
 		spaceLayer.setNodes(nodesList);
 
-		FileOutputStream outStream = new FileOutputStream("output/" + name + "-indoor.gml", true);
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,

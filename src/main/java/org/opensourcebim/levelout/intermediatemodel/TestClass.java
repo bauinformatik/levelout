@@ -1,5 +1,7 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,10 +92,15 @@ public class TestClass {
 
 		List<FootPrint> footPrints = Arrays.asList(fp1, fp2, fp3);
 
-		GenericBuilding gbld = new GenericBuilding(footPrints, "test");
-		gbld.createCitygmlBuilding();
-		gbld.createOsmBuilding();
-		gbld.createIndoorGmlBuilding();
+		if(!new File("output").exists()){
+			if(!new File("output").mkdir()){
+				return;
+			};
+		}
+		GenericBuilding gbld = new GenericBuilding(footPrints);
+		gbld.createCitygmlBuilding(new FileOutputStream("output/test-city.gml"));
+		gbld.createOsmBuilding(new FileOutputStream("output/test.osm"));
+		gbld.createIndoorGmlBuilding(new FileOutputStream("output/test-indoor.gml", true));
 	}
 }
 
