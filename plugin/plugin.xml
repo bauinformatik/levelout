@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginDescriptor>
+    <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.serializer.CityGmlSerializerPlugin</implementationClass>
+        <description>CityGML Serializer</description>
+        <name>CityGML</name>
+    </JavaPlugin>
+    <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.serializer.IndoorGmlSerializerPlugin</implementationClass>
+        <description>IndoorGML Serializer</description>
+        <name>IndoorGML</name>
+    </JavaPlugin>
+    <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.serializer.OsmSerializerPlugin</implementationClass>
+        <description>OSM Serializer</description>
+        <name>OSM</name>
+    </JavaPlugin>
+    <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.checkingservice.LevelOutChecking</implementationClass>
+        <description>LevelOut Checking Service</description>
+        <name>LevelOut-Checking</name>
+    </JavaPlugin>
+</PluginDescriptor>

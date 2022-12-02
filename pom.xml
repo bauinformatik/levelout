@@ -6,11 +6,28 @@
 	<artifactId>LevelOutSerializers</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<name>LevelOutSerializers</name>
+	<organization>
+		<name>Bauhaus-Universität Weimar</name>
+		<url>https://www.uni-weimar.de</url>
+	</organization>
 	<properties>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 	</properties>
+	<build>
+		<resources>
+			<resource>
+				<targetPath>plugin</targetPath>
+				<directory>plugin</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
 	<repositories>
+		<repository>
+			<id>central</id>
+			<url>https://repo1.maven.org/maven2</url>
+		</repository>
 		<repository>
 			<id>topobyte</id>
 			<name>TopoByte</name>
@@ -23,7 +40,12 @@
 		</repository>
 	</repositories>
 	<dependencies>
-		<!-- TODO: use JAXB 2 maven plugin to generate or install in local repo, 
+		<dependency>
+			<groupId>org.opensourcebim</groupId>
+			<artifactId>shared</artifactId>
+			<version>1.5.182</version>
+		</dependency>
+		<!-- TODO: use JAXB 2 maven plugin to generate or install in local repo,
 			now taken from https://github.com/STEMLab/InFactory lib -->
 		<dependency>
 			<groupId>org.jvnet.ogc</groupId>
