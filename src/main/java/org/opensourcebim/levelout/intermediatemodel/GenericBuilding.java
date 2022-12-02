@@ -46,7 +46,7 @@ public class GenericBuilding {
 	}
 		
 	public void createCitygmlBuilding(OutputStream outStream)  throws Exception {
-		CityGMLContext context = CityGMLContext.newInstance();
+		CityGMLContext context = CityGMLContext.newInstance(getClass().getClassLoader());
 		Building building = new Building();
 		for (FootPrint footPrint : footPrints) {
 			footPrint.setLodgeom(building);
