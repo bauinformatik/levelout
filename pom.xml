@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opensourcebim.levelout</groupId>
-	<artifactId>LevelOutSerializers</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<artifactId>LevelOutPlugins</artifactId>
+	<version>0.1</version>
 	<name>LevelOutSerializers</name>
 	<organization>
 		<name>Bauhaus-Universität Weimar</name>
@@ -70,6 +70,11 @@
 			<groupId>de.topobyte</groupId>
 			<artifactId>osm4j-geometry</artifactId>
 			<version>0.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.slimjars.trove4j</groupId>
+			<artifactId>trove4j-long-array-list</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.citygml4j</groupId>
