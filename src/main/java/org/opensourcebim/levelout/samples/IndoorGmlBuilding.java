@@ -20,13 +20,24 @@ import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
 import net.opengis.gml.v_3_2_1.BoundingShapeType;
+import net.opengis.gml.v_3_2_1.DirectPositionListType;
 import net.opengis.gml.v_3_2_1.DirectPositionType;
+import net.opengis.gml.v_3_2_1.LinearRingType;
 import net.opengis.gml.v_3_2_1.PointPropertyType;
 import net.opengis.gml.v_3_2_1.PointType;
+import net.opengis.gml.v_3_2_1.PolygonType;
+import net.opengis.gml.v_3_2_1.RingPropertyType;
+import net.opengis.gml.v_3_2_1.ShellPropertyType;
+import net.opengis.gml.v_3_2_1.ShellType;
 import net.opengis.gml.v_3_2_1.AbstractGeometryType;
+import net.opengis.gml.v_3_2_1.AbstractRingPropertyType;
+import net.opengis.gml.v_3_2_1.AbstractRingType;
 import net.opengis.gml.v_3_2_1.AbstractSolidType;
+import net.opengis.gml.v_3_2_1.AbstractSurfaceType;
 import net.opengis.gml.v_3_2_1.SolidPropertyType;
 import net.opengis.gml.v_3_2_1.SolidType;
+import net.opengis.gml.v_3_2_1.SurfacePropertyType;
+import net.opengis.gml.v_3_2_1.SurfaceType;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -34,7 +45,10 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
 import org.opensourcebim.levelout.samples.IndoorGmlSample.IndoorGMLNameSpaceMapper;
+import org.xmlobjects.gml.model.geometry.primitives.LinearRing;
+import org.xmlobjects.gml.model.geometry.primitives.Ring;
 import org.xmlobjects.gml.model.geometry.primitives.Solid;
+import org.xmlobjects.gml.model.geometry.primitives.Surface;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
@@ -55,7 +69,10 @@ import java.util.Map;
 
 public class IndoorGmlBuilding {
 	
-	private static ObjectFactory objectFactory = new ObjectFactory();
+	private static net.opengis.indoorgml.core.v_1_0.ObjectFactory objectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
+	
+	private static net.opengis.gml.v_3_2_1.ObjectFactory obj = new net.opengis.gml.v_3_2_1.ObjectFactory();
+	
 	
 	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
 
@@ -232,12 +249,73 @@ public class IndoorGmlBuilding {
 	public static CellSpaceType createCellspace(String id, String uri) {
 		CellSpaceType cellspace = new CellSpaceType();
 		cellspace.setId(id);
+		
+		
+		SolidPropertyType  sp = new SolidPropertyType ();
+		AbstractSolidType ab = new AbstractSolidType();
+		ab.setSrsDimension(BigInteger.valueOf(3));
+		//ab.set
+		CellSpaceGeometryType cg = new CellSpaceGeometryType();
+		
+		SolidType sld = new SolidType();
+		ShellPropertyType shell = new ShellPropertyType ();
+		ShellType sheltyp = new ShellType();
+		List<SurfacePropertyType> surlis = new ArrayList<> ();
+		sheltyp.setSurfaceMember(surlis);
+		SurfacePropertyType sur = new SurfacePropertyType();
+		surlis.add(sur);
+	//	sur.setAbstractSurface);
+		
+	shell.setShell(sheltyp);
+		sld.setExterior(shell);
+		//AbstractSurfaceType abssurtyp = new AbstractSurfaceType();
+	//	abssurtyp.set
+	//	AbstractSurfaceType abs =
+		sur.setAbstractSurface(obj.createAbstractSurface( AbstractSurfaceType()));
+		cg.setGeometry2D(sur);
+		cg.setGeometry3D(sp);
+		
+		cellspace.setCellSpaceGeometry(cg);
+		cellspace.setCellSpaceGeometry(objectFactory.createCellSpaceGeometryType());
 		ExternalObjectReferenceType extrefobj = new ExternalObjectReferenceType();
 		extrefobj.setUri(uri);
 		ExternalReferenceType extreftyp = new ExternalReferenceType();
 		extreftyp.setExternalObject(extrefobj);
 		List<ExternalReferenceType> extreflist = new ArrayList<ExternalReferenceType>();
 		cellspace.setExternalReference(extreflist);
+		
+		
+		
+		
+		
+		PolygonType pt = new PolygonType();
+
+		LinearRingType linringtyp = new LinearRingType();
+		DirectPositionListType dirposlis = new DirectPositionListType();
+		linringtyp.setPosList(dirposlis);
+	
+		DirectPositionType dirPos = new DirectPositionType();
+	
+	
+		
+		List <Double> l = new ArrayList();
+		l.add(null);
+		dirposlis.setValue(l);
+		
+		AbstractRingPropertyType absringProp = new AbstractRingPropertyType();
+		absringProp.setAbstractRing(obj.createAbstractRing(linringtyp));
+		pt.setExterior(absringProp);
+		
+		cellspace.setCellSpaceGeometry(cg);
+		
+		
+		
+		cg.setGeometry2D(sur);
+		sur.setAbstractSurface(obj.createAbstractSurface(pt));
+		
+	
+		
+		
 		return cellspace;
 	}
 
@@ -251,13 +329,21 @@ public class IndoorGmlBuilding {
 		PointPropertyType pointProp = new PointPropertyType();
 
 		PointType point = new PointType();
+		
+		//point.set
 
+		
 
 		DirectPositionType dirPos = new DirectPositionType();
+		
+	
+		
+		
+	
 
 		//	dirPos.setValue(Arrays.asList(5.0,5.0,5.0));
 		//	dirPos.setSrsDimension(BigInteger.valueOf(3));
-
+		
 
 		dirPos.withValue(x,y,z).withSrsDimension(BigInteger.valueOf(3));
 
@@ -266,6 +352,7 @@ public class IndoorGmlBuilding {
 
 
 		state.setGeometry(pointProp);
+	
 	}
 
 	public static void setMetadata(Geometry g, String metadata, Object value) {

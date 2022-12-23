@@ -34,15 +34,15 @@ import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 
-public class GenericPolygon {
+public class Room {
 	private final long id;
 	private final String type;
 	private final int dimension;
-	private final List<GenericNode> nodeList;
+	private final List<Corner> nodeList;
 	private final IdCreator idCreator = DefaultIdCreator.getInstance();
 	private final GeometryFactory geometryFactory = GeometryFactory.newInstance().withIdCreator(idCreator);
 
-	public GenericPolygon(long id, String type, int dimension, List<GenericNode> nodeList) {
+	public Room(long id, String type, int dimension, List<Corner> nodeList) {
 		this.id = id; // TODO auto-increment
 		this.type = type; // TODO change to enum if needed at all
 		this.dimension = dimension; // TODO static value, always 3
@@ -52,7 +52,7 @@ public class GenericPolygon {
 	public void createosmWay(OsmOutputStream osmOutput) throws IOException {
 		long id = this.id * -1;
 		List<Long>nodes = new ArrayList<>();
-		for (GenericNode genericNode : nodeList) {
+		for (Corner genericNode : nodeList) {
 			OsmNode node = genericNode.createOsmNode();
 			osmOutput.write(node);
 			nodes.add(node.getId());
@@ -64,7 +64,7 @@ public class GenericPolygon {
 
 	public Polygon createCitygmlPoly() {
 		List<Double> coordinates = new ArrayList<>();
-		for (GenericNode genericNode : nodeList) {
+		for (Corner genericNode : nodeList) {
 			coordinates.addAll(genericNode.createCityGmlNode()); // adding the list generated from citygmlnode
 		}
 		return geometryFactory.createPolygon(coordinates, getDimension());
@@ -116,7 +116,7 @@ public class GenericPolygon {
 		PointPropertyType pointProperty = new PointPropertyType();
 		PointType point = new PointType();
 		DirectPositionType dirPos = new DirectPositionType();
-		for (GenericNode node : nodeList) {
+		for (Corner node : nodeList) {
 			if (node.getX() < minX) {
 				minX = node.getX();
 			} else if (node.getX() > maxX) {

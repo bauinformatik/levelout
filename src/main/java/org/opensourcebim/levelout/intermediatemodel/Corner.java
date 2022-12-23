@@ -6,14 +6,14 @@ import java.util.List;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.impl.Node;
 
-public class GenericNode {
+public class Corner {
 
 	private final long id;
 	private final double x;
 	private final double y;
 	private final double z;
 
-	public GenericNode(long id, double x, double y, double z) {
+	public Corner(long id, double x, double y, double z) {
 		this.id = id;
 		this.x = x;
 		this.y = y;

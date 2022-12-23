@@ -22,14 +22,14 @@ import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 
-public class FootPrint {
+public class Storey {
 
 	private int level;
-	private int id;
-	private final List<GenericPolygon> polygonList;
+	private long id;
+	private final List<Room> polygonList;
 	//private GenericPolygon gp;
 
-	public FootPrint(int level, int id, List<GenericPolygon> polygonList) {
+	public Storey(int level, int id, List<Room> polygonList) {
 		this.level = level;
 		this.id = id;
 		this.polygonList = polygonList;
@@ -41,7 +41,7 @@ public class FootPrint {
 
 	public void setLodgeom(Building building) {
 		List<Polygon> polygonList = new ArrayList<>();
-		for (GenericPolygon genericPolygon : this.polygonList) {
+		for (Room genericPolygon : this.polygonList) {
 			Polygon poly = genericPolygon.createCitygmlPoly(); // to use for shell
 			polygonList.add(poly);
 			building.addBoundary(genericPolygon.createBoundary(poly));
@@ -73,13 +73,13 @@ public class FootPrint {
 	}*/
 
 	public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException {
-		for (GenericPolygon genericPolygon : polygonList) {
+		for (Room genericPolygon : polygonList) {
 			genericPolygon.createosmWay(osmOutput); // how to set tags
 		}
 	}
 
 	public void createIndoorFeatures(List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
-		for (GenericPolygon genericPolygon : polygonList) {
+		for (Room genericPolygon : polygonList) {
 			CellSpaceType cs = genericPolygon.createIndoorGmlCellSpace();
 			IndoorGmlBuilding.createCellspaceMember(cs, cellSpaceMembers);
 
@@ -91,7 +91,7 @@ public class FootPrint {
 		}
 	}
 
-	public List<GenericPolygon> getPolygonList() {
+	public List<Room> getPolygonList() {
 		return polygonList;
 	}
 }

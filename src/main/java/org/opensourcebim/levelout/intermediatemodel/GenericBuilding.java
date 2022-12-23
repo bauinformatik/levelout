@@ -38,17 +38,17 @@ import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 public class GenericBuilding {
 
-	private final List<FootPrint> footPrints;
+	private final List<Storey> footPrints;
 	private static final ObjectFactory objectFactory = new ObjectFactory();
 
-	public GenericBuilding(List<FootPrint> footPrints) {
+	public GenericBuilding(List<Storey> footPrints) {
 		this.footPrints = footPrints;
 	}
 		
 	public void createCitygmlBuilding(OutputStream outStream)  throws Exception {
 		CityGMLContext context = CityGMLContext.newInstance(getClass().getClassLoader());
 		Building building = new Building();
-		for (FootPrint footPrint : footPrints) {
+		for (Storey footPrint : footPrints) {
 			footPrint.setLodgeom(building);
 		}
 		Envelope envelope = building.computeEnvelope();
@@ -57,8 +57,8 @@ public class GenericBuilding {
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
 
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream, StandardCharsets.UTF_8.name())) {
-			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
-					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
+			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultNamespace(CoreModule.of(version).getNamespaceURI())//withDefaultPrefixes()
+				
 					.withHeaderComment("File created with citygml4j");
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
 			writer.writeMember(building);
@@ -67,8 +67,8 @@ public class GenericBuilding {
 
 	public void createOsmBuilding(OutputStream outStream) throws IOException {
 		OsmOutputStream osmOutStream = new OsmXmlOutputStream(outStream, true);
-		for (FootPrint footPrint : footPrints) {
-			for (GenericPolygon polygon: footPrint.getPolygonList()) {
+		for (Storey footPrint : footPrints) {
+			for (Room polygon: footPrint.getPolygonList()) {
 				polygon.createosmWay(osmOutStream); // how to write tags
 			}
 		}
@@ -126,7 +126,7 @@ public class GenericBuilding {
 		List<StateMemberType> states = new ArrayList<>();
 		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
 
-		for (FootPrint footPrint : footPrints) {
+		for (Storey footPrint : footPrints) {
 			footPrint.createIndoorFeatures(states, cellSpaceMembers);
 		}
 
