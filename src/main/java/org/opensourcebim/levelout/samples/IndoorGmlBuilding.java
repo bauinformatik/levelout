@@ -45,44 +45,6 @@ public class IndoorGmlBuilding {
 
 		String fileName = "output/outindoor5.gml";
 		FileOutputStream fout = new FileOutputStream(fileName);
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description 
-		indoorFeatures.setId("if1");
-
-		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
-		primalSpaceFeature.setId("pf1");
-
-		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg1");
-
-		SpaceLayersType spaceLayers = new SpaceLayersType();
-		spaceLayers.setId("slayers1");
-		List<SpaceLayersType> spaceLayersList = List.of(spaceLayers);
-
-		SpaceLayerType spaceLayer = new SpaceLayerType();
-		spaceLayer.setId("sl1");
-		List<SpaceLayerMemberType> spaceLayerMembers = new ArrayList<>();
-		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
-		spaceLayerMember.setSpaceLayer(spaceLayer);
-		spaceLayerMembers.add(spaceLayerMember);
-
-		NodesType nodes = new NodesType();
-		nodes.setId("n1");
-		List<NodesType> nodesList = List.of(nodes);
-
-		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProperty = new PrimalSpaceFeaturesPropertyType();
-		primalSpaceFeaturesProperty.setPrimalSpaceFeatures(primalSpaceFeature);
-
-		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProperty);
-
-		MultiLayeredGraphPropertyType multiLayeredGraphProperty = new MultiLayeredGraphPropertyType();
-		multiLayeredGraphProperty.setMultiLayeredGraph(multiLayeredGraph);
-
-		indoorFeatures.setMultiLayeredGraph(multiLayeredGraphProperty);
-
-		multiLayeredGraph.setSpaceLayers(spaceLayersList);
-
-		spaceLayers.setSpaceLayerMember(spaceLayerMembers);
-		spaceLayer.setNodes(nodesList);
 
 		CellSpaceType cs1 = createCellSpace("c1", null);
 		CellSpaceType cs2 = createCellSpace("c2", null);
@@ -98,7 +60,13 @@ public class IndoorGmlBuilding {
 		createCellSpaceMember(cs4, cellspacemembers);
 		createCellSpaceMember(cs5, cellspacemembers);
 		createCellSpaceMember(cs6, cellspacemembers);
+
+		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
+		primalSpaceFeature.setId("pf1");
 		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
+
+		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProperty = new PrimalSpaceFeaturesPropertyType();
+		primalSpaceFeaturesProperty.setPrimalSpaceFeatures(primalSpaceFeature);
 
 		StateType st1 = createState("s1");
 		StateType st2 = createState("s2");
@@ -136,7 +104,35 @@ public class IndoorGmlBuilding {
 		setDualityState(st5, cs5);
 		setDualityState(st6, cs6);
 
+		NodesType nodes = new NodesType();
+		nodes.setId("n1");
 		nodes.setStateMember(states);
+		List<NodesType> nodesList = List.of(nodes);
+
+		SpaceLayerType spaceLayer = new SpaceLayerType();
+		spaceLayer.setId("sl1");
+		spaceLayer.setNodes(nodesList);
+
+		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
+		spaceLayerMember.setSpaceLayer(spaceLayer);
+		List<SpaceLayerMemberType> spaceLayerMembers = List.of(spaceLayerMember);
+
+		SpaceLayersType spaceLayers = new SpaceLayersType();
+		spaceLayers.setId("slayers1");
+		spaceLayers.setSpaceLayerMember(spaceLayerMembers);
+		List<SpaceLayersType> spaceLayersList = List.of(spaceLayers);
+
+		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
+		multiLayeredGraph.setId("mlg1");
+		multiLayeredGraph.setSpaceLayers(spaceLayersList);
+
+		MultiLayeredGraphPropertyType multiLayeredGraphProperty = new MultiLayeredGraphPropertyType();
+		multiLayeredGraphProperty.setMultiLayeredGraph(multiLayeredGraph);
+
+		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
+		indoorFeatures.setId("if1");
+		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProperty);
+		indoorFeatures.setMultiLayeredGraph(multiLayeredGraphProperty);
 
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
@@ -148,8 +144,6 @@ public class IndoorGmlBuilding {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
 		marshaller.marshal(indoorObjectFactory.createIndoorFeatures(indoorFeatures), fout);
-
-
 	}
 
 	public static void setDualityState(StateType state, CellSpaceType cellSpace) {
