@@ -3,7 +3,6 @@ package org.opensourcebim.levelout.intermediatemodel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import org.citygml4j.core.model.building.Building;
@@ -11,10 +10,6 @@ import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
-import org.xmlobjects.gml.model.geometry.primitives.Shell;
-import org.xmlobjects.gml.model.geometry.primitives.Solid;
-import org.xmlobjects.gml.model.geometry.primitives.SolidProperty;
-import org.xmlobjects.gml.model.geometry.primitives.Surface;
 import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty;
 
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
@@ -81,13 +76,13 @@ public class Storey {
 	public void createIndoorFeatures(List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
 		for (Room genericPolygon : polygonList) {
 			CellSpaceType cs = genericPolygon.createIndoorGmlCellSpace();
-			IndoorGmlBuilding.createCellspaceMember(cs, cellSpaceMembers);
+			IndoorGmlBuilding.createCellSpaceMember(cs, cellSpaceMembers);
 
 			StateType st = genericPolygon.createIndoorGmlState();
 			IndoorGmlBuilding.createStateMember(st, stateMembers);
 
-			IndoorGmlBuilding.setDualitycellspace(cs, st);
-			IndoorGmlBuilding.setdualityState(cs, st);
+			IndoorGmlBuilding.setDualityCellSpace(cs, st);
+			IndoorGmlBuilding.setDualityState(st, cs);
 		}
 	}
 
