@@ -5,42 +5,61 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
-import net.opengis.gml.v_3_2_1.BoundingShapeType;
-import net.opengis.indoorgml.core.v_1_0.CellSpaceGeometryType;
-import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
-import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
-import net.opengis.indoorgml.core.v_1_0.EdgesType;
-import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.NodesType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.StateMemberType;
-import net.opengis.indoorgml.core.v_1_0.StateType;
-import net.opengis.indoorgml.navigation.v_1_0.GeneralSpaceType;
-import net.opengis.indoorgml.navigation.v_1_0.ObjectFactory;
+import net.opengis.gml.v_3_2_1.*;
+import net.opengis.indoorgml.core.v_1_0.*;
+
+import java.lang.Boolean;
 
 public class IndoorGmlSample {
+
+	static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
+	static final net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
 	public static void main(String[] args) throws JAXBException {
-		CellSpaceType cellspace = new CellSpaceType();
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
-		indoorFeatures.setPrimalSpaceFeatures(
-				new PrimalSpaceFeaturesPropertyType().withPrimalSpaceFeatures(
-						new PrimalSpaceFeaturesType().withCellSpaceMember(
-								new CellSpaceMemberType().withCellSpace(
-										new ObjectFactory().createGeneralSpace(new GeneralSpaceType())
+		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType().withPrimalSpaceFeatures(
+			new PrimalSpaceFeaturesPropertyType().withPrimalSpaceFeatures(
+				new PrimalSpaceFeaturesType().withCellSpaceMember(
+					new CellSpaceMemberType().withCellSpace(
+						indoorFactory.createCellSpace(new CellSpaceType().withCellSpaceGeometry(
+							new CellSpaceGeometryType().withGeometry2D(
+								new SurfacePropertyType().withAbstractSurface(
+									gmlFactory.createPolygon(new PolygonType().withExterior(
+										new AbstractRingPropertyType().withAbstractRing(
+											gmlFactory.createLinearRing(new LinearRingType().withCoordinates(
+												new CoordinatesType()
+											))
+										)
+									))
 								)
-						)
+							)
+						))
+					)
 				)
+			)
+		).withMultiLayeredGraph(
+			new MultiLayeredGraphPropertyType().withMultiLayeredGraph(
+				new MultiLayeredGraphType().withSpaceLayers(
+					new SpaceLayersType().withSpaceLayerMember(
+						new SpaceLayerMemberType().withSpaceLayer(
+							new SpaceLayerType().withNodes(
+								new NodesType().withStateMember(
+									new StateMemberType().withState(
+										new StateType()
+									)
+								)
+							).withEdges(
+								new EdgesType().withTransitionMember(
+									new TransitionMemberType().withTransition(
+										new TransitionType()
+									)
+								)
+							)
+						)
+					)
+				)
+			)
+
 		);
-		BoundingShapeType boundary = new BoundingShapeType();
-		cellspace.setBoundedBy(boundary);
-		CellSpaceGeometryType geometry = new CellSpaceGeometryType();
-		cellspace.setCellSpaceGeometry(geometry);
-		EdgesType edges = new EdgesType();
-		NodesType nodes = new NodesType();
-		StateMemberType stateMember = new StateMemberType();
-		stateMember.setState(new StateType());
-		nodes.getStateMember().add(stateMember);
+
 		JAXBContext context = JAXBContext.newInstance(IndoorFeaturesType.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
@@ -50,7 +69,7 @@ public class IndoorGmlSample {
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
-		marshaller.marshal(new net.opengis.indoorgml.core.v_1_0.ObjectFactory().createIndoorFeatures(indoorFeatures), System.out);
+		marshaller.marshal(indoorFactory.createIndoorFeatures(indoorFeatures), System.out);
 	}
 
 	public static class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {
@@ -75,7 +94,7 @@ public class IndoorGmlSample {
 
 		@Override
 		public String[] getPreDeclaredNamespaceUris() {
-			return new String[] { DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI };
+			return new String[]{DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI};
 		}
 	}
 
