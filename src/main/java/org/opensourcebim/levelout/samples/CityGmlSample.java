@@ -1,6 +1,7 @@
 package org.opensourcebim.levelout.samples;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.AbstractBuildingProperty;
@@ -29,7 +30,7 @@ public class CityGmlSample {
 		cityModel.getCityObjectMembers().add(new AbstractCityObjectProperty(building));
 		Storey storey = new Storey();
 		Elevation elevation = new Elevation(new Code("floorFinish"), new DirectPosition(3.00));
-		storey.setElevations(Arrays.asList(new ElevationProperty(elevation)));
+		storey.setElevations(List.of(new ElevationProperty(elevation)));
 		building.getBuildingSubdivisions().add(new AbstractBuildingSubdivisionProperty(storey));
 		CityGMLOutputFactory cityGmlOutputFactory = CityGMLContext.newInstance().createCityGMLOutputFactory(CityGMLVersion.v3_0);
 		CityGMLWriter writer = cityGmlOutputFactory.createCityGMLWriter(System.out).withIndent("  ").withDefaultPrefixes();
