@@ -15,7 +15,6 @@ import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
-import net.opengis.indoorgml.core.v_1_0.ObjectFactory;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalObjectReferenceType;
 import net.opengis.indoorgml.core.v_1_0.ExternalReferenceType;
@@ -69,9 +68,9 @@ import java.util.Map;
 
 public class IndoorGmlBuilding {
 	
-	private static net.opengis.indoorgml.core.v_1_0.ObjectFactory objectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
+	private static net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorgmlObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
 	
-	private static net.opengis.gml.v_3_2_1.ObjectFactory obj = new net.opengis.gml.v_3_2_1.ObjectFactory();
+	private static net.opengis.gml.v_3_2_1.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
 	
 	
 	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
@@ -217,7 +216,7 @@ public class IndoorGmlBuilding {
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
-		marshaller.marshal(objectFactory.createIndoorFeatures(indoorFeatures), fout);
+		marshaller.marshal(indoorgmlObjectFactory.createIndoorFeatures(indoorFeatures), fout);
 
 
 	}
@@ -237,7 +236,7 @@ public class IndoorGmlBuilding {
 	public static void createCellspaceMember(CellSpaceType cellspace, List<CellSpaceMemberType> cellspacemembers) {
 		CellSpaceMemberType cellspacemember1 = new CellSpaceMemberType();
 		cellspacemembers.add(cellspacemember1);	
-		cellspacemember1.setCellSpace(objectFactory.createCellSpace(cellspace));
+		cellspacemember1.setCellSpace(indoorgmlObjectFactory.createCellSpace(cellspace));
 	}
 
 	public static void createStateMember(StateType state, List<StateMemberType> states) {
@@ -271,12 +270,12 @@ public class IndoorGmlBuilding {
 		//AbstractSurfaceType abssurtyp = new AbstractSurfaceType();
 	//	abssurtyp.set
 	//	AbstractSurfaceType abs =
-		sur.setAbstractSurface(obj.createAbstractSurface( AbstractSurfaceType()));
+		sur.setAbstractSurface(gmlObjectFactory.createAbstractSurface( AbstractSurfaceType()));
 		cg.setGeometry2D(sur);
 		cg.setGeometry3D(sp);
 		
 		cellspace.setCellSpaceGeometry(cg);
-		cellspace.setCellSpaceGeometry(objectFactory.createCellSpaceGeometryType());
+		cellspace.setCellSpaceGeometry(indoorgmlObjectFactory.createCellSpaceGeometryType());
 		ExternalObjectReferenceType extrefobj = new ExternalObjectReferenceType();
 		extrefobj.setUri(uri);
 		ExternalReferenceType extreftyp = new ExternalReferenceType();
@@ -303,7 +302,7 @@ public class IndoorGmlBuilding {
 		dirposlis.setValue(l);
 		
 		AbstractRingPropertyType absringProp = new AbstractRingPropertyType();
-		absringProp.setAbstractRing(obj.createAbstractRing(linringtyp));
+		absringProp.setAbstractRing(gmlObjectFactory.createAbstractRing(linringtyp));
 		pt.setExterior(absringProp);
 		
 		cellspace.setCellSpaceGeometry(cg);
@@ -311,7 +310,7 @@ public class IndoorGmlBuilding {
 		
 		
 		cg.setGeometry2D(sur);
-		sur.setAbstractSurface(obj.createAbstractSurface(pt));
+		sur.setAbstractSurface(gmlObjectFactory.createAbstractSurface(pt));
 		
 	
 		
