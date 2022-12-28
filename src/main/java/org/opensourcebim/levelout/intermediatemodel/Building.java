@@ -13,11 +13,12 @@ import javax.xml.bind.Marshaller;
 
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import org.citygml4j.core.model.CityGMLVersion;
-import org.citygml4j.core.model.building.Building;
 import org.citygml4j.xml.CityGMLContext;
+import org.citygml4j.xml.CityGMLContextException;
 import org.citygml4j.xml.module.citygml.CoreModule;
 import org.citygml4j.xml.writer.CityGMLChunkWriter;
 import org.citygml4j.xml.writer.CityGMLOutputFactory;
+import org.citygml4j.xml.writer.CityGMLWriteException;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 
@@ -36,18 +37,18 @@ import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
-public class GenericBuilding {
+public class Building {
 
 	private final List<Storey> footPrints;
 	private static final ObjectFactory objectFactory = new ObjectFactory();
 
-	public GenericBuilding(List<Storey> footPrints) {
+	public Building(List<Storey> footPrints) {
 		this.footPrints = footPrints;
 	}
 		
-	public void createCitygmlBuilding(OutputStream outStream)  throws Exception {
+	public void createCitygmlBuilding(OutputStream outStream) throws CityGMLContextException, CityGMLWriteException {
 		CityGMLContext context = CityGMLContext.newInstance(getClass().getClassLoader());
-		Building building = new Building();
+		org.citygml4j.core.model.building.Building building = new org.citygml4j.core.model.building.Building();
 		for (Storey footPrint : footPrints) {
 			footPrint.setLodgeom(building);
 		}
@@ -58,7 +59,6 @@ public class GenericBuilding {
 
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream, StandardCharsets.UTF_8.name())) {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultNamespace(CoreModule.of(version).getNamespaceURI())//withDefaultPrefixes()
-				
 					.withHeaderComment("File created with citygml4j");
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
 			writer.writeMember(building);

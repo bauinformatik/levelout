@@ -1,14 +1,10 @@
 package org.opensourcebim.levelout.samples;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.citygml4j.core.model.CityGMLVersion;
-import org.citygml4j.core.model.building.AbstractBuildingProperty;
 import org.citygml4j.core.model.building.AbstractBuildingSubdivisionProperty;
 import org.citygml4j.core.model.building.Building;
-import org.citygml4j.core.model.building.BuildingPart;
-import org.citygml4j.core.model.building.BuildingPartProperty;
 import org.citygml4j.core.model.building.Storey;
 import org.citygml4j.core.model.construction.Elevation;
 import org.citygml4j.core.model.construction.ElevationProperty;
@@ -16,14 +12,13 @@ import org.citygml4j.core.model.core.AbstractCityObjectProperty;
 import org.citygml4j.core.model.core.CityModel;
 import org.citygml4j.xml.CityGMLContext;
 import org.citygml4j.xml.CityGMLContextException;
-import org.citygml4j.xml.writer.CityGMLChunkWriter;
 import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.citygml4j.xml.writer.CityGMLWriteException;
 import org.citygml4j.xml.writer.CityGMLWriter;
 import org.xmlobjects.gml.model.basictypes.Code;
 import org.xmlobjects.gml.model.geometry.DirectPosition;
 
-public class CityGmlSample {
+public class CityGmlBasic {
 	public static void main(String[] args) throws CityGMLWriteException, CityGMLContextException {
 		Building building = new Building();
 		CityModel cityModel = new CityModel();

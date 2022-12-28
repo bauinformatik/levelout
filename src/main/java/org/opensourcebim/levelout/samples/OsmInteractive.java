@@ -18,7 +18,7 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
-public class OsmBuilding {
+public class OsmInteractive {
 	private static final Scanner sc = new Scanner (System.in);
 	private static OsmXmlOutputStream osmOutput;
 

@@ -1,11 +1,16 @@
-package org.opensourcebim.levelout.intermediatemodel;
+package org.opensourcebim.levelout.samples;
+
+import org.opensourcebim.levelout.intermediatemodel.Building;
+import org.opensourcebim.levelout.intermediatemodel.Corner;
+import org.opensourcebim.levelout.intermediatemodel.Room;
+import org.opensourcebim.levelout.intermediatemodel.Storey;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestClass {
+public class IntermediateResidential {
 
 	public static void main(String[] args) throws Exception {
 		// set1 ground
@@ -97,10 +102,10 @@ public class TestClass {
 				return;
 			};
 		}
-		GenericBuilding gbld = new GenericBuilding(footPrints);
+		Building gbld = new Building(footPrints);
 		gbld.createCitygmlBuilding(new FileOutputStream("output/test-city.gml"));
 		gbld.createOsmBuilding(new FileOutputStream("output/test.osm"));
-		gbld.createIndoorGmlBuilding(new FileOutputStream("output/test-indoor.gml", true));
+		gbld.createIndoorGmlBuilding(new FileOutputStream("output/test-indoor.gml"));
 	}
 }
 

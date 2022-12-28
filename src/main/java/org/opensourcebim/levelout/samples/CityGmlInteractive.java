@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class CitygmlBuilding {
+public class CityGmlInteractive {
 
 	private IdCreator id;
 	private GeometryFactory geom;
 	private final Scanner scanner = new Scanner(System.in);
 
 	public static void main(String[] args) throws Exception {
-		new CitygmlBuilding().doMain();
+		new CityGmlInteractive().doMain();
 	}
 
 	public void doMain() throws Exception {
@@ -107,19 +107,19 @@ public class CitygmlBuilding {
 	}
 	else if (name.contains("wall"))
 	{
-		bsp=  processBoundarySurface(new WallSurface(), polygons);
+		bsp =  processBoundarySurface(new WallSurface(), polygons);
 	}
 	else if (name.contains("roof"))
 	{
-		bsp= processBoundarySurface(new RoofSurface(), polygons);
+		bsp = processBoundarySurface(new RoofSurface(), polygons);
 	}
 	else if (name.contains("ceiling"))
 	{
-		bsp= processBoundarySurface(new CeilingSurface(), polygons);
+		bsp = processBoundarySurface(new CeilingSurface(), polygons);
 	}
 	else if (name.contains("floor"))
 	{
-		bsp= processBoundarySurface(new FloorSurface(), polygons);
+		bsp = processBoundarySurface(new FloorSurface(), polygons);
 	}
 	return bsp;
 

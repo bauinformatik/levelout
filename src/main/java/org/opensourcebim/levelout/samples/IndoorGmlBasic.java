@@ -10,7 +10,7 @@ import net.opengis.indoorgml.core.v_1_0.*;
 
 import java.lang.Boolean;
 
-public class IndoorGmlSample {
+public class IndoorGmlBasic {
 
 	static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
 	static final net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();

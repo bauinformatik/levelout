@@ -11,7 +11,7 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
-public class OsmSample {
+public class OsmBasic {
 	public static void main(String[] args) throws IOException {
 		OsmNode node1 = new Node(-1,0,0);
 		OsmNode node2 = new Node(-2,100,0);

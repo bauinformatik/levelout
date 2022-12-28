@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import org.citygml4j.core.model.building.Building;
-import org.opensourcebim.levelout.samples.IndoorGmlBuilding;
+import org.opensourcebim.levelout.samples.IndoorGmlResidential;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
@@ -76,13 +76,13 @@ public class Storey {
 	public void createIndoorFeatures(List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
 		for (Room genericPolygon : polygonList) {
 			CellSpaceType cs = genericPolygon.createIndoorGmlCellSpace();
-			IndoorGmlBuilding.createCellSpaceMember(cs, cellSpaceMembers);
+			IndoorGmlResidential.createCellSpaceMember(cs, cellSpaceMembers);
 
 			StateType st = genericPolygon.createIndoorGmlState();
-			IndoorGmlBuilding.createStateMember(st, stateMembers);
+			IndoorGmlResidential.createStateMember(st, stateMembers);
 
-			IndoorGmlBuilding.setDualityCellSpace(cs, st);
-			IndoorGmlBuilding.setDualityState(st, cs);
+			IndoorGmlResidential.setDualityCellSpace(cs, st);
+			IndoorGmlResidential.setDualityState(st, cs);
 		}
 	}
 
