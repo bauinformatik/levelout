@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.google.common.primitives.Longs;
 import org.citygml4j.core.model.construction.CeilingSurface;
+import org.citygml4j.core.model.construction.DoorSurface;
 import org.citygml4j.core.model.construction.FloorSurface;
 import org.citygml4j.core.model.construction.GroundSurface;
 import org.citygml4j.core.model.construction.RoofSurface;
@@ -86,6 +87,8 @@ public class Room {
 			return processBoundarySurface(new RoofSurface(), polygon);
 		} else if (type.contains("ceiling")) {
 			return processBoundarySurface(new CeilingSurface(), polygon);
+		} else if (type.contains("door")) {
+				return processBoundarySurface(new DoorSurface(), polygon);
 		} else if (type.contains("floor")) {
 			return processBoundarySurface(new FloorSurface(), polygon);
 		} else return null;  // TODO: not nice

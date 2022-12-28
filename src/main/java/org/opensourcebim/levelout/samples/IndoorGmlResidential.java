@@ -43,7 +43,7 @@ public class IndoorGmlResidential {
 
 	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
 
-		String fileName = "output/outindoor5.gml";
+		String fileName = "output/outindoor5_2.gml";
 		FileOutputStream fout = new FileOutputStream(fileName);
 
 		CellSpaceType cs1 = createCellSpace("c1", null);
@@ -198,7 +198,7 @@ public class IndoorGmlResidential {
 
 		PolygonType polygon = new PolygonType();
 
-		LinearRingType linearRing = new LinearRingType();
+	    LinearRingType linearRing = new LinearRingType();
 		DirectPositionListType directPositions = new DirectPositionListType();
 		linearRing.setPosList(directPositions);
 
@@ -210,7 +210,7 @@ public class IndoorGmlResidential {
 		polygon.setExterior(abstractRingProperty);
 
 		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
-		cellSpaceGeometry.setGeometry2D(surfaceProperty);
+	//	cellSpaceGeometry.setGeometry2D(surfaceProperty);
 		surfaceProperty.setAbstractSurface(gmlObjectFactory.createPolygon(polygon));
 		return cellSpace;
 	}
