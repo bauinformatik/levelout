@@ -58,7 +58,7 @@ public class Building {
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
 
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream, StandardCharsets.UTF_8.name())) {
-			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultNamespace(CoreModule.of(version).getNamespaceURI())//withDefaultPrefixes()
+			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes().withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 					.withHeaderComment("File created with citygml4j");
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
 			writer.writeMember(building);
