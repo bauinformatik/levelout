@@ -9,7 +9,9 @@ import org.opensourcebim.levelout.intermediatemodel.Storey;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class IntermediateResidential {
@@ -106,12 +108,11 @@ public class IntermediateResidential {
 		List<Room> polygons3 = Arrays.asList(gp7, gp8, gp9);
 		List<Door>	door = Arrays.asList(gp10,gp11);
 
-		Storey fp1 = new Storey(0, 1, polygons1,door);
-		//Storey fp2 = new Storey(1, 2, polygons2,null);
-		//Storey fp3 = new Storey(1, 3, polygons3,null);
+		Storey fp1 = new Storey(0, 1, polygons1, door);
+		Storey fp2 = new Storey(1, 2, polygons2, Collections.emptyList());
+		Storey fp3 = new Storey(1, 3, polygons3, Collections.emptyList());
 
-
-		List<Storey> footPrints = Arrays.asList(fp1);//, fp2, fp3);
+		List<Storey> footPrints = Arrays.asList(fp1, fp2, fp3);
 
 		if(!new File("output").exists()){
 			if(!new File("output").mkdir()){
