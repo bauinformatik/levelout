@@ -63,7 +63,8 @@ public class IndoorGmlResidential {
 		StateType st4 = indoorGmlBuilder.createState("s4");
 		StateType st5 = indoorGmlBuilder.createState("s5");
 		StateType st6 = indoorGmlBuilder.createState("s6");
-
+		
+	
 		indoorGmlBuilder.setStatePos(st1, 5.0, 5.0, 5.0);
 		indoorGmlBuilder.setStatePos(st2, 5.0, 5.0, 15.0);
 		indoorGmlBuilder.setStatePos(st3, 15.0, 2.5, 5.0);
