@@ -25,6 +25,7 @@ import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Way;
 import net.opengis.gml.v_3_2_1.DirectPositionType;
@@ -50,7 +51,7 @@ public class Room {
 		this.nodeList = nodeList;
 	}
 
-	public void createosmWay(OsmOutputStream osmOutput) throws IOException {
+	public void createosmWay(OsmOutputStream osmOutput, List<OsmTag> indoortags) throws IOException {
 		long id = this.id * -1;
 		List<Long>nodes = new ArrayList<>();
 		for (Corner genericNode : nodeList) {
@@ -59,7 +60,7 @@ public class Room {
 			nodes.add(node.getId());
 		}
 		nodes.add(nodes.get(0));
-		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes))); // TODO: how to create and set tags, the name of the polygon is just one part of the tag
+		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes)), indoortags); // TODO: how to create and set tags, the name of the polygon is just one part of the tag
 		osmOutput.write(way);
 	}
 

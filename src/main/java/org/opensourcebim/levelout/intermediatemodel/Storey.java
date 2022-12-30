@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
+import de.topobyte.osm4j.core.model.impl.Tag;
+
 import org.citygml4j.core.model.building.Building;
 import org.opensourcebim.levelout.samples.IndoorGmlResidential;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve;
@@ -91,11 +94,7 @@ public class Storey {
 		building.setLod2Solid(new SolidProperty(new Solid(shell)));
 	}*/
 
-	public void writeTagswaysOsm(OsmOutputStream osmOutput) throws IOException {
-		for (Room genericPolygon : polygonList) {
-			genericPolygon.createosmWay(osmOutput); // how to set tags
-		}
-	}
+	
 
 	public void createIndoorFeatures(List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
 		for (Room genericPolygon : polygonList) {
@@ -109,7 +108,14 @@ public class Storey {
 			IndoorGmlResidential.setDualityState(st, cs);
 		}
 	}
+	
+	public int getLevel() {
+		return level;
+	}
 
+	public void setLevel(int level) {
+		this.level = level;
+	}
 	public List<Room> getPolygonList() {
 		return polygonList;
 	}

@@ -25,6 +25,8 @@ import org.xmlobjects.gml.model.geometry.Envelope;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import de.topobyte.osm4j.core.access.OsmOutputStream;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
+import de.topobyte.osm4j.core.model.impl.Tag;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
@@ -67,9 +69,18 @@ public class Building {
 
 	public void createOsmBuilding(OutputStream outStream) throws IOException {
 		OsmOutputStream osmOutStream = new OsmXmlOutputStream(outStream, true);
+		
+		List<OsmTag> indoortags =  new ArrayList<>();
+		OsmTag tag1 = new Tag("building", "residential");
+		OsmTag tag2 = new Tag("indoor", "room");
+		indoortags.add(tag1);
+		indoortags.add(tag2);
 		for (Storey footPrint : footPrints) {
+			String lvl = Integer.toString(footPrint.getLevel());
+			OsmTag tag3 = new Tag("level", lvl);
+			indoortags.add(tag3);
 			for (Room polygon: footPrint.getPolygonList()) {
-				polygon.createosmWay(osmOutStream); // how to write tags
+				polygon.createosmWay(osmOutStream,indoortags); // how to write tags
 			}
 		}
 		osmOutStream.complete();
