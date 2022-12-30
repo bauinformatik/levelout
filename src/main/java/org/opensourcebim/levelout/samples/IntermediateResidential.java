@@ -6,10 +6,12 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
+import org.opensourcebim.levelout.builders.CityGmlBuilder;
+import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
+import org.opensourcebim.levelout.builders.OsmBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -120,9 +122,9 @@ public class IntermediateResidential {
 			};
 		}
 		Building gbld = new Building(footPrints);
-		gbld.createCitygmlBuilding(new FileOutputStream("output/test-city.gml"));
-		gbld.createOsmBuilding(new FileOutputStream("output/test.osm"));
-		gbld.createIndoorGmlBuilding(new FileOutputStream("output/test-indoor.gml"));
+		new CityGmlBuilder().createCitygmlBuilding(new FileOutputStream("output/test-city.gml"), gbld);
+		new OsmBuilder().createOsmBuilding(new FileOutputStream("output/test.osm"), gbld);
+		new IndoorGmlBuilder().createIndoorGmlBuilding(new FileOutputStream("output/test-indoor.gml"), gbld);
 	}
 }
 
