@@ -1,6 +1,7 @@
 package org.opensourcebim.levelout.samples;
 
 
+import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;

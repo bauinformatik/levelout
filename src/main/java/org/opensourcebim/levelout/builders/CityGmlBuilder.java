@@ -121,11 +121,14 @@ public class CityGmlBuilder {
 		for (Storey footPrint : building.getFootPrints()) {
 			setLodgeom(cityGmlBuilding, footPrint);
 		}
-		Envelope envelope = cityGmlBuilding.computeEnvelope();
+		write(outStream, cityGmlBuilding);
+	}
 
+	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding) throws CityGMLContextException, CityGMLWriteException {
 		CityGMLContext context = CityGMLContext.newInstance(cityGmlBuilding.getClass().getClassLoader());
 		CityGMLVersion version = CityGMLVersion.v3_0;
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
+		Envelope envelope = cityGmlBuilding.computeEnvelope();
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream, StandardCharsets.UTF_8.name())) {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes().withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 

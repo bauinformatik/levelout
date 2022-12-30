@@ -10,12 +10,15 @@ import org.citygml4j.xml.CityGMLContext;
 import org.citygml4j.xml.module.citygml.CoreModule;
 import org.citygml4j.xml.writer.CityGMLChunkWriter;
 import org.citygml4j.xml.writer.CityGMLOutputFactory;
+import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.*;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
+
+import java.io.FileOutputStream;
 import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -35,7 +38,6 @@ public class CityGmlInteractive {
 	public void doMain() throws Exception {
 		String fileName = "output/out120.gml";
 		
-		CityGMLContext context = CityGMLContext.newInstance();
 
 		id = DefaultIdCreator.getInstance();
 		geom = GeometryFactory.newInstance().withIdCreator(id);
@@ -60,23 +62,12 @@ public class CityGmlInteractive {
 	
 		setLoDgeom(building, polygons);
 
-		Envelope envelope = building.computeEnvelope();
-
-		CityGMLVersion version = CityGMLVersion.v2_0;
-		CityGMLOutputFactory out = context.createCityGMLOutputFactory(version);
 		Path output = Paths.get(fileName);
 		Files.createDirectories(output.getParent());
 		System.out.print(output.getParent());
 		Files.createFile(output);
 
-		try (CityGMLChunkWriter writer = out.createCityGMLChunkWriter(output, StandardCharsets.UTF_8.name())) {
-			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
-					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
-					.withHeaderComment("File created with citygml4j");
-			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
-			writer.writeMember(building);
-		}
-
+		new CityGmlBuilder().write(new FileOutputStream(output.toFile()), building);
 	}
 
 	private void setLoDgeom(Building building, List<Polygon> polygons) {

@@ -196,6 +196,7 @@ public class IndoorGmlBuilder {
 		primalSpaceFeature.setCellSpaceMember(cellSpaceMembers);
 		nodes.setStateMember(states);
 
+		write(outStream, indoorFeatures);
 		return indoorFeatures;
 	}
 
