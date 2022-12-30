@@ -24,4 +24,7 @@ public class Storey {
 		return Collections.unmodifiableList(DoorList);
 	}
 
+	public int getLevel() {
+		return level;
+	}
 }
