@@ -72,30 +72,21 @@ public class OsmInteractive {
 
 	private static Map<String, List<OsmTag>> createTagSets() {
 		Map<String,List<OsmTag>> alltags = new HashMap<>();
-		List<OsmTag> outlinetags = new ArrayList<>();
-		List<OsmTag> indoortags1 = new ArrayList<>();
-		List<OsmTag> indoortags2 = new ArrayList<>();
-
-		OsmTag tag1 = new Tag("building", "residential");
-		OsmTag tag2 = new Tag("building:levels", "2");
-		OsmTag tag3 = new Tag("roof:shape", "flat");
-		OsmTag tag4 = new Tag("indoor", "room");
-		OsmTag tag5 = new Tag("level", "0");
-		OsmTag tag6 = new Tag("level", "1");
-		OsmTag tag7 = new Tag("min_level", "0");
-		OsmTag tag8 = new Tag("max_level", "1");
-
-		outlinetags.add(tag1);
-		outlinetags.add(tag2);
-		outlinetags.add(tag3);
-		outlinetags.add(tag7);
-		outlinetags.add(tag8);
-
-		indoortags1.add(tag4);
-		indoortags1.add(tag5);
-
-		indoortags2.add(tag4);
-		indoortags2.add(tag6);
+		List<OsmTag> outlinetags = List.of(
+			new Tag("building", "residential"),
+			new Tag("building:levels", "2"),
+			new Tag("roof:shape", "flat"),
+			new Tag("min_level", "0"),
+			new Tag("max_level", "1")
+		);
+		List<OsmTag> indoortags1 = List.of(
+			new Tag("indoor", "room"),
+			new Tag("level", "0")
+		);
+		List<OsmTag> indoortags2 = List.of(
+			new Tag("indoor", "room"),
+			new Tag("level", "1")
+		);
 
 		alltags.put("outlinetags",outlinetags);
 		alltags.put("indoortags1",indoortags1);

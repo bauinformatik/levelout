@@ -18,7 +18,6 @@ public class Room {
 	}
 
 	public List<Double> computeCentroid() {
-		// computing centroid from nodeslist
 		double minX = nodeList.get(0).getX();
 		double minY = nodeList.get(0).getY();
 		double minZ = nodeList.get(0).getZ();
