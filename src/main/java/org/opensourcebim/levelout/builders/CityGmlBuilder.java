@@ -134,9 +134,7 @@ public class CityGmlBuilder {
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
 		Envelope envelope = cityGmlBuilding.computeEnvelope();
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream, StandardCharsets.UTF_8.name())) {
-			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes().withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
-
-					.withHeaderComment("File created with citygml4j");
+			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes().withDefaultNamespace(CoreModule.of(version).getNamespaceURI()).withHeaderComment("File created with citygml4j");
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
 			writer.writeMember(cityGmlBuilding);
 		}

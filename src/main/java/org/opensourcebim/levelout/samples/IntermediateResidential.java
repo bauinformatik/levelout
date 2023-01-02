@@ -121,7 +121,7 @@ public class IntermediateResidential {
 				return;
 			};
 		}
-		Building gbld = new Building(footPrints);
+		Building gbld = new Building(10, footPrints );
 		new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
 		new OsmBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test.osm"));
 		new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));

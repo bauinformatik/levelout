@@ -17,11 +17,15 @@ import org.opensourcebim.levelout.intermediatemodel.Storey;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OsmBuilder {
-	public static void createosmWay(Room room, OsmOutputStream osmOutput, List<OsmTag> tags) throws IOException {
+	private OsmOutputStream osmOutput;
+
+	private void createAndWriteRoom(Room room, String level) throws IOException {
 		long id = room.getId() * -1;
+		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all and write later
 		List<Long> nodes = new ArrayList<>();
 		for (Corner genericNode : room.getRooms()) {
 			OsmNode node = genericNode.createOsmNode();
@@ -29,26 +33,28 @@ public class OsmBuilder {
 			nodes.add(node.getId());
 		}
 		nodes.add(nodes.get(0));
-		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes)), tags); // TODO: how to create and set tags, the name of the polygon is just one part of the tag
+		List<OsmTag> tags = Arrays.asList (new Tag("indoor", "room"), new Tag("level", level) );
+		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		osmOutput.write(way);
 	}
 
-	public void createAndWriteBuilding(Building building, OutputStream outStream) throws IOException {
-		List<OsmTag> indoorTags =  new ArrayList<>();
-		OsmTag tag1 = new Tag("building", "residential");
-		OsmTag tag2 = new Tag("indoor", "room");
-		indoorTags.add(tag1);
-		indoorTags.add(tag2);
-		OsmOutputStream osmOutStream = new OsmXmlOutputStream(outStream, true);
-		for (Storey footPrint : building.getFootPrints()) {
-			String lvl = Integer.toString(footPrint.getLevel());
-			OsmTag tag3 = new Tag("level", lvl);
-			indoorTags.add(tag3);
-			for (Room polygon: footPrint.getPolygonList()) {
-				createosmWay(polygon, osmOutStream, indoorTags);
-			}
+	private void createAndWriteStorey(Storey storey) throws IOException {
+		String lvl = Integer.toString(storey.getLevel());
+		for (Room polygon: storey.getPolygonList()) {
+			createAndWriteRoom(polygon, lvl);
 		}
-		osmOutStream.complete();
+	}
+
+	public void createAndWriteBuilding(Building building, OutputStream outputStream) throws IOException {
+		this.osmOutput = new OsmXmlOutputStream(outputStream, true);
+		int id = -building.getId();
+		OsmWay way = new Way(id, TLongArrayList.wrap(new long[]{}), List.of(new Tag("building", "residential")));
+		// TODO: figure out building polygon
+		this.osmOutput.write(way);
+		for (Storey footPrint : building.getFootPrints()) {
+			createAndWriteStorey(footPrint);
+		}
+		this.osmOutput.complete();
 	}
 
 }
