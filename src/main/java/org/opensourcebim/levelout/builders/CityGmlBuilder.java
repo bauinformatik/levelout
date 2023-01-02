@@ -116,12 +116,16 @@ public class CityGmlBuilder {
 		cityGmlBuilding.setLod0MultiCurve(new MultiCurveProperty(new MultiCurve(curveMember)));
 	}
 
-	public void createCitygmlBuilding(OutputStream outStream, Building building) throws CityGMLContextException, CityGMLWriteException {
+	public void createAndWriteBuilding(Building building, OutputStream outStream) throws CityGMLContextException, CityGMLWriteException {
+		write(outStream, createBuilding(building));
+	}
+
+	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
 		for (Storey footPrint : building.getFootPrints()) {
 			setLodgeom(cityGmlBuilding, footPrint);
 		}
-		write(outStream, cityGmlBuilding);
+		return cityGmlBuilding;
 	}
 
 	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding) throws CityGMLContextException, CityGMLWriteException {

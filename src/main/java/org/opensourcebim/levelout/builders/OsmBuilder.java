@@ -33,7 +33,7 @@ public class OsmBuilder {
 		osmOutput.write(way);
 	}
 
-	public void createOsmBuilding(OutputStream outStream, Building building) throws IOException {
+	public void createAndWriteBuilding(Building building, OutputStream outStream) throws IOException {
 		List<OsmTag> indoorTags =  new ArrayList<>();
 		OsmTag tag1 = new Tag("building", "residential");
 		OsmTag tag2 = new Tag("indoor", "room");
@@ -45,7 +45,7 @@ public class OsmBuilder {
 			OsmTag tag3 = new Tag("level", lvl);
 			indoorTags.add(tag3);
 			for (Room polygon: footPrint.getPolygonList()) {
-				createosmWay(polygon, osmOutStream, indoorTags); // how to write tags
+				createosmWay(polygon, osmOutStream, indoorTags);
 			}
 		}
 		osmOutStream.complete();

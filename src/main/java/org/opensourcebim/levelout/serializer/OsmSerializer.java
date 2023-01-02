@@ -10,7 +10,7 @@ public class OsmSerializer extends AbstractLevelOutSerializer {
     @Override
     public void writeToOutputStream(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
         try {
-            new OsmBuilder().createOsmBuilding(outputStream, building);
+            new OsmBuilder().createAndWriteBuilding(building, outputStream);
         } catch (Exception e) {
             throw new SerializerException(e);
         }

@@ -10,7 +10,7 @@ public class CityGmlSerializer extends AbstractLevelOutSerializer {
     @Override
     public void writeToOutputStream(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
         try {
-            new CityGmlBuilder().createCitygmlBuilding(outputStream, building);
+            new CityGmlBuilder().createAndWriteBuilding(building, outputStream);
         } catch (Exception e) {
             throw new SerializerException(e);
         }

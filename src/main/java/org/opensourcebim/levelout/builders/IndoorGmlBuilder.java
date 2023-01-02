@@ -6,12 +6,10 @@ import net.opengis.indoorgml.core.v_1_0.*;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
-import org.xmlobjects.gml.model.geometry.primitives.PointProperty;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
@@ -67,8 +65,6 @@ public class IndoorGmlBuilder {
 		TransitionMemberType transitionMember = new TransitionMemberType();
 		transitionMembers.add(transitionMember);
 		transitionMember.setTransition(transition);
-		
-		
 	}
 
 	public CellSpaceType createCellSpace(String id, String uri) {
@@ -184,7 +180,11 @@ public class IndoorGmlBuilder {
 		}
 	}
 
-	public IndoorFeaturesType createIndoorGmlBuilding(OutputStream outStream, Building building) throws FileNotFoundException, JAXBException {
+	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
+		write(outStream, createIndoorFeatures(building));
+	}
+
+	private IndoorFeaturesType createIndoorFeatures(Building building) {
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
 		indoorFeatures.setId("if");
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
@@ -231,8 +231,6 @@ public class IndoorGmlBuilder {
 
 		primalSpaceFeature.setCellSpaceMember(cellSpaceMembers);
 		nodes.setStateMember(states);
-
-		write(outStream, indoorFeatures);
 		return indoorFeatures;
 	}
 

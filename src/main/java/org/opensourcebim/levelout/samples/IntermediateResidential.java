@@ -1,7 +1,6 @@
 package org.opensourcebim.levelout.samples;
 
 
-import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
@@ -123,9 +122,9 @@ public class IntermediateResidential {
 			};
 		}
 		Building gbld = new Building(footPrints);
-		new CityGmlBuilder().createCitygmlBuilding(new FileOutputStream("output/test-city.gml"), gbld);
-		new OsmBuilder().createOsmBuilding(new FileOutputStream("output/test.osm"), gbld);
-		new IndoorGmlBuilder().createIndoorGmlBuilding(new FileOutputStream("output/test-indoor.gml"), gbld);
+		new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
+		new OsmBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test.osm"));
+		new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));
 	}
 }
 
