@@ -9,10 +9,14 @@ import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StateMemberType;
+import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
+import net.opengis.indoorgml.core.v_1_0.TransitionMemberType;
+import net.opengis.indoorgml.core.v_1_0.TransitionType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
+import net.opengis.indoorgml.core.v_1_0.EdgesType;
 
 import org.locationtech.jts.io.ParseException;
 
@@ -31,7 +35,7 @@ public class IndoorGmlResidential {
 
 	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
 
-		String fileName = "output/outindoor5_2.gml";
+		String fileName = "output/outindoor5_6.gml";
 		FileOutputStream fout = new FileOutputStream(fileName);
 		IndoorGmlBuilder indoorGmlBuilder = new IndoorGmlBuilder();
 
@@ -64,6 +68,27 @@ public class IndoorGmlResidential {
 		StateType st5 = indoorGmlBuilder.createState("s5");
 		StateType st6 = indoorGmlBuilder.createState("s6");
 		
+		
+		TransitionType t1 = indoorGmlBuilder.createTransition("t1");
+		List<StatePropertyType> stateProplist = new ArrayList<>();
+		
+		
+		StatePropertyType stateProp = new StatePropertyType ();
+		stateProplist.add(stateProp);
+		stateProp.setState(st1);
+		
+		StatePropertyType stateProp2 = new StatePropertyType ();
+		stateProplist.add(stateProp2);
+		stateProp2.setState(st2);
+		
+		
+		t1.setConnects(stateProplist);
+		
+		indoorGmlBuilder.setTransitionPos(t1);
+
+		
+		
+		
 	
 		indoorGmlBuilder.setStatePos(st1, 5.0, 5.0, 5.0);
 		indoorGmlBuilder.setStatePos(st2, 5.0, 5.0, 15.0);
@@ -79,6 +104,9 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.createStateMember(st4, states);
 		indoorGmlBuilder.createStateMember(st5, states);
 		indoorGmlBuilder.createStateMember(st6, states);
+		
+		List<TransitionMemberType> transitions = new ArrayList<>();
+		indoorGmlBuilder.createTransitionMember(t1, transitions);
 
 		indoorGmlBuilder.setDualityCellSpace(cs1, st1);
 		indoorGmlBuilder.setDualityCellSpace(cs2, st2);
@@ -98,10 +126,16 @@ public class IndoorGmlResidential {
 		nodes.setId("n1");
 		nodes.setStateMember(states);
 		List<NodesType> nodesList = List.of(nodes);
+		
+		EdgesType edges = new EdgesType();
+		edges.setId("e1");
+		edges.setTransitionMember(transitions);
+		List<EdgesType> edgesList = List.of(edges);
 
 		SpaceLayerType spaceLayer = new SpaceLayerType();
 		spaceLayer.setId("sl1");
 		spaceLayer.setNodes(nodesList);
+		spaceLayer.setEdges(edgesList);
 
 		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
 		spaceLayerMember.setSpaceLayer(spaceLayer);

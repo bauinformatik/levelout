@@ -6,6 +6,7 @@ import net.opengis.indoorgml.core.v_1_0.*;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
+import org.xmlobjects.gml.model.geometry.primitives.PointProperty;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -61,6 +62,14 @@ public class IndoorGmlBuilder {
 		stateMembers.add(stateMember);
 		stateMember.setState(state);
 	}
+	
+	public void createTransitionMember(TransitionType transition, List<TransitionMemberType> transitionMembers) {
+		TransitionMemberType transitionMember = new TransitionMemberType();
+		transitionMembers.add(transitionMember);
+		transitionMember.setTransition(transition);
+		
+		
+	}
 
 	public CellSpaceType createCellSpace(String id, String uri) {
 		CellSpaceType cellSpace = new CellSpaceType();
@@ -112,6 +121,32 @@ public class IndoorGmlBuilder {
 		name.setId(id);
 		return name;
 	}
+	
+	public TransitionType createTransition(String id) {
+		TransitionType name = new TransitionType();
+		name.setId(id);
+		return name;
+	}
+	
+	public void setTransitionPos(TransitionType trans) {
+		
+		CurvePropertyType curveProp = new CurvePropertyType ();
+		LineStringType linestring = new LineStringType();
+		DirectPositionListType dirposlist = new DirectPositionListType();
+		linestring.setPosList(dirposlist);
+
+		List<Double> coordinates = Arrays.asList(5.,5.,5.,5.,5.,15.);
+		dirposlist.setValue(coordinates);
+		
+
+		List<PointPropertyType> pointprop = new ArrayList<>();
+		
+	//	linestring.setPosOrPointPropertyOrPointRep(gmlObjectFactory.createPointProperty(pointprop));
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		trans.setGeometry(curveProp);
+	}
+
+	
 
 	public void setDualityState(StateType state, CellSpaceType cellSpace) {
 		CellSpacePropertyType cellSpaceProperty = new CellSpacePropertyType();
@@ -134,6 +169,7 @@ public class IndoorGmlBuilder {
 		pointProperty.setPoint(point);
 		state.setGeometry(pointProperty);
 	}
+	
 
 	private void createIndoorFeatures(Storey storey, List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
 		for (Room genericPolygon : storey.getPolygonList()) {
@@ -238,4 +274,6 @@ public class IndoorGmlBuilder {
 			return new String[]{DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI};
 		}
 	}
+
+
 }
