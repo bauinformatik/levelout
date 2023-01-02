@@ -37,10 +37,10 @@ public class CityGmlBuilder {
 
 	public LineString createCitygmlLines(Door door) {
 		List<Double> coordinates = new ArrayList<>();
-		for (Corner genericNode : door.getCorners()) {
-			coordinates.addAll(genericNode.createCityGmlNode()); // adding the list generated from citygmlnode
+		for (Corner corner : door.getCorners()) {
+			coordinates.addAll(corner.asCoordinateList());
 		}
-		return geometryFactory.createLineString(coordinates, door.getDimension());
+		return geometryFactory.createLineString(coordinates, 3);
 	}
 
 	public AbstractSpaceBoundaryProperty createBoundaryLine(Door door, LineString line) {
@@ -60,10 +60,10 @@ public class CityGmlBuilder {
 
 	private Polygon createCitygmlPoly(Room room) {
 		List<Double> coordinates = new ArrayList<>();
-		for (Corner genericNode : room.getRooms()) {
-			coordinates.addAll(genericNode.createCityGmlNode());
+		for (Corner corner : room.getCorners()) {
+			coordinates.addAll(corner.asCoordinateList());
 		}
-		return geometryFactory.createPolygon(coordinates, room.getDimension());
+		return geometryFactory.createPolygon(coordinates, 3);
 	}
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
@@ -92,12 +92,12 @@ public class CityGmlBuilder {
 	private void setLodgeom(org.citygml4j.core.model.building.Building cityGmlBuilding, Storey storey) {
 		List<Polygon> polygonList = new ArrayList<>();
 		List<LineString> LineStringList = new ArrayList<>();
-		for (Room genericPolygon : storey.getPolygonList()) {
+		for (Room genericPolygon : storey.getRooms()) {
 			Polygon poly = createCitygmlPoly(genericPolygon); // to use for shell
 			polygonList.add(poly);
 			cityGmlBuilding.addBoundary(createBoundary(genericPolygon, poly));
 		}
-		for (Door genericPolygon : storey.getDoorList()) {
+		for (Door genericPolygon : storey.getDoors()) {
 			LineString line = createCitygmlLines(genericPolygon); // to use for shell
 			LineStringList.add(line);
 			cityGmlBuilding.addBoundary(createBoundaryLine(genericPolygon, line));
@@ -122,8 +122,8 @@ public class CityGmlBuilder {
 
 	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
-		for (Storey footPrint : building.getFootPrints()) {
-			setLodgeom(cityGmlBuilding, footPrint);
+		for (Storey storeys : building.getStoreys()) {
+			setLodgeom(cityGmlBuilding, storeys);
 		}
 		return cityGmlBuilding;
 	}

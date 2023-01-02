@@ -27,7 +27,7 @@ public class OsmBuilder {
 		long id = room.getId() * -1;
 		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all and write later
 		List<Long> nodes = new ArrayList<>();
-		for (Corner genericNode : room.getRooms()) {
+		for (Corner genericNode : room.getCorners()) {
 			OsmNode node = genericNode.createOsmNode();
 			osmOutput.write(node);
 			nodes.add(node.getId());
@@ -40,8 +40,8 @@ public class OsmBuilder {
 
 	private void createAndWriteStorey(Storey storey) throws IOException {
 		String lvl = Integer.toString(storey.getLevel());
-		for (Room polygon: storey.getPolygonList()) {
-			createAndWriteRoom(polygon, lvl);
+		for (Room room: storey.getRooms()) {
+			createAndWriteRoom(room, lvl);
 		}
 	}
 
@@ -51,8 +51,8 @@ public class OsmBuilder {
 		OsmWay way = new Way(id, TLongArrayList.wrap(new long[]{}), List.of(new Tag("building", "residential")));
 		// TODO: figure out building polygon
 		this.osmOutput.write(way);
-		for (Storey footPrint : building.getFootPrints()) {
-			createAndWriteStorey(footPrint);
+		for (Storey storey : building.getStoreys()) {
+			createAndWriteStorey(storey);
 		}
 		this.osmOutput.complete();
 	}

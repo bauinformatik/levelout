@@ -55,24 +55,6 @@ public class IntermediateResidential {
 		Corner n23 = new Corner(23, 10, 6, 3);
 		Corner n24 = new Corner(24, 10, 2, 3);
 
-		// set 7 roof
-		Corner n25 = new Corner(25, 0, 0, 6);
-		Corner n26 = new Corner(26, 0, 6, 6);
-		Corner n27 = new Corner(27, 6, 6, 6);
-		Corner n28 = new Corner(28, 6, 0, 6);
-
-		// set 8 roof
-		Corner n29 = new Corner(29, 6, 0, 6);
-		Corner n30 = new Corner(30, 6, 2, 6);
-		Corner n31 = new Corner(31, 10, 2, 6);
-		Corner n32 = new Corner(32, 10, 0, 6);
-
-		// set 9 roof
-		Corner n33 = new Corner(33, 6, 2, 6);
-		Corner n34 = new Corner(34, 6, 6, 6);
-		Corner n35 = new Corner(35, 10, 6, 6);
-		Corner n36 = new Corner(36, 10, 2, 6);
-		
 		// set 10 door
 				Corner n37 = new Corner(37, 1, 0, 0);
 				Corner n38 = new Corner(38, 2, 0, 0);
@@ -86,42 +68,34 @@ public class IntermediateResidential {
 		List<Corner> nodes4 = Arrays.asList(n13, n14, n15, n16);
 		List<Corner> nodes5 = Arrays.asList(n17, n18, n19, n20);
 		List<Corner> nodes6 = Arrays.asList(n21, n22, n23, n24);
-		List<Corner> nodes7 = Arrays.asList(n25, n26, n27, n28);
-		List<Corner> nodes8 = Arrays.asList(n29, n30, n31, n32);
-		List<Corner> nodes9 = Arrays.asList(n33, n34, n35, n36);
 		List<Corner> corners10 = Arrays.asList(n37, n38);
 		List<Corner> corners11 = Arrays.asList(n39, n40);
 
 
-		Room gp1 = new Room(1, "floor", 3, nodes1);
-		Room gp2 = new Room(2, "floor", 3, nodes2);
-		Room gp3 = new Room(3, "floor", 3, nodes3);
-		Room gp4 = new Room(4, "floor", 3, nodes4);
-		Room gp5 = new Room(5, "floor", 3, nodes5);
-		Room gp6 = new Room(6, "floor", 3, nodes6);
-		Room gp7 = new Room(7, "roof", 3, nodes7);
-		Room gp8 = new Room(8, "roof", 3, nodes8);
-		Room gp9 = new Room(9, "roof", 3, nodes9);
-		Door gp10 = new Door(10, "door", 3, corners10);
-		Door gp11 = new Door(11, "door", 3, corners11);
+		Room gp1 = new Room(1, "floor", nodes1);
+		Room gp2 = new Room(2, "floor", nodes2);
+		Room gp3 = new Room(3, "floor", nodes3);
+		Room gp4 = new Room(4, "floor", nodes4);
+		Room gp5 = new Room(5, "floor", nodes5);
+		Room gp6 = new Room(6, "floor", nodes6);
+		Door gp10 = new Door(10, "door", corners10);
+		Door gp11 = new Door(11, "door", corners11);
 
 		List<Room> polygons1 = Arrays.asList(gp1, gp2, gp3);
 		List<Room> polygons2 = Arrays.asList(gp4, gp5, gp6);
-		List<Room> polygons3 = Arrays.asList(gp7, gp8, gp9);
 		List<Door>	door = Arrays.asList(gp10,gp11);
 
-		Storey fp1 = new Storey(0, 1, polygons1, door);
-		Storey fp2 = new Storey(1, 2, polygons2, Collections.emptyList());
-		Storey fp3 = new Storey(1, 3, polygons3, Collections.emptyList());
+		Storey st1 = new Storey(0, polygons1, door);
+		Storey st2 = new Storey(1, polygons2, Collections.emptyList());
 
-		List<Storey> footPrints = Arrays.asList(fp1, fp2, fp3);
+		List<Storey> storeys = Arrays.asList(st1, st2);
 
 		if(!new File("output").exists()){
 			if(!new File("output").mkdir()){
 				return;
 			};
 		}
-		Building gbld = new Building(10, footPrints );
+		Building gbld = new Building(10, storeys );
 		new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
 		new OsmBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test.osm"));
 		new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));

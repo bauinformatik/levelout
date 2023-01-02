@@ -5,16 +5,16 @@ import java.util.List;
 
 public class Building {
 
-	private final List<Storey> footPrints;
+	private final List<Storey> storeys;
 	private final int id;
 
-	public Building(int id, List<Storey> footPrints) {
-		this.footPrints = footPrints;
+	public Building(int id, List<Storey> storeys) {
+		this.storeys = storeys;
 		this.id = id;
 	}
 
-	public List<Storey> getFootPrints(){
-		return Collections.unmodifiableList(footPrints);
+	public List<Storey> getStoreys(){
+		return Collections.unmodifiableList(storeys);
 	}
 
 	public int getId() {

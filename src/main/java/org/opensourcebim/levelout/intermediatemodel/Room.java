@@ -7,25 +7,23 @@ import java.util.List;
 public class Room {
 	private final long id;
 	private final String type;
-	private final int dimension;
-	private final List<Corner> nodeList;
+	private final List<Corner> corners;
 
-	public Room(long id, String type, int dimension, List<Corner> nodeList) {
+	public Room(long id, String type, List<Corner> corners) {
 		this.id = id; // TODO auto-increment
 		this.type = type; // TODO change to enum if needed at all
-		this.dimension = dimension; // TODO static value, always 3
-		this.nodeList = nodeList;
+		this.corners = corners;
 	}
 
 	public List<Double> computeCentroid() {
-		double minX = nodeList.get(0).getX();
-		double minY = nodeList.get(0).getY();
-		double minZ = nodeList.get(0).getZ();
+		double minX = corners.get(0).getX();
+		double minY = corners.get(0).getY();
+		double minZ = corners.get(0).getZ();
 		double maxX = minX, maxY = minY, maxZ = minZ;
 
 		// TODO: check formula for centroid calculation
 
-		for (Corner node : nodeList) {
+		for (Corner node : corners) {
 			if (node.getX() < minX) {
 				minX = node.getX();
 			} else if (node.getX() > maxX) {
@@ -49,10 +47,6 @@ public class Room {
 		return List.of(centroidX, centroidY, centroidZ);
 	}
 
-	public int getDimension() {
-		return dimension;
-	}
-
 	public String getType() {
 		return type;
 	}
@@ -60,7 +54,7 @@ public class Room {
 		return id;
 	}
 
-	public List<Corner> getRooms(){
-		return Collections.unmodifiableList(nodeList);
+	public List<Corner> getCorners(){
+		return Collections.unmodifiableList(corners);
 	}
 }

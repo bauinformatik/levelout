@@ -5,23 +5,21 @@ import java.util.List;
 
 public class Storey {
 
-	private int level;
-	private long id;
-	private final List<Room> polygonList;
-	private final List<Door> DoorList;
+	private final int level;
+	private final List<Room> rooms;
+	private final List<Door> doors;
 
-	public Storey(int level, int id, List<Room> polygonList, List<Door> doorList) {
+	public Storey(int level, List<Room> rooms, List<Door> doors) {
 		this.level = level;
-		this.id = id;
-		this.polygonList = polygonList;
-		this.DoorList = doorList;
+		this.rooms = rooms;
+		this.doors = doors;
 	}
 
-	public List<Room> getPolygonList() {
-		return Collections.unmodifiableList(polygonList);
+	public List<Room> getRooms() {
+		return Collections.unmodifiableList(rooms);
 	}
-	public List<Door> getDoorList() {
-		return Collections.unmodifiableList(DoorList);
+	public List<Door> getDoors() {
+		return Collections.unmodifiableList(doors);
 	}
 
 	public int getLevel() {

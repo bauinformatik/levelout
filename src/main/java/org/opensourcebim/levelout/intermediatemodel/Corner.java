@@ -24,7 +24,7 @@ public class Corner {
 		return new Node(id * -1, x, y);
 	}
 
-	public List<Double> createCityGmlNode() {
+	public List<Double> asCoordinateList() {
 		return Arrays.asList(x, y, z);
 	}
 

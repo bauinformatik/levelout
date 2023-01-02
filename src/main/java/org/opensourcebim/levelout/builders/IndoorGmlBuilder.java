@@ -168,7 +168,7 @@ public class IndoorGmlBuilder {
 	
 
 	private void createIndoorFeatures(Storey storey, List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
-		for (Room genericPolygon : storey.getPolygonList()) {
+		for (Room genericPolygon : storey.getRooms()) {
 			CellSpaceType cs = createIndoorGmlCellSpace(genericPolygon);
 			createCellSpaceMember(cs, cellSpaceMembers);
 
@@ -225,8 +225,8 @@ public class IndoorGmlBuilder {
 		List<StateMemberType> states = new ArrayList<>();
 		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
 
-		for (Storey footPrint : building.getFootPrints()) {
-			createIndoorFeatures(footPrint, states, cellSpaceMembers);
+		for (Storey storeys : building.getStoreys()) {
+			createIndoorFeatures(storeys, states, cellSpaceMembers);
 		}
 
 		primalSpaceFeature.setCellSpaceMember(cellSpaceMembers);
