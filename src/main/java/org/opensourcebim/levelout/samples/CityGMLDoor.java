@@ -3,6 +3,8 @@ package org.opensourcebim.levelout.samples;
 
 import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.Building;
+import org.citygml4j.core.model.building.BuildingRoom;
+import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
 import org.citygml4j.core.model.core.AbstractThematicSurface;
@@ -13,6 +15,7 @@ import org.citygml4j.xml.writer.CityGMLChunkWriter;
 import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
+import org.opensourcebim.levelout.intermediatemodel.Wall;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve;
@@ -38,7 +41,7 @@ public class CityGMLDoor {
 	}
 
 	public void doMain() throws Exception {
-		String fileName = "output/doorsample11.gml";
+		String fileName = "output/doorsample17.gml";
 		
 		CityGMLContext context = CityGMLContext.newInstance();
 
@@ -46,7 +49,7 @@ public class CityGMLDoor {
 		geom = GeometryFactory.newInstance().withIdCreator(id);
 
 		Building building = new Building();
-
+		
 		List<LineString> lines = new ArrayList<>();
 		
 		
@@ -77,11 +80,23 @@ public class CityGMLDoor {
 	
 			wall.setFillingSurfaces(Arrays.asList(createBoundary("door",l1),createBoundary("door",l2)));
 			
-			
-		building.addBoundary(new AbstractSpaceBoundaryProperty(wall));
+		BuildingRoom br = new BuildingRoom();
+	
+		List<BuildingRoomProperty> builingroomProplist = new ArrayList<>();
+		BuildingRoomProperty builingroomProp = new BuildingRoomProperty();
+		builingroomProp.setInlineObject(br);
+		builingroomProplist.add(builingroomProp);
+		
+	//	building.setBuildingRooms(null);
+		
 			//building.addBoundary(createBoundary("door",l2));
 			
-			setLoDgeomd(building, lines);
+		//	setLoDgeomd(building, lines);
+		//	setLoDgeomdoor(br, lines);
+			setLoDgeomdooronwall(wall, lines);
+			br.addBoundary(new AbstractSpaceBoundaryProperty(wall));
+			building.setBuildingRooms(builingroomProplist);
+
 			Envelope envelope = building.computeEnvelope();
 
 			CityGMLVersion version = CityGMLVersion.v3_0;
@@ -104,7 +119,41 @@ public class CityGMLDoor {
 	
 	
 	
-		private AbstractFillingSurfaceProperty createBoundary(String name, LineString l1) {
+		private void setLoDgeomdooronwall(WallSurface wall, List<LineString> lines) {
+			 List<CurveProperty> curveMember = new ArrayList<>();
+		      for (LineString line : lines) {
+
+		      	curveMember.add(new CurveProperty("#" + line.getId()));
+				}
+		      
+		      for(CurveProperty curveprop : curveMember)
+		      {
+		    	  System.out.println(curveprop);
+		      }
+		    
+		      	wall. setLod0MultiCurve(new MultiCurveProperty(new MultiCurve(curveMember)));
+		}
+		
+
+		private void setLoDgeomdoor(BuildingRoom br, List<LineString> lines) {
+
+			 List<CurveProperty> curveMember = new ArrayList<>();
+		      for (LineString line : lines) {
+
+		      	curveMember.add(new CurveProperty("#" + line.getId()));
+				}
+		      
+		      for(CurveProperty curveprop : curveMember)
+		      {
+		    	  System.out.println(curveprop);
+		      }
+		    
+		      	br. setLod0MultiCurve(new MultiCurveProperty(new MultiCurve(curveMember)));
+		}
+		
+	
+
+		public  AbstractFillingSurfaceProperty createBoundary(String name, LineString l1) {
 							return processBoundarySurface(new DoorSurface(), l1);
 			
 			}

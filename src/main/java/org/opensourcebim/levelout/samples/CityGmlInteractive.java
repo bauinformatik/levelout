@@ -2,9 +2,14 @@ package org.opensourcebim.levelout.samples;
 
 import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.Building;
+import org.citygml4j.core.model.building.BuildingPart;
+import org.citygml4j.core.model.building.BuildingRoom;
+import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
 import org.citygml4j.core.model.core.AbstractThematicSurface;
+import org.citygml4j.core.model.core.AbstractUnoccupiedSpace;
+import org.citygml4j.core.model.core.AbstractUnoccupiedSpaceProperty;
 import org.citygml4j.core.util.geometry.GeometryFactory;
 import org.citygml4j.xml.CityGMLContext;
 import org.citygml4j.xml.module.citygml.CoreModule;
@@ -13,6 +18,7 @@ import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
+import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.*;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
@@ -36,13 +42,21 @@ public class CityGmlInteractive {
 	}
 
 	public void doMain() throws Exception {
-		String fileName = "output/out120.gml";
+		String fileName = "output/cityhr3.gml";
 		
 
 		id = DefaultIdCreator.getInstance();
 		geom = GeometryFactory.newInstance().withIdCreator(id);
 
 		Building building = new Building();
+		
+		
+		List<BuildingRoomProperty> builingroomProplist = new ArrayList<>();
+		BuildingRoomProperty builingroomProp = new BuildingRoomProperty();
+		BuildingRoom room = new BuildingRoom();
+		builingroomProp.setInlineObject(room);
+		builingroomProplist.add(builingroomProp);
+		building.setBuildingRooms(builingroomProplist);
 
 		List<Polygon> polygons = new ArrayList<>();
 		
@@ -57,10 +71,12 @@ public class CityGmlInteractive {
 			System.out.println("Enter polygon dimensions");
 			Polygon p1 =  createPoly(createDouble(), sc.nextInt());  	
 			polygons.add(p1);
-			building.addBoundary(createBoundary(name,p1));
+			//building.addBoundary(createBoundary(name,p1));
+			room.addBoundary(createBoundary(name,p1));
 		}
 	
-		setLoDgeom(building, polygons);
+		//setLoDgeom(building, polygons);
+		setLoDgeomroom(room, polygons);
 
 		Path output = Paths.get(fileName);
 		Files.createDirectories(output.getParent());
@@ -69,6 +85,16 @@ public class CityGmlInteractive {
 
 		new CityGmlBuilder().write(new FileOutputStream(output.toFile()), building);
 	}
+
+	private void setLoDgeomroom(BuildingRoom room, List<Polygon> polygons) {
+		List<SurfaceProperty> surfaceMember = new ArrayList<>();
+		for (Polygon polygon : polygons) {
+			surfaceMember.add(new SurfaceProperty("#" + polygon.getId()));
+		}
+		room.setLod0MultiSurface(new MultiSurfaceProperty(new MultiSurface(surfaceMember)));
+	}
+	
+	
 
 	private void setLoDgeom(Building building, List<Polygon> polygons) {
 		Shell shell = new Shell();
@@ -119,6 +145,8 @@ public class CityGmlInteractive {
 	private Polygon createPoly(double[] coordinates, int dimension) {
 		return geom.createPolygon(coordinates, dimension);
 	}
+	
+	
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 			Polygon... polygons) {

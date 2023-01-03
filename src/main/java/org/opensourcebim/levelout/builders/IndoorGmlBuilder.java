@@ -123,26 +123,7 @@ public class IndoorGmlBuilder {
 		name.setId(id);
 		return name;
 	}
-	
-	public void setTransitionPos(TransitionType trans) {
-		
-		CurvePropertyType curveProp = new CurvePropertyType ();
-		LineStringType linestring = new LineStringType();
-		DirectPositionListType dirposlist = new DirectPositionListType();
-		linestring.setPosList(dirposlist);
 
-		List<Double> coordinates = Arrays.asList(5.,5.,5.,5.,5.,15.);
-		dirposlist.setValue(coordinates);
-		
-
-		List<PointPropertyType> pointprop = new ArrayList<>();
-		
-	//	linestring.setPosOrPointPropertyOrPointRep(gmlObjectFactory.createPointProperty(pointprop));
-		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
-		trans.setGeometry(curveProp);
-	}
-
-	
 
 	public void setDualityState(StateType state, CellSpaceType cellSpace) {
 		CellSpacePropertyType cellSpaceProperty = new CellSpacePropertyType();
@@ -164,6 +145,24 @@ public class IndoorGmlBuilder {
 		point.setPos(directPosition);
 		pointProperty.setPoint(point);
 		state.setGeometry(pointProperty);
+	}
+	
+public void setTransitionPos(TransitionType trans) {
+		
+		CurvePropertyType curveProp = new CurvePropertyType ();
+		LineStringType linestring = new LineStringType();
+		DirectPositionListType dirposlist = new DirectPositionListType();
+		linestring.setPosList(dirposlist);
+
+		List<Double> coordinates = Arrays.asList(5.,5.,5.,5.,5.,15.);
+		dirposlist.setValue(coordinates);
+		
+
+		List<PointPropertyType> pointprop = new ArrayList<>();
+		
+	//	linestring.setPosOrPointPropertyOrPointRep(gmlObjectFactory.createPointProperty(pointprop));
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		trans.setGeometry(curveProp);
 	}
 	
 
