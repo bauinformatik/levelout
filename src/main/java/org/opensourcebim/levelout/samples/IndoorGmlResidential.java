@@ -106,19 +106,12 @@ public class IndoorGmlResidential {
 		edges.setId("e1");
 		indoorGmlBuilder.addTransition(edges, t1);
 
-		indoorGmlBuilder.setDualityCellSpace(cs1, st1);
-		indoorGmlBuilder.setDualityCellSpace(cs2, st2);
-		indoorGmlBuilder.setDualityCellSpace(cs3, st3);
-		indoorGmlBuilder.setDualityCellSpace(cs4, st4);
-		indoorGmlBuilder.setDualityCellSpace(cs5, st5);
-		indoorGmlBuilder.setDualityCellSpace(cs6, st6);
-
-		indoorGmlBuilder.setDualityState(st1, cs1);
-		indoorGmlBuilder.setDualityState(st2, cs2);
-		indoorGmlBuilder.setDualityState(st3, cs3);
-		indoorGmlBuilder.setDualityState(st4, cs4);
-		indoorGmlBuilder.setDualityState(st5, cs5);
-		indoorGmlBuilder.setDualityState(st6, cs6);
+		indoorGmlBuilder.setDuality(cs1, st1);
+		indoorGmlBuilder.setDuality(cs2, st2);
+		indoorGmlBuilder.setDuality(cs3, st3);
+		indoorGmlBuilder.setDuality(cs4, st4);
+		indoorGmlBuilder.setDuality(cs5, st5);
+		indoorGmlBuilder.setDuality(cs6, st6);
 
 		SpaceLayerType spaceLayer = new SpaceLayerType();
 		spaceLayer.setId("sl1");

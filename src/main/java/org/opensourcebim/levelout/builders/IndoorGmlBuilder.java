@@ -151,15 +151,19 @@ public class IndoorGmlBuilder {
 		transitionMember.setTransition(transition);
 		edges.getTransitionMember().add(transitionMember);
 	}
-	public void setDualityState(StateType state, CellSpaceType cellSpace) {
+	private void setDualCellSpaceForState(StateType state, CellSpaceType cellSpace) {
 		CellSpacePropertyType cellSpaceProperty = new CellSpacePropertyType();
 		cellSpaceProperty.setHref("#" + cellSpace.getId());
 		state.setDuality(cellSpaceProperty);
 	}
-	public void setDualityCellSpace(CellSpaceType cellSpace, StateType state) {
+	private void setDualStateForCellSpace(CellSpaceType cellSpace, StateType state) {
 		StatePropertyType stateProperty = new StatePropertyType();
 		stateProperty.setHref("#" + state.getId());
 		cellSpace.setDuality(stateProperty);
+	}
+	public void setDuality(CellSpaceType cellSpace, StateType state){
+		setDualCellSpaceForState(state, cellSpace);
+		setDualStateForCellSpace(cellSpace, state);
 	}
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
 		write(outStream, createIndoorFeatures(building));
@@ -214,8 +218,7 @@ public class IndoorGmlBuilder {
 				setStatePos(state, room);
 				addState(nodes, state);
 
-				setDualityCellSpace(cs, state);
-				setDualityState(state, cs);
+				setDuality(cs, state);
 			}
 		}
 
