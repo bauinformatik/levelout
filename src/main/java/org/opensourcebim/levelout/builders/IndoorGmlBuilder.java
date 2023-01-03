@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class IndoorGmlBuilder {
@@ -54,13 +53,13 @@ public class IndoorGmlBuilder {
 
 	public void addState(NodesType nodes, StateType state) {
 		StateMemberType stateMember = new StateMemberType();
-		nodes.getStateMember().add(stateMember);
 		stateMember.setState(state);
+		nodes.getStateMember().add(stateMember);
 	}
-	public void createTransitionMember(TransitionType transition, List<TransitionMemberType> transitionMembers) {
+	public void addTransition(EdgesType edges, TransitionType transition) {
 		TransitionMemberType transitionMember = new TransitionMemberType();
-		transitionMembers.add(transitionMember);
 		transitionMember.setTransition(transition);
+		edges.getTransitionMember().add(transitionMember);
 	}
 
 	public CellSpaceType createCellSpace(String id) {
@@ -167,22 +166,19 @@ public class IndoorGmlBuilder {
 		return point;
 	}
 
-	public void setTransitionPos(TransitionType trans) {
-		
+	public void setTransitionPos(TransitionType trans, List<Double> coordinates) {
+		LineStringType linestring = createLineString(coordinates);
 		CurvePropertyType curveProp = new CurvePropertyType ();
-		LineStringType linestring = new LineStringType();
-		DirectPositionListType dirposlist = new DirectPositionListType();
-		linestring.setPosList(dirposlist);
-
-		List<Double> coordinates = Arrays.asList(5.,5.,5.,5.,5.,15.);
-		dirposlist.setValue(coordinates);
-		
-
-		List<PointPropertyType> pointprop = new ArrayList<>();
-		
-	//	linestring.setPosOrPointPropertyOrPointRep(gmlObjectFactory.createPointProperty(pointprop));
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
 		trans.setGeometry(curveProp);
+	}
+
+	private LineStringType createLineString(List<Double> coordinates) {
+		LineStringType linestring = new LineStringType();
+		DirectPositionListType dirPositions = new DirectPositionListType();
+		linestring.setPosList(dirPositions);
+		dirPositions.setValue(coordinates);
+		return linestring;
 	}
 
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {

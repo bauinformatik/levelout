@@ -7,10 +7,8 @@ import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
 import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
-import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
-import net.opengis.indoorgml.core.v_1_0.TransitionMemberType;
 import net.opengis.indoorgml.core.v_1_0.TransitionType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
@@ -88,8 +86,8 @@ public class IndoorGmlResidential {
 		
 		
 		t1.setConnects(stateProplist);
-		
-		indoorGmlBuilder.setTransitionPos(t1);
+
+		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(5.,5.,5.,5.,5.,15.));
 
 		indoorGmlBuilder.setStatePos(st1, 5.0, 5.0, 5.0);
 		indoorGmlBuilder.setStatePos(st2, 5.0, 5.0, 15.0);
@@ -107,8 +105,9 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.addState(nodes, st5);
 		indoorGmlBuilder.addState(nodes, st6);
 		
-		List<TransitionMemberType> transitions = new ArrayList<>();
-		indoorGmlBuilder.createTransitionMember(t1, transitions);
+		EdgesType edges = new EdgesType();
+		edges.setId("e1");
+		indoorGmlBuilder.addTransition(edges, t1);
 
 		indoorGmlBuilder.setDualityCellSpace(cs1, st1);
 		indoorGmlBuilder.setDualityCellSpace(cs2, st2);
@@ -124,17 +123,10 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setDualityState(st5, cs5);
 		indoorGmlBuilder.setDualityState(st6, cs6);
 
-		List<NodesType> nodesList = List.of(nodes);
-		
-		EdgesType edges = new EdgesType();
-		edges.setId("e1");
-		edges.setTransitionMember(transitions);
-		List<EdgesType> edgesList = List.of(edges);
-
 		SpaceLayerType spaceLayer = new SpaceLayerType();
 		spaceLayer.setId("sl1");
-		spaceLayer.setNodes(nodesList);
-		spaceLayer.setEdges(edgesList);
+		spaceLayer.setNodes(List.of(nodes));
+		spaceLayer.setEdges(List.of(edges));
 
 		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
 		spaceLayerMember.setSpaceLayer(spaceLayer);
