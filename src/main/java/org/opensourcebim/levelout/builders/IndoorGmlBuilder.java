@@ -168,11 +168,15 @@ public class IndoorGmlBuilder {
 		setDualCellSpaceForState(state, cellSpace);
 		setDualStateForCellSpace(cellSpace, state);
 	}
-	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
-		write(outStream, createIndoorFeatures(building));
+	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
+		return indoorFeatures.getMultiLayeredGraph().getMultiLayeredGraph().getSpaceLayers().get(0).getSpaceLayerMember().get(0).getSpaceLayer();
 	}
 
-	private IndoorFeaturesType createIndoorFeatures(Building building) {
+	public PrimalSpaceFeaturesType getPrimalSpace(IndoorFeaturesType indoorFeatures) {
+		return indoorFeatures.getPrimalSpaceFeatures().getPrimalSpaceFeatures();
+	}
+
+	public IndoorFeaturesType createIndoorFeatures() {
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
 		indoorFeatures.setId("if");
 
@@ -186,45 +190,43 @@ public class IndoorGmlBuilder {
 
 		SpaceLayersType spaceLayers = new SpaceLayersType();
 		spaceLayers.setId("slayers");
-		List<SpaceLayersType> spaceLayerslist = new ArrayList<>();
-		spaceLayerslist.add(spaceLayers);
-
 		SpaceLayerType spaceLayer = new SpaceLayerType();
 		spaceLayer.setId("sl");
-		List<SpaceLayerMemberType> spaceLayerMemberList = new ArrayList<>();
 		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
 		spaceLayerMember.setSpaceLayer(spaceLayer);
-		spaceLayerMemberList.add(spaceLayerMember);
 
 		NodesType nodes = new NodesType();
 		nodes.setId("n");
-		List<NodesType> nodesList = new ArrayList<>();
-		nodesList.add(nodes);
-
 		MultiLayeredGraphPropertyType multilayergraphProp = new MultiLayeredGraphPropertyType();
 		multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
 		indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
 
-		multiLayeredGraph.setSpaceLayers(spaceLayerslist);
+		multiLayeredGraph.setSpaceLayers(List.of(spaceLayers));
+		spaceLayers.setSpaceLayerMember(List.of(spaceLayerMember));
+		spaceLayer.setNodes(List.of(nodes));
+		return indoorFeatures;
+	}
 
-		spaceLayers.setSpaceLayerMember(spaceLayerMemberList);
-		spaceLayer.setNodes(nodesList);
-
+	private IndoorFeaturesType createIndoorFeatures(Building building) {
+		IndoorFeaturesType indoorFeatures = createIndoorFeatures();
+		PrimalSpaceFeaturesType primalSpace = getPrimalSpace(indoorFeatures);
+		SpaceLayerType dualSpace = getFirstDualSpaceLayer(indoorFeatures);
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
 				CellSpaceType cs = createCellSpace(room);
 				add2DGeometry(cs, room);
-				addCellSpace(primalSpaceFeature, cs);
-
+				addCellSpace(primalSpace, cs);
 				StateType state = createState(room);
 				setStatePos(state, room);
-				addState(nodes, state);
-
+				addState(dualSpace.getNodes().get(0), state);
 				setDuality(cs, state);
 			}
 		}
-
 		return indoorFeatures;
+	}
+
+	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
+		write(outStream, createIndoorFeatures(building));
 	}
 
 	public void write(OutputStream outStream, IndoorFeaturesType indoorFeatures) throws JAXBException {

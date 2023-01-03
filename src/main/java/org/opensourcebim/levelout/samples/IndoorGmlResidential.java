@@ -1,23 +1,16 @@
 package org.opensourcebim.levelout.samples;
 
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
 import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 import net.opengis.indoorgml.core.v_1_0.TransitionType;
-import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.EdgesType;
 
 import org.locationtech.jts.io.ParseException;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 
 import javax.xml.bind.JAXBException;
@@ -51,8 +44,8 @@ public class IndoorGmlResidential {
 			indoorGmlBuilder.add3DGeometry(cs, coordinates);
 		}
 
-		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
-		primalSpaceFeature.setId("pf1");
+		IndoorFeaturesType indoorFeatures = indoorGmlBuilder.createIndoorFeatures();
+		PrimalSpaceFeaturesType primalSpaceFeature = indoorGmlBuilder.getPrimalSpace(indoorFeatures);
 
 		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs1);
 		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs2);
@@ -60,9 +53,6 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs4);
 		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs5);
 		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs6);
-
-		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProperty = new PrimalSpaceFeaturesPropertyType();
-		primalSpaceFeaturesProperty.setPrimalSpaceFeatures(primalSpaceFeature);
 
 		StateType st1 = indoorGmlBuilder.createState("s1");
 		StateType st2 = indoorGmlBuilder.createState("s2");
@@ -93,16 +83,17 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setStatePos(st5, 15.0, 7.5, 5.0);
 		indoorGmlBuilder.setStatePos(st6, 15.0, 7.5, 15.0);
 
-		NodesType nodes = new NodesType();
+		NodesType nodes = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getNodes().get(0);
 		nodes.setId("n1");
+
 		indoorGmlBuilder.addState(nodes, st1);
 		indoorGmlBuilder.addState(nodes, st2);
 		indoorGmlBuilder.addState(nodes, st3);
 		indoorGmlBuilder.addState(nodes, st4);
 		indoorGmlBuilder.addState(nodes, st5);
 		indoorGmlBuilder.addState(nodes, st6);
-		
-		EdgesType edges = new EdgesType();
+
+		EdgesType edges = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getEdges().get(0);
 		edges.setId("e1");
 		indoorGmlBuilder.addTransition(edges, t1);
 
@@ -113,58 +104,7 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setDuality(cs5, st5);
 		indoorGmlBuilder.setDuality(cs6, st6);
 
-		SpaceLayerType spaceLayer = new SpaceLayerType();
-		spaceLayer.setId("sl1");
-		spaceLayer.setNodes(List.of(nodes));
-		spaceLayer.setEdges(List.of(edges));
-
-		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
-		spaceLayerMember.setSpaceLayer(spaceLayer);
-		List<SpaceLayerMemberType> spaceLayerMembers = List.of(spaceLayerMember);
-
-		SpaceLayersType spaceLayers = new SpaceLayersType();
-		spaceLayers.setId("slayers1");
-		spaceLayers.setSpaceLayerMember(spaceLayerMembers);
-		List<SpaceLayersType> spaceLayersList = List.of(spaceLayers);
-
-		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg1");
-		multiLayeredGraph.setSpaceLayers(spaceLayersList);
-
-		MultiLayeredGraphPropertyType multiLayeredGraphProperty = new MultiLayeredGraphPropertyType();
-		multiLayeredGraphProperty.setMultiLayeredGraph(multiLayeredGraph);
-
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
-		indoorFeatures.setId("if1");
-		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProperty);
-		indoorFeatures.setMultiLayeredGraph(multiLayeredGraphProperty);
-
 		new IndoorGmlBuilder().write(fout,indoorFeatures);
 	}
 
-	public static class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {
-		private static final String DEFAULT_URI = "http://www.opengis.net/indoorgml/1.0/core";
-		private static final String NAVIGATION_URI = "http://www.opengis.net/indoorgml/1.0/navigation";
-		private static final String GML_URI = "http://www.opengis.net/gml/3.2";
-		private static final String XLINK_URI = "http://www.w3.org/1999/xlink";
-
-		@Override
-		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-			if (DEFAULT_URI.equals(namespaceUri)) {
-				return "core";
-			} else if (NAVIGATION_URI.equals(namespaceUri)) {
-				return "navi";
-			} else if (GML_URI.equals(namespaceUri)) {
-				return "gml";
-			} else if (XLINK_URI.equals(namespaceUri)) {
-				return "xlink";
-			}
-			return suggestion;
-		}
-
-		@Override
-		public String[] getPreDeclaredNamespaceUris() {
-			return new String[]{DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI};
-		}
-	}
 }
