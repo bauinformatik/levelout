@@ -98,13 +98,14 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setStatePos(st5, 15.0, 7.5, 5.0);
 		indoorGmlBuilder.setStatePos(st6, 15.0, 7.5, 15.0);
 
-		List<StateMemberType> states = new ArrayList<>();
-		indoorGmlBuilder.createStateMember(st1, states);
-		indoorGmlBuilder.createStateMember(st2, states);
-		indoorGmlBuilder.createStateMember(st3, states);
-		indoorGmlBuilder.createStateMember(st4, states);
-		indoorGmlBuilder.createStateMember(st5, states);
-		indoorGmlBuilder.createStateMember(st6, states);
+		NodesType nodes = new NodesType();
+		nodes.setId("n1");
+		indoorGmlBuilder.addState(nodes, st1);
+		indoorGmlBuilder.addState(nodes, st2);
+		indoorGmlBuilder.addState(nodes, st3);
+		indoorGmlBuilder.addState(nodes, st4);
+		indoorGmlBuilder.addState(nodes, st5);
+		indoorGmlBuilder.addState(nodes, st6);
 		
 		List<TransitionMemberType> transitions = new ArrayList<>();
 		indoorGmlBuilder.createTransitionMember(t1, transitions);
@@ -123,9 +124,6 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setDualityState(st5, cs5);
 		indoorGmlBuilder.setDualityState(st6, cs6);
 
-		NodesType nodes = new NodesType();
-		nodes.setId("n1");
-		nodes.setStateMember(states);
 		List<NodesType> nodesList = List.of(nodes);
 		
 		EdgesType edges = new EdgesType();

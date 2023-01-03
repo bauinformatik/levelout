@@ -46,33 +46,17 @@ public class IndoorGmlBuilder {
 	private CellSpaceType createCellSpace(Room room) {
 		return createCellSpace("cs"+room.getId());
 	}
-	private StateType createIndoorGmlState(Room room) {
-		PointPropertyType pointProperty = new PointPropertyType();
-		PointType point = new PointType();
-		DirectPositionType dirPos = new DirectPositionType();
-		List<Double> centroid = room.computeCentroid();
-		dirPos.withValue(centroid.get(0), centroid.get(1), centroid.get(2)).withSrsDimension(BigInteger.valueOf(3));
-		point.setPos(dirPos);
-		pointProperty.setPoint(point);
-
-		StateType state = new StateType();
-		state.setId("st" + room.getId());
-		state.setGeometry(pointProperty);
-		return state;
-	}
-
 	public void addCellSpace(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceType cellSpace) {
 		CellSpaceMemberType cellSpaceMember = new CellSpaceMemberType();
 		cellSpaceMember.setCellSpace(indoorObjectFactory.createCellSpace(cellSpace));
 		primalSpaceFeatures.getCellSpaceMember().add(cellSpaceMember);
 	}
 
-	public void createStateMember(StateType state, List<StateMemberType> stateMembers) {
+	public void addState(NodesType nodes, StateType state) {
 		StateMemberType stateMember = new StateMemberType();
-		stateMembers.add(stateMember);
+		nodes.getStateMember().add(stateMember);
 		stateMember.setState(state);
 	}
-	
 	public void createTransitionMember(TransitionType transition, List<TransitionMemberType> transitionMembers) {
 		TransitionMemberType transitionMember = new TransitionMemberType();
 		transitionMembers.add(transitionMember);
@@ -140,7 +124,11 @@ public class IndoorGmlBuilder {
 		name.setId(id);
 		return name;
 	}
-	
+
+	private StateType createState(Room room) {
+		return createState("st" + room.getId());
+	}
+
 	public TransitionType createTransition(String id) {
 		TransitionType name = new TransitionType();
 		name.setId(id);
@@ -160,16 +148,26 @@ public class IndoorGmlBuilder {
 	}
 
 	public void setStatePos(StateType state, double x, double y, double z) {
+		PointType point = createPoint(x, y, z);
 		PointPropertyType pointProperty = new PointPropertyType();
+		pointProperty.setPoint(point);
+		state.setGeometry(pointProperty);
+	}
+
+	private void setStatePos(StateType state, Room room) {
+		List<Double> centroid = room.computeCentroid();
+		setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
+	}
+
+	private PointType createPoint(double x, double y, double z) {
 		PointType point = new PointType();
 		DirectPositionType directPosition = new DirectPositionType();
 		directPosition.withValue(x, y, z).withSrsDimension(BigInteger.valueOf(3));
 		point.setPos(directPosition);
-		pointProperty.setPoint(point);
-		state.setGeometry(pointProperty);
+		return point;
 	}
-	
-public void setTransitionPos(TransitionType trans) {
+
+	public void setTransitionPos(TransitionType trans) {
 		
 		CurvePropertyType curveProp = new CurvePropertyType ();
 		LineStringType linestring = new LineStringType();
@@ -236,11 +234,12 @@ public void setTransitionPos(TransitionType trans) {
 				CellSpaceType cs = createCellSpace(room);
 				addCellSpace(primalSpaceFeature, cs);
 
-				StateType st = createIndoorGmlState(room);
-				createStateMember(st, states);
+				StateType state = createState(room);
+				setStatePos(state, room);
+				addState(nodes, state);
 
-				setDualityCellSpace(cs, st);
-				setDualityState(st, cs);
+				setDualityCellSpace(cs, state);
+				setDualityState(state, cs);
 			}
 		}
 
