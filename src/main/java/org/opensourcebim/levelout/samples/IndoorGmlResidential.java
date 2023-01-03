@@ -71,10 +71,8 @@ public class IndoorGmlResidential {
 		StateType st5 = indoorGmlBuilder.createState("s5");
 		StateType st6 = indoorGmlBuilder.createState("s6");
 		
-		
 		TransitionType t1 = indoorGmlBuilder.createTransition("t1");
 		List<StatePropertyType> stateProplist = new ArrayList<>();
-		
 		
 		StatePropertyType stateProp = new StatePropertyType ();
 		stateProplist.add(stateProp);
@@ -83,8 +81,7 @@ public class IndoorGmlResidential {
 		StatePropertyType stateProp2 = new StatePropertyType ();
 		stateProplist.add(stateProp2);
 		stateProp2.setState(st2);
-		
-		
+
 		t1.setConnects(stateProplist);
 
 		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(5.,5.,5.,5.,5.,15.));
