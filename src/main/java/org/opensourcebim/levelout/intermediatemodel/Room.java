@@ -1,6 +1,7 @@
 
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,5 +57,13 @@ public class Room {
 
 	public List<Corner> getCorners(){
 		return Collections.unmodifiableList(corners);
+	}
+
+	public List<Double> asCoordinateList() {
+		List<Double> coordinates = new ArrayList<>();
+		for (Corner corner: corners){
+			coordinates.addAll(corner.asCoordinateList());
+		}
+		return coordinates;
 	}
 }

@@ -96,6 +96,9 @@ public class IndoorGmlBuilder {
 		cellSpaceGeometry.setGeometry2D(surfaceProperty);
 		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
 	}
+	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
+		add2DGeometry(cellSpace, room.asCoordinateList());
+	}
 	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
 		PolygonType polygon = createSurface(coordinates);
 		add2DGeometry(cellSpace, polygon);
@@ -207,11 +210,10 @@ public class IndoorGmlBuilder {
 		spaceLayers.setSpaceLayerMember(spaceLayerMemberList);
 		spaceLayer.setNodes(nodesList);
 
-		List<StateMemberType> states = new ArrayList<>();
-
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
 				CellSpaceType cs = createCellSpace(room);
+				add2DGeometry(cs, room);
 				addCellSpace(primalSpaceFeature, cs);
 
 				StateType state = createState(room);
@@ -222,7 +224,6 @@ public class IndoorGmlBuilder {
 			}
 		}
 
-		nodes.setStateMember(states);
 		return indoorFeatures;
 	}
 
