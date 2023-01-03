@@ -1,6 +1,5 @@
 package org.opensourcebim.levelout.samples;
 
-import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
@@ -28,6 +27,7 @@ import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class IndoorGmlResidential {
@@ -39,24 +39,29 @@ public class IndoorGmlResidential {
 		FileOutputStream fout = new FileOutputStream(fileName);
 		IndoorGmlBuilder indoorGmlBuilder = new IndoorGmlBuilder();
 
-		CellSpaceType cs1 = indoorGmlBuilder.createCellSpace("c1", null);
-		CellSpaceType cs2 = indoorGmlBuilder.createCellSpace("c2", null);
-		CellSpaceType cs3 = indoorGmlBuilder.createCellSpace("c3", null);
-		CellSpaceType cs4 = indoorGmlBuilder.createCellSpace("c4", null);
-		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5", null);
-		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6", null);
+		CellSpaceType cs1 = indoorGmlBuilder.createCellSpace("c1");
+		CellSpaceType cs2 = indoorGmlBuilder.createCellSpace("c2");
+		CellSpaceType cs3 = indoorGmlBuilder.createCellSpace("c3");
+		CellSpaceType cs4 = indoorGmlBuilder.createCellSpace("c4");
+		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5");
+		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6");
 
-		List<CellSpaceMemberType> cellspacemembers = new ArrayList<>();
-		indoorGmlBuilder.createCellSpaceMember(cs1, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs2, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs3, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs4, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs5, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs6, cellspacemembers);
+		// TODO use realistic values here
+		List<Double> coordinates = Arrays.asList(0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.);
+		for(CellSpaceType cs : List.of(cs1, cs2, cs3, cs4, cs5)){
+			indoorGmlBuilder.add2DGeometry(cs, coordinates);
+			indoorGmlBuilder.add3DGeometry(cs, coordinates);
+		}
 
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
 		primalSpaceFeature.setId("pf1");
-		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
+
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs1);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs2);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs3);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs4);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs5);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs6);
 
 		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProperty = new PrimalSpaceFeaturesPropertyType();
 		primalSpaceFeaturesProperty.setPrimalSpaceFeatures(primalSpaceFeature);
@@ -86,10 +91,6 @@ public class IndoorGmlResidential {
 		
 		indoorGmlBuilder.setTransitionPos(t1);
 
-		
-		
-		
-	
 		indoorGmlBuilder.setStatePos(st1, 5.0, 5.0, 5.0);
 		indoorGmlBuilder.setStatePos(st2, 5.0, 5.0, 15.0);
 		indoorGmlBuilder.setStatePos(st3, 15.0, 2.5, 5.0);
@@ -153,7 +154,7 @@ public class IndoorGmlResidential {
 		MultiLayeredGraphPropertyType multiLayeredGraphProperty = new MultiLayeredGraphPropertyType();
 		multiLayeredGraphProperty.setMultiLayeredGraph(multiLayeredGraph);
 
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
+		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
 		indoorFeatures.setId("if1");
 		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProperty);
 		indoorFeatures.setMultiLayeredGraph(multiLayeredGraphProperty);
