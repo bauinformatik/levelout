@@ -56,11 +56,10 @@ public class IntermediateResidential {
 		Corner n24 = new Corner(24, 10, 2, 3);
 
 		// set 10 door
-				Corner n37 = new Corner(37, 1, 0, 0);
-				Corner n38 = new Corner(38, 2, 0, 0);
-				Corner n39 = new Corner(39, 6, 5, 0);
-				Corner n40 = new Corner(40, 6, 6, 0);
-				
+		Corner n37 = new Corner(37, 1, 0, 0);
+		Corner n38 = new Corner(38, 2, 0, 0);
+		Corner n39 = new Corner(39, 6, 5, 0);
+		Corner n40 = new Corner(40, 6, 6, 0);
 
 		List<Corner> nodes1 = Arrays.asList(n1, n2, n3, n4);
 		List<Corner> nodes2 = Arrays.asList(n5, n6, n7, n8);
@@ -71,8 +70,6 @@ public class IntermediateResidential {
 		List<Corner> corners10 = Arrays.asList(n37, n38);
 		List<Corner> corners11 = Arrays.asList(n39, n40);
 
-
-
 		Room gp1 = new Room(1, "floor", nodes1);
 		Room gp2 = new Room(2, "floor", nodes2);
 		Room gp3 = new Room(3, "floor", nodes3);
@@ -81,7 +78,6 @@ public class IntermediateResidential {
 		Room gp6 = new Room(6, "floor", nodes6);
 		Door gp10 = new Door(10, "door", corners10);
 		Door gp11 = new Door(11, "door", corners11);
-
 
 		List<Room> polygons1 = Arrays.asList(gp1, gp2, gp3);
 		List<Room> polygons2 = Arrays.asList(gp4, gp5, gp6);

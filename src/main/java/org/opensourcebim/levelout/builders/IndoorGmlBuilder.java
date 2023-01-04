@@ -14,223 +14,219 @@ import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class IndoorGmlBuilder {
 	private static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
 	private static final net.opengis.gml.v_3_2_1.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
 
-	public static CellSpaceType createIndoorGmlCellSpace(Room room) {
-		CellSpaceType cellspace = new CellSpaceType();
-		cellspace.setId("cs" + room.getId());
-		ExternalObjectReferenceType extrefobj = new ExternalObjectReferenceType();
-		extrefobj.setUri(null); // that's the default anyway, I guess
-		ExternalReferenceType extreftyp = new ExternalReferenceType();
-		extreftyp.setExternalObject(extrefobj);
-		List<ExternalReferenceType> extreflist = new ArrayList<>();
-		extreflist.add(extreftyp);
-		cellspace.setExternalReference(extreflist);
-		return cellspace;
-	}
-
-	public static StateType createIndoorGmlState(Room room) {
-		PointPropertyType pointProperty = new PointPropertyType();
+	private PointType createPoint(double x, double y, double z) {
 		PointType point = new PointType();
-		DirectPositionType dirPos = new DirectPositionType();
-		List<Double> centroid = room.computeCentroid();
-		dirPos.withValue(centroid.get(0), centroid.get(1), centroid.get(2)).withSrsDimension(BigInteger.valueOf(3));
-		point.setPos(dirPos);
-		pointProperty.setPoint(point);
-
-		StateType state = new StateType();
-		state.setId("st" + room.getId());
-		state.setGeometry(pointProperty);
-		return state;
+		DirectPositionType directPosition = new DirectPositionType();
+		directPosition.withValue(x, y, z).withSrsDimension(BigInteger.valueOf(3));
+		point.setPos(directPosition);
+		return point;
 	}
-
-	public void createCellSpaceMember(CellSpaceType cellSpace, List<CellSpaceMemberType> cellSpaceMembers) {
-		CellSpaceMemberType cellSpaceMember = new CellSpaceMemberType();
-		cellSpaceMembers.add(cellSpaceMember);
-		cellSpaceMember.setCellSpace(indoorObjectFactory.createCellSpace(cellSpace));
+	private LineStringType createLineString(List<Double> coordinates) {
+		LineStringType linestring = new LineStringType();
+		DirectPositionListType dirPositions = new DirectPositionListType();
+		linestring.setPosList(dirPositions);
+		dirPositions.setValue(coordinates);
+		return linestring;
 	}
-
-	public void createStateMember(StateType state, List<StateMemberType> stateMembers) {
-		StateMemberType stateMember = new StateMemberType();
-		stateMembers.add(stateMember);
-		stateMember.setState(state);
-	}
-	
-	public void createTransitionMember(TransitionType transition, List<TransitionMemberType> transitionMembers) {
-		TransitionMemberType transitionMember = new TransitionMemberType();
-		transitionMembers.add(transitionMember);
-		transitionMember.setTransition(transition);
-	}
-
-	public CellSpaceType createCellSpace(String id, String uri) {
-		CellSpaceType cellSpace = new CellSpaceType();
-		cellSpace.setId(id);
-
-		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
-		SolidPropertyType solidProperty = new SolidPropertyType();
-
-		SolidType solid = new SolidType();
-		ShellPropertyType shellProperty = new ShellPropertyType();
-		ShellType shell = new ShellType();
-		SurfacePropertyType surfaceProperty = new SurfacePropertyType();
-
-		shell.setSurfaceMember(List.of(surfaceProperty));
-		shellProperty.setShell(shell);
-		solid.setExterior(shellProperty);
-		solidProperty.setAbstractSolid(gmlObjectFactory.createSolid(solid));
-		cellSpaceGeometry.setGeometry3D(solidProperty);
-
-		ExternalObjectReferenceType externalObjectReference = new ExternalObjectReferenceType();
-		externalObjectReference.setUri("file://GMLID_"+id+".city.gml"); // (B) uri represents whole object
-		externalObjectReference.setName("GMLID_"+id); // (A) reference to single object within foreign data set, e.g. CityGML
-		ExternalReferenceType externalReference = new ExternalReferenceType();
-		externalReference.setInformationSystem("test.city.gml"); // (A) uri represents foreign model with multiple objects, e.g. CityGML
-		externalReference.setExternalObject(externalObjectReference);
-		cellSpace.setExternalReference(List.of(externalReference));
-
-		PolygonType polygon = new PolygonType();
-
-	    LinearRingType linearRing = new LinearRingType();
+	private static PolygonType createSurface(List<Double> coordinates) {
 		DirectPositionListType directPositions = new DirectPositionListType();
-		linearRing.setPosList(directPositions);
-
-		List<Double> coordinates = Arrays.asList(0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.);
 		directPositions.setValue(coordinates);
-
+		LinearRingType linearRing = new LinearRingType();
+		linearRing.setPosList(directPositions);
 		AbstractRingPropertyType abstractRingProperty = new AbstractRingPropertyType();
 		abstractRingProperty.setAbstractRing(gmlObjectFactory.createLinearRing(linearRing));
+		PolygonType polygon = new PolygonType();
 		polygon.setExterior(abstractRingProperty);
-
-		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
-	//	cellSpaceGeometry.setGeometry2D(surfaceProperty);
+		return polygon;
+	}
+	private static SolidType createSolid(PolygonType polygon) {
+		SurfacePropertyType surfaceProperty = new SurfacePropertyType();
 		surfaceProperty.setAbstractSurface(gmlObjectFactory.createPolygon(polygon));
+		ShellType shell = new ShellType();
+		shell.setSurfaceMember(List.of(surfaceProperty));
+		ShellPropertyType shellProperty = new ShellPropertyType();
+		shellProperty.setShell(shell);
+		SolidType solid = new SolidType();
+		solid.setExterior(shellProperty);
+		return solid;
+	}
+	private ExternalReferenceType createExternalReference(String externalUri) {
+		// resource at external URI represents whole object
+		ExternalObjectReferenceType externalObjectReference = new ExternalObjectReferenceType();
+		externalObjectReference.setUri(null);
+		ExternalReferenceType externalReference = new ExternalReferenceType();
+		externalReference.setExternalObject(externalObjectReference);
+		return externalReference;
+	}
+	private ExternalReferenceType createExternalReference(String externalUri, String externalId) {
+		// resource at external URI represents multiple objects, one of which is identified by externalId
+		ExternalObjectReferenceType externalObjectReference = new ExternalObjectReferenceType();
+		externalObjectReference.setName(externalId);
+		ExternalReferenceType externalReference = new ExternalReferenceType();
+		externalReference.setInformationSystem(externalUri);
+		externalReference.setExternalObject(externalObjectReference);
+		return externalReference;
+	}
+	private void addExternalReference(CellSpaceType cellspace, ExternalReferenceType externalReference){
+		cellspace.getExternalReference().add(externalReference);
+	}
+	public CellSpaceType createCellSpace(String id) {
+		CellSpaceType cellSpace = new CellSpaceType();
+		cellSpace.setId(id);
 		return cellSpace;
 	}
-
+	private CellSpaceType createCellSpace(Room room) {
+		return createCellSpace("cs"+room.getId());
+	}
+	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
+		PolygonType polygon = createSurface(coordinates);
+		SolidType solid = createSolid(polygon);
+		add3DGeometry(cellSpace, solid);
+	}
+	private void add2DGeometry(CellSpaceType cellSpace, PolygonType polygon) {
+		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
+		SurfacePropertyType surfaceProperty = new SurfacePropertyType();
+		surfaceProperty.setAbstractSurface(gmlObjectFactory.createPolygon(polygon));
+		cellSpaceGeometry.setGeometry2D(surfaceProperty);
+		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
+	}
+	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
+		add2DGeometry(cellSpace, room.asCoordinateList());
+	}
+	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
+		PolygonType polygon = createSurface(coordinates);
+		add2DGeometry(cellSpace, polygon);
+	}
+	private void add3DGeometry(CellSpaceType cellSpace, SolidType solid) {
+		SolidPropertyType solidProperty = new SolidPropertyType();
+		solidProperty.setAbstractSolid(gmlObjectFactory.createSolid(solid));
+		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
+		cellSpaceGeometry.setGeometry3D(solidProperty);
+		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
+	}
+	public void addCellSpace(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceType cellSpace) {
+		CellSpaceMemberType cellSpaceMember = new CellSpaceMemberType();
+		cellSpaceMember.setCellSpace(indoorObjectFactory.createCellSpace(cellSpace));
+		primalSpaceFeatures.getCellSpaceMember().add(cellSpaceMember);
+	}
 	public StateType createState(String id) {
 		StateType name = new StateType();
 		name.setId(id);
 		return name;
 	}
-	
+	private StateType createState(Room room) {
+		return createState("st" + room.getId());
+	}
+	public void setStatePos(StateType state, double x, double y, double z) {
+		PointType point = createPoint(x, y, z);
+		PointPropertyType pointProperty = new PointPropertyType();
+		pointProperty.setPoint(point);
+		state.setGeometry(pointProperty);
+	}
+	private void setStatePos(StateType state, Room room) {
+		List<Double> centroid = room.computeCentroid();
+		setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
+	}
+	public void addState(NodesType nodes, StateType state) {
+		StateMemberType stateMember = new StateMemberType();
+		stateMember.setState(state);
+		nodes.getStateMember().add(stateMember);
+	}
 	public TransitionType createTransition(String id) {
 		TransitionType name = new TransitionType();
 		name.setId(id);
 		return name;
 	}
-
-
-	public void setDualityState(StateType state, CellSpaceType cellSpace) {
+	public void setTransitionPos(TransitionType trans, List<Double> coordinates) {
+		LineStringType linestring = createLineString(coordinates);
+		CurvePropertyType curveProp = new CurvePropertyType ();
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		trans.setGeometry(curveProp);
+	}
+	public void addTransition(EdgesType edges, TransitionType transition) {
+		TransitionMemberType transitionMember = new TransitionMemberType();
+		transitionMember.setTransition(transition);
+		edges.getTransitionMember().add(transitionMember);
+	}
+	private void setDualCellSpaceForState(StateType state, CellSpaceType cellSpace) {
 		CellSpacePropertyType cellSpaceProperty = new CellSpacePropertyType();
 		cellSpaceProperty.setHref("#" + cellSpace.getId());
 		state.setDuality(cellSpaceProperty);
 	}
-
-	public void setDualityCellSpace(CellSpaceType cellSpace, StateType state) {
+	private void setDualStateForCellSpace(CellSpaceType cellSpace, StateType state) {
 		StatePropertyType stateProperty = new StatePropertyType();
 		stateProperty.setHref("#" + state.getId());
 		cellSpace.setDuality(stateProperty);
 	}
-
-	public void setStatePos(StateType state, double x, double y, double z) {
-		PointPropertyType pointProperty = new PointPropertyType();
-		PointType point = new PointType();
-		DirectPositionType directPosition = new DirectPositionType();
-		directPosition.withValue(x, y, z).withSrsDimension(BigInteger.valueOf(3));
-		point.setPos(directPosition);
-		pointProperty.setPoint(point);
-		state.setGeometry(pointProperty);
+	public void setDuality(CellSpaceType cellSpace, StateType state){
+		setDualCellSpaceForState(state, cellSpace);
+		setDualStateForCellSpace(cellSpace, state);
 	}
-	
-public void setTransitionPos(TransitionType trans) {
-		
-		CurvePropertyType curveProp = new CurvePropertyType ();
-		LineStringType linestring = new LineStringType();
-		DirectPositionListType dirposlist = new DirectPositionListType();
-		linestring.setPosList(dirposlist);
-
-		List<Double> coordinates = Arrays.asList(5.,5.,5.,5.,5.,15.);
-		dirposlist.setValue(coordinates);
-		
-
-		List<PointPropertyType> pointprop = new ArrayList<>();
-		
-	//	linestring.setPosOrPointPropertyOrPointRep(gmlObjectFactory.createPointProperty(pointprop));
-		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
-		trans.setGeometry(curveProp);
-	}
-	
-
-	private void createIndoorFeatures(Storey storey, List<StateMemberType> stateMembers, List<CellSpaceMemberType> cellSpaceMembers) {
-		for (Room genericPolygon : storey.getRooms()) {
-			CellSpaceType cs = createIndoorGmlCellSpace(genericPolygon);
-			createCellSpaceMember(cs, cellSpaceMembers);
-
-			StateType st = createIndoorGmlState(genericPolygon);
-			createStateMember(st, stateMembers);
-
-			setDualityCellSpace(cs, st);
-			setDualityState(st, cs);
-		}
+	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
+		return indoorFeatures.getMultiLayeredGraph().getMultiLayeredGraph().getSpaceLayers().get(0).getSpaceLayerMember().get(0).getSpaceLayer();
 	}
 
-	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
-		write(outStream, createIndoorFeatures(building));
+	public PrimalSpaceFeaturesType getPrimalSpace(IndoorFeaturesType indoorFeatures) {
+		return indoorFeatures.getPrimalSpaceFeatures().getPrimalSpaceFeatures();
 	}
 
-	private IndoorFeaturesType createIndoorFeatures(Building building) {
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
+	public IndoorFeaturesType createIndoorFeatures() {
+		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
 		indoorFeatures.setId("if");
+
 		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
 		primalSpaceFeature.setId("pf");
-		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg"); //	+ String.valueOf(id);
-
-		SpaceLayersType spaceLayers = new SpaceLayersType();
-		spaceLayers.setId("slayers");
-		List<SpaceLayersType> spaceLayerslist = new ArrayList<>();
-		spaceLayerslist.add(spaceLayers);
-
-		SpaceLayerType spaceLayer = new SpaceLayerType();
-		spaceLayer.setId("sl");
-		List<SpaceLayerMemberType> spaceLayerMemberList = new ArrayList<>();
-		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
-		spaceLayerMember.setSpaceLayer(spaceLayer);
-		spaceLayerMemberList.add(spaceLayerMember);
-
-		NodesType nodes = new NodesType();
-		nodes.setId("n");
-		List<NodesType> nodesList = new ArrayList<>();
-		nodesList.add(nodes);
-
 		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProp = new PrimalSpaceFeaturesPropertyType();
 		primalSpaceFeaturesProp.setPrimalSpaceFeatures(primalSpaceFeature);
 		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProp);
+		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
+		multiLayeredGraph.setId("mlg");
 
+		SpaceLayersType spaceLayers = new SpaceLayersType();
+		spaceLayers.setId("slayers");
+		SpaceLayerType spaceLayer = new SpaceLayerType();
+		spaceLayer.setId("sl");
+		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
+		spaceLayerMember.setSpaceLayer(spaceLayer);
+
+		NodesType nodes = new NodesType();
+		nodes.setId("n");
 		MultiLayeredGraphPropertyType multilayergraphProp = new MultiLayeredGraphPropertyType();
 		multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
 		indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
 
-		multiLayeredGraph.setSpaceLayers(spaceLayerslist);
-
-		spaceLayers.setSpaceLayerMember(spaceLayerMemberList);
-		spaceLayer.setNodes(nodesList);
-
-		List<StateMemberType> states = new ArrayList<>();
-		List<CellSpaceMemberType> cellSpaceMembers = new ArrayList<>();
-
-		for (Storey storeys : building.getStoreys()) {
-			createIndoorFeatures(storeys, states, cellSpaceMembers);
-		}
-
-		primalSpaceFeature.setCellSpaceMember(cellSpaceMembers);
-		nodes.setStateMember(states);
+		multiLayeredGraph.setSpaceLayers(List.of(spaceLayers));
+		spaceLayers.setSpaceLayerMember(List.of(spaceLayerMember));
+		spaceLayer.setNodes(List.of(nodes));
 		return indoorFeatures;
+	}
+
+	private IndoorFeaturesType createIndoorFeatures(Building building) {
+		IndoorFeaturesType indoorFeatures = createIndoorFeatures();
+		PrimalSpaceFeaturesType primalSpace = getPrimalSpace(indoorFeatures);
+		SpaceLayerType dualSpace = getFirstDualSpaceLayer(indoorFeatures);
+		for (Storey storey : building.getStoreys()) {
+			for (Room room : storey.getRooms()) {
+				CellSpaceType cs = createCellSpace(room);
+				add2DGeometry(cs, room);
+				addCellSpace(primalSpace, cs);
+				StateType state = createState(room);
+				setStatePos(state, room);
+				addState(dualSpace.getNodes().get(0), state);
+				setDuality(cs, state);
+			}
+		}
+		return indoorFeatures;
+	}
+
+	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
+		write(outStream, createIndoorFeatures(building));
 	}
 
 	public void write(OutputStream outStream, IndoorFeaturesType indoorFeatures) throws JAXBException {

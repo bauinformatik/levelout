@@ -1,26 +1,16 @@
 package org.opensourcebim.levelout.samples;
 
-import net.opengis.indoorgml.core.v_1_0.CellSpaceMemberType;
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphPropertyType;
-import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesPropertyType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayerMemberType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayerType;
-import net.opengis.indoorgml.core.v_1_0.SpaceLayersType;
-import net.opengis.indoorgml.core.v_1_0.StateMemberType;
 import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
-import net.opengis.indoorgml.core.v_1_0.TransitionMemberType;
 import net.opengis.indoorgml.core.v_1_0.TransitionType;
-import net.opengis.indoorgml.core.v_1_0.MultiLayeredGraphType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.EdgesType;
 
 import org.locationtech.jts.io.ParseException;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 
 import javax.xml.bind.JAXBException;
@@ -28,6 +18,7 @@ import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class IndoorGmlResidential {
@@ -39,27 +30,29 @@ public class IndoorGmlResidential {
 		FileOutputStream fout = new FileOutputStream(fileName);
 		IndoorGmlBuilder indoorGmlBuilder = new IndoorGmlBuilder();
 
-		CellSpaceType cs1 = indoorGmlBuilder.createCellSpace("c1", null);
-		CellSpaceType cs2 = indoorGmlBuilder.createCellSpace("c2", null);
-		CellSpaceType cs3 = indoorGmlBuilder.createCellSpace("c3", null);
-		CellSpaceType cs4 = indoorGmlBuilder.createCellSpace("c4", null);
-		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5", null);
-		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6", null);
+		CellSpaceType cs1 = indoorGmlBuilder.createCellSpace("c1");
+		CellSpaceType cs2 = indoorGmlBuilder.createCellSpace("c2");
+		CellSpaceType cs3 = indoorGmlBuilder.createCellSpace("c3");
+		CellSpaceType cs4 = indoorGmlBuilder.createCellSpace("c4");
+		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5");
+		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6");
 
-		List<CellSpaceMemberType> cellspacemembers = new ArrayList<>();
-		indoorGmlBuilder.createCellSpaceMember(cs1, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs2, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs3, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs4, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs5, cellspacemembers);
-		indoorGmlBuilder.createCellSpaceMember(cs6, cellspacemembers);
+		// TODO use realistic values here
+		List<Double> coordinates = Arrays.asList(0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.);
+		for(CellSpaceType cs : List.of(cs1, cs2, cs3, cs4, cs5)){
+			indoorGmlBuilder.add2DGeometry(cs, coordinates);
+			indoorGmlBuilder.add3DGeometry(cs, coordinates);
+		}
 
-		PrimalSpaceFeaturesType primalSpaceFeature = new PrimalSpaceFeaturesType();
-		primalSpaceFeature.setId("pf1");
-		primalSpaceFeature.setCellSpaceMember(cellspacemembers);
+		IndoorFeaturesType indoorFeatures = indoorGmlBuilder.createIndoorFeatures();
+		PrimalSpaceFeaturesType primalSpaceFeature = indoorGmlBuilder.getPrimalSpace(indoorFeatures);
 
-		PrimalSpaceFeaturesPropertyType primalSpaceFeaturesProperty = new PrimalSpaceFeaturesPropertyType();
-		primalSpaceFeaturesProperty.setPrimalSpaceFeatures(primalSpaceFeature);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs1);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs2);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs3);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs4);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs5);
+		indoorGmlBuilder.addCellSpace(primalSpaceFeature, cs6);
 
 		StateType st1 = indoorGmlBuilder.createState("s1");
 		StateType st2 = indoorGmlBuilder.createState("s2");
@@ -68,10 +61,8 @@ public class IndoorGmlResidential {
 		StateType st5 = indoorGmlBuilder.createState("s5");
 		StateType st6 = indoorGmlBuilder.createState("s6");
 		
-		
 		TransitionType t1 = indoorGmlBuilder.createTransition("t1");
 		List<StatePropertyType> stateProplist = new ArrayList<>();
-		
 		
 		StatePropertyType stateProp = new StatePropertyType ();
 		stateProplist.add(stateProp);
@@ -80,16 +71,11 @@ public class IndoorGmlResidential {
 		StatePropertyType stateProp2 = new StatePropertyType ();
 		stateProplist.add(stateProp2);
 		stateProp2.setState(st2);
-		
-		
-		t1.setConnects(stateProplist);
-		
-		indoorGmlBuilder.setTransitionPos(t1);
 
-		
-		
-		
-	
+		t1.setConnects(stateProplist);
+
+		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(5.,5.,5.,5.,5.,15.));
+
 		indoorGmlBuilder.setStatePos(st1, 5.0, 5.0, 5.0);
 		indoorGmlBuilder.setStatePos(st2, 5.0, 5.0, 15.0);
 		indoorGmlBuilder.setStatePos(st3, 15.0, 2.5, 5.0);
@@ -97,93 +83,28 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setStatePos(st5, 15.0, 7.5, 5.0);
 		indoorGmlBuilder.setStatePos(st6, 15.0, 7.5, 15.0);
 
-		List<StateMemberType> states = new ArrayList<>();
-		indoorGmlBuilder.createStateMember(st1, states);
-		indoorGmlBuilder.createStateMember(st2, states);
-		indoorGmlBuilder.createStateMember(st3, states);
-		indoorGmlBuilder.createStateMember(st4, states);
-		indoorGmlBuilder.createStateMember(st5, states);
-		indoorGmlBuilder.createStateMember(st6, states);
-		
-		List<TransitionMemberType> transitions = new ArrayList<>();
-		indoorGmlBuilder.createTransitionMember(t1, transitions);
-
-		indoorGmlBuilder.setDualityCellSpace(cs1, st1);
-		indoorGmlBuilder.setDualityCellSpace(cs2, st2);
-		indoorGmlBuilder.setDualityCellSpace(cs3, st3);
-		indoorGmlBuilder.setDualityCellSpace(cs4, st4);
-		indoorGmlBuilder.setDualityCellSpace(cs5, st5);
-		indoorGmlBuilder.setDualityCellSpace(cs6, st6);
-
-		indoorGmlBuilder.setDualityState(st1, cs1);
-		indoorGmlBuilder.setDualityState(st2, cs2);
-		indoorGmlBuilder.setDualityState(st3, cs3);
-		indoorGmlBuilder.setDualityState(st4, cs4);
-		indoorGmlBuilder.setDualityState(st5, cs5);
-		indoorGmlBuilder.setDualityState(st6, cs6);
-
-		NodesType nodes = new NodesType();
+		NodesType nodes = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getNodes().get(0);
 		nodes.setId("n1");
-		nodes.setStateMember(states);
-		List<NodesType> nodesList = List.of(nodes);
-		
-		EdgesType edges = new EdgesType();
+
+		indoorGmlBuilder.addState(nodes, st1);
+		indoorGmlBuilder.addState(nodes, st2);
+		indoorGmlBuilder.addState(nodes, st3);
+		indoorGmlBuilder.addState(nodes, st4);
+		indoorGmlBuilder.addState(nodes, st5);
+		indoorGmlBuilder.addState(nodes, st6);
+
+		EdgesType edges = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getEdges().get(0);
 		edges.setId("e1");
-		edges.setTransitionMember(transitions);
-		List<EdgesType> edgesList = List.of(edges);
+		indoorGmlBuilder.addTransition(edges, t1);
 
-		SpaceLayerType spaceLayer = new SpaceLayerType();
-		spaceLayer.setId("sl1");
-		spaceLayer.setNodes(nodesList);
-		spaceLayer.setEdges(edgesList);
-
-		SpaceLayerMemberType spaceLayerMember = new SpaceLayerMemberType();
-		spaceLayerMember.setSpaceLayer(spaceLayer);
-		List<SpaceLayerMemberType> spaceLayerMembers = List.of(spaceLayerMember);
-
-		SpaceLayersType spaceLayers = new SpaceLayersType();
-		spaceLayers.setId("slayers1");
-		spaceLayers.setSpaceLayerMember(spaceLayerMembers);
-		List<SpaceLayersType> spaceLayersList = List.of(spaceLayers);
-
-		MultiLayeredGraphType multiLayeredGraph = new MultiLayeredGraphType();
-		multiLayeredGraph.setId("mlg1");
-		multiLayeredGraph.setSpaceLayers(spaceLayersList);
-
-		MultiLayeredGraphPropertyType multiLayeredGraphProperty = new MultiLayeredGraphPropertyType();
-		multiLayeredGraphProperty.setMultiLayeredGraph(multiLayeredGraph);
-
-		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType(); // description
-		indoorFeatures.setId("if1");
-		indoorFeatures.setPrimalSpaceFeatures(primalSpaceFeaturesProperty);
-		indoorFeatures.setMultiLayeredGraph(multiLayeredGraphProperty);
+		indoorGmlBuilder.setDuality(cs1, st1);
+		indoorGmlBuilder.setDuality(cs2, st2);
+		indoorGmlBuilder.setDuality(cs3, st3);
+		indoorGmlBuilder.setDuality(cs4, st4);
+		indoorGmlBuilder.setDuality(cs5, st5);
+		indoorGmlBuilder.setDuality(cs6, st6);
 
 		new IndoorGmlBuilder().write(fout,indoorFeatures);
 	}
 
-	public static class IndoorGMLNameSpaceMapper extends NamespacePrefixMapper {
-		private static final String DEFAULT_URI = "http://www.opengis.net/indoorgml/1.0/core";
-		private static final String NAVIGATION_URI = "http://www.opengis.net/indoorgml/1.0/navigation";
-		private static final String GML_URI = "http://www.opengis.net/gml/3.2";
-		private static final String XLINK_URI = "http://www.w3.org/1999/xlink";
-
-		@Override
-		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-			if (DEFAULT_URI.equals(namespaceUri)) {
-				return "core";
-			} else if (NAVIGATION_URI.equals(namespaceUri)) {
-				return "navi";
-			} else if (GML_URI.equals(namespaceUri)) {
-				return "gml";
-			} else if (XLINK_URI.equals(namespaceUri)) {
-				return "xlink";
-			}
-			return suggestion;
-		}
-
-		@Override
-		public String[] getPreDeclaredNamespaceUris() {
-			return new String[]{DEFAULT_URI, NAVIGATION_URI, GML_URI, XLINK_URI};
-		}
-	}
 }
