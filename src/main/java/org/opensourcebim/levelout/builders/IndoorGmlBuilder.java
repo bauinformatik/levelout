@@ -168,8 +168,10 @@ public class IndoorGmlBuilder {
 		setDualCellSpaceForState(state, cellSpace);
 		setDualStateForCellSpace(cellSpace, state);
 	}
+	
 	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
 		return indoorFeatures.getMultiLayeredGraph().getMultiLayeredGraph().getSpaceLayers().get(0).getSpaceLayerMember().get(0).getSpaceLayer();
+
 	}
 
 	public PrimalSpaceFeaturesType getPrimalSpace(IndoorFeaturesType indoorFeatures) {

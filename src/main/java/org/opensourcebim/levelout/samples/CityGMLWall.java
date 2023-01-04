@@ -43,7 +43,7 @@ public class CityGMLWall {
 	}
 
 	public void doMain() throws Exception {
-		String fileName = "output/roomstorey.gml";
+		String fileName = "output/roomstorey3.gml";
 		
 		CityGMLContext context = CityGMLContext.newInstance();
 
@@ -151,6 +151,7 @@ public class CityGMLWall {
 	
 	
 	
+
 		private void setLoDgeomdonwall(BuildingRoom room, List<LineString> linestrings) {
 			 List<CurveProperty> curveMember = new ArrayList<>();
 		      for (LineString line : linestrings) {
