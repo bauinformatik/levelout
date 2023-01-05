@@ -84,7 +84,7 @@ public class IndoorGmlBuilder {
 	private CellSpaceType createCellSpace(Room room) {
 		return createCellSpace("cs"+room.getId());
 	}
-	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
+	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
 		PolygonType polygon = createSurface(coordinates);
 		SolidType solid = createSolid(polygon);
 		add3DGeometry(cellSpace, solid);
@@ -99,7 +99,7 @@ public class IndoorGmlBuilder {
 	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
 		add2DGeometry(cellSpace, room.asCoordinateList());
 	}
-	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
+	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
 		PolygonType polygon = createSurface(coordinates);
 		add2DGeometry(cellSpace, polygon);
 	}
@@ -199,6 +199,8 @@ public class IndoorGmlBuilder {
 
 		NodesType nodes = new NodesType();
 		nodes.setId("n");
+		EdgesType edges = new EdgesType();
+		edges.setId("e");
 		MultiLayeredGraphPropertyType multilayergraphProp = new MultiLayeredGraphPropertyType();
 		multilayergraphProp.setMultiLayeredGraph(multiLayeredGraph);
 		indoorFeatures.setMultiLayeredGraph(multilayergraphProp);
@@ -206,6 +208,7 @@ public class IndoorGmlBuilder {
 		multiLayeredGraph.setSpaceLayers(List.of(spaceLayers));
 		spaceLayers.setSpaceLayerMember(List.of(spaceLayerMember));
 		spaceLayer.setNodes(List.of(nodes));
+		spaceLayer.setEdges(List.of(edges));
 		return indoorFeatures;
 	}
 
