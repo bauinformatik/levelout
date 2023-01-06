@@ -167,5 +167,32 @@ public class OsmInteractive {
 		System.out.println("Converted to Lat/Long: " + latlong.toString());
 		System.out.println();
 	}
+	
+	public static void ifclocaltomapcoord(double lat, double lon) {
+		//IFC Map Conversion parameters
+		
+		double eastings = 333780.622;
+		double	northings =  6246775.891;
+		double 	orthogonalHeight = 97.457;
+		double 	xAxisAbscissa = 0.990330045;
+		double 	xAxisOrdinate = -0.138731399;
+		double 	scale = 0.999998;
+		double rotation = Math.atan2(xAxisAbscissa, xAxisOrdinate); // check order 
+		
+		// local coordinates 
+		double localx = 0;
+		double localy = 0;
+		double localzh = 0;
+		
+		double a = scale * Math.cos(rotation);
+		double b = scale * Math.sin(rotation);
+		
+		// map coordinates 
+		double eastingsmap = (a*localx) - (b*localy)+ eastings;
+		double nothingsmap = (b*localx) + (a*localy)+ northings;
+		
+		double height = localzh + orthogonalHeight;
+	}
+	
 
 }
