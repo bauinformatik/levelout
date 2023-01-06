@@ -21,8 +21,8 @@ import uk.me.jstott.jcoord.LatLng;
 import uk.me.jstott.jcoord.UTMRef;
 
 public class OsmInteractive {
-	private static final Scanner sc = new Scanner(System.in);
-	private static OsmXmlOutputStream osmOutput;
+	public static Scanner sc = new Scanner(System.in);
+	public static OsmXmlOutputStream osmOutput;
 
 	public static void main(String[] args) throws IOException {
 		String fileName = "output/osmoutput7.osm";
@@ -61,7 +61,7 @@ public class OsmInteractive {
 		}
 	}
 
-	private static void readAndWriteNodeDetails(int num) {
+	public static void readAndWriteNodeDetails(int num) {
 		List<Node> nodeList = new ArrayList<>();
 		double bearing = 0;
 		double originlat = 50.9773653;
