@@ -37,7 +37,6 @@ public class IndoorGmlResidential {
 		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5");
 		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6");
 
-		// TODO use realistic values here
 		List<Double> coordinates = Arrays.asList(0.,0.,0.,10.,0.,0.,10.,10.,0.,0.,10.,0.);
 		for(CellSpaceType cs : List.of(cs1, cs2, cs3, cs4, cs5,cs6)){
 			indoorGmlBuilder.add2DGeometry(cs, coordinates);

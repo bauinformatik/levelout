@@ -13,7 +13,6 @@ import javax.xml.bind.Marshaller;
 import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 public class IndoorGmlBuilder {
@@ -84,10 +83,9 @@ public class IndoorGmlBuilder {
 	private CellSpaceType createCellSpace(Room room) {
 		return createCellSpace("cs"+room.getId());
 	}
-	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
+	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
 		PolygonType polygon = createSurface(coordinates);
-		SolidType solid = createSolid(polygon);
-		add3DGeometry(cellSpace, solid);
+		add2DGeometry(cellSpace, polygon);
 	}
 	private void add2DGeometry(CellSpaceType cellSpace, PolygonType polygon) {
 		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
@@ -99,9 +97,10 @@ public class IndoorGmlBuilder {
 	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
 		add2DGeometry(cellSpace, room.asCoordinateList());
 	}
-	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
+	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
 		PolygonType polygon = createSurface(coordinates);
-		add2DGeometry(cellSpace, polygon);
+		SolidType solid = createSolid(polygon);
+		add3DGeometry(cellSpace, solid);
 	}
 	private void add3DGeometry(CellSpaceType cellSpace, SolidType solid) {
 		SolidPropertyType solidProperty = new SolidPropertyType();
@@ -109,6 +108,9 @@ public class IndoorGmlBuilder {
 		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
 		cellSpaceGeometry.setGeometry3D(solidProperty);
 		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
+	}
+	private void add3DGeometry(CellSpaceType cellSpace, Room room) {
+		add3DGeometry(cellSpace, room.asCoordinateList());
 	}
 	public void addCellSpace(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceType cellSpace) {
 		CellSpaceMemberType cellSpaceMember = new CellSpaceMemberType();
@@ -179,6 +181,7 @@ public class IndoorGmlBuilder {
 	}
 
 	public IndoorFeaturesType createIndoorFeatures() {
+		// TODO: do this in builder constructor and keep it private, to ensure proper creation of primal and dual space
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
 		indoorFeatures.setId("if");
 
