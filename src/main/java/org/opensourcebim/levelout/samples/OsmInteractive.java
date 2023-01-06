@@ -17,6 +17,8 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
+import uk.me.jstott.jcoord.LatLng;
+import uk.me.jstott.jcoord.UTMRef;
 
 public class OsmInteractive {
 	private static final Scanner sc = new Scanner(System.in);
@@ -61,45 +63,38 @@ public class OsmInteractive {
 
 	private static void readAndWriteNodeDetails(int num) {
 		List<Node> nodeList = new ArrayList<>();
-		double bearing =0;
+		double bearing = 0;
 		double originlat = 50.9773653;
-    	double originlon = 11.34782554233;
-    	double originx =0;
-    	double originy=0;
-    	double mapunitdistance = 0.010;
+		double originlon = 11.34782554233;
+		double originx = 0;
+		double originy = 0;
+		double mapunitdistance = 0.10;
 		for (int i = 0; i < num; i++) {
 			System.out.println("Enter the node details in the following order : id, longitude, latitude");
 			long id = sc.nextLong();
 			double lat = sc.nextDouble();
 			double lon = sc.nextDouble();
-		    if (i==0)
-		    {
-				getGeolocations(id,originlat, originlon, 0, 0);
-				originx =lon;
+			if (i == 0) {
+				getGeolocations(id, originlat, originlon, 0, 0);
+				originx = lon;
 				originy = lat;
-		    }
-			else
-			{
-				double distance =  mapunitdistance*(Math.sqrt(Math.pow((lon-originx), 2) + Math.pow((lat-originy), 2)));
-				if (lon != originx && lat == originy)
-				{
-					bearing= 90;
-					getGeolocations(id,originlat, originlon, distance, bearing);
-				}
-				else if (lon == originx && lat != originy)
-				{
-					bearing =0;
-					getGeolocations(id,originlat, originlon, distance, bearing);
-				}
-				else if (lon != originx && lat != originy)
-				{
-					bearing =45;
-					getGeolocations(id,originlat, originlon, distance, bearing);
+			} else {
+				double distance = mapunitdistance
+						* (Math.sqrt(Math.pow((lon - originx), 2) + Math.pow((lat - originy), 2)));
+				if (lon != originx && lat == originy) {
+					bearing = 90;
+					getGeolocations(id, originlat, originlon, distance, bearing);
+				} else if (lon == originx && lat != originy) {
+					bearing = 0;
+					getGeolocations(id, originlat, originlon, distance, bearing);
+				} else if (lon != originx && lat != originy) {
+					bearing = 45;
+					getGeolocations(id, originlat, originlon, distance, bearing);
 				}
 			}
-			
+
 		}
-	
+
 	}
 
 	private static Map<String, List<OsmTag>> createTagSets() {
@@ -127,34 +122,50 @@ public class OsmInteractive {
 		return nodeList;
 	}
 
-	public static void getGeolocations( long i, double lat1, double lon1, double distance, double brng) {
+	public static void getGeolocations(long i, double lat1, double lon1, double distance, double brng) {
 
-		if (i==-1)
-		{
+		if (i == -1) {
 			System.out.println(lon1);
 			System.out.println(lat1);
 			osmOutput.write(new Node(i, lon1, lat1));
-			
+
+		} else {
+			lon1 = Math.toRadians(lon1);
+			lat1 = Math.toRadians(lat1);
+			brng = Math.toRadians(brng);
+			double lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / 6371)
+					+ Math.cos(lat1) * Math.sin(distance / 6371) * Math.cos(brng));
+
+			double lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(distance / 6371) * Math.cos(lat1),
+					Math.cos(distance) - Math.sin(lat1) * Math.sin(lat2));
+
+			double lat2d = Math.toDegrees(lat2);
+			double long2d = Math.toDegrees(lon2);
+
+			osmOutput.write(new Node(i, long2d, lat2d));
+			System.out.println(lat2d);
+			System.out.println(long2d);
 		}
-		else
-		{
-		lon1 = Math.toRadians(lon1);
-		lat1 = Math.toRadians(lat1);
-		brng = Math.toRadians(brng);
-		double lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / 6371)
-				+ Math.cos(lat1) * Math.sin(distance / 6371) * Math.cos(brng));
+	}
 
-		double lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(distance / 6371) * Math.cos(lat1),
-				Math.cos(distance) - Math.sin(lat1) * Math.sin(lat2));
+	public static void wgstoProjectedCoorsys(double lat, double lon) {
+		System.out.println("Convert Latitude/Longitude to UTM Reference");
+		LatLng latlon = new LatLng(lat, lon);
+		// LatLng latlon = new LatLng(53.320555, -1.729000);
+		System.out.println("Latitude/Longitude: " + latlon.toString());
+		UTMRef utm = latlon.toUTMRef();
+		System.out.println("Converted to UTM Ref: " + utm.toString());
+		System.out.println();
+	}
 
-
-		double lat2d = Math.toDegrees(lat2);
-		double long2d = Math.toDegrees(lon2);
-
-		osmOutput.write(new Node(i, long2d,lat2d));
-		System.out.println(lat2d);
-		System.out.println(long2d);
-		}
+	public static void projectedtoWgsCoorsys(double northing, double easting, int zonelon, char zonelat) {
+		System.out.println("Convert UTM Reference to Latitude/Longitude");
+		UTMRef utm = new UTMRef(zonelon, zonelat, easting, northing);
+		// UTMRef utm = new UTMRef(30, 'U', 584662.2085495128, 5908683.746009846);
+		System.out.println("UTM Reference: " + utm.toString());
+		LatLng latlong = utm.toLatLng();
+		System.out.println("Converted to Lat/Long: " + latlong.toString());
+		System.out.println();
 	}
 
 }

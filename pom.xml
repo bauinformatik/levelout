@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opensourcebim.levelout</groupId>
 	<artifactId>LevelOutPlugins</artifactId>
@@ -38,6 +36,10 @@
 			<name>SlimJars</name>
 			<url>https://mvn.slimjars.com</url>
 		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -70,6 +72,11 @@
 			<groupId>de.topobyte</groupId>
 			<artifactId>osm4j-geometry</artifactId>
 			<version>0.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.xni06</groupId>
+			<artifactId>JCoord</artifactId>
+			<version>24347197e2364650a6b1cf2cc46d064414edc22a</version>
 		</dependency>
 		<dependency>
 			<groupId>com.slimjars.trove4j</groupId>
@@ -107,11 +114,11 @@
 			<version>1.4.0</version>
 		</dependency>
 		<dependency>
-	<groupId>com.google.guava</groupId>
-	<artifactId>guava</artifactId>
-	<version>31.1-jre</version>
-</dependency>
-<!-- Thanks for using https://jar-download.com -->
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.1-jre</version>
+		</dependency>
+		<!-- Thanks for using https://jar-download.com -->
 
 		<!-- https://mvnrepository.com/artifact/org.wololo/jts2geojson -->
 		<!--   dependency>
