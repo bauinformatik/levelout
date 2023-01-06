@@ -7,7 +7,7 @@ public class IndoorGmlSerializerPlugin extends GmlSerializerPlugin {
 
     @Override
     public Serializer createSerializer(PluginConfiguration pluginConfiguration) {
-        return new IndoorGmlSerializer();
+        return new IndoorGmlSerializer(getIfcExtractionMethod(pluginConfiguration));
     }
 
 }

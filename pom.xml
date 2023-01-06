@@ -48,6 +48,18 @@
 			<artifactId>pluginbase</artifactId>
 			<version>1.5.182</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opensourcebim</groupId>
+			<artifactId>bimserver</artifactId>
+			<version>1.5.183-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.opensourcebim</groupId>
+			<artifactId>bimserverjar</artifactId>
+			<version>1.5.183-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- IndoorGML -->
 		<dependency>
@@ -139,7 +151,12 @@
 			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.12.6.1</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

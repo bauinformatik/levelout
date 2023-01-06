@@ -1,6 +1,9 @@
 package org.opensourcebim.levelout.builders;
 
 import org.citygml4j.core.model.CityGMLVersion;
+import org.citygml4j.core.model.building.AbstractBuildingSubdivisionProperty;
+import org.citygml4j.core.model.building.BuildingRoom;
+import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
 import org.citygml4j.core.model.core.AbstractThematicSurface;
@@ -13,6 +16,7 @@ import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.citygml4j.xml.writer.CityGMLWriteException;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.Door;
+import org.xmlobjects.gml.model.deprecated.StringOrRef;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve;
@@ -93,14 +97,18 @@ public class CityGmlBuilder {
 		List<Polygon> polygonList = new ArrayList<>();
 		List<LineString> LineStringList = new ArrayList<>();
 		for (Room genericPolygon : storey.getRooms()) {
-			Polygon poly = createCitygmlPoly(genericPolygon); // to use for shell
-			polygonList.add(poly);
-			cityGmlBuilding.addBoundary(createBoundary(genericPolygon, poly));
+			if(genericPolygon.getCorners().size()>=3){
+				Polygon poly = createCitygmlPoly(genericPolygon); // to use for shell
+				polygonList.add(poly);
+				cityGmlBuilding.addBoundary(createBoundary(genericPolygon, poly));
+			}
 		}
 		for (Door genericPolygon : storey.getDoors()) {
-			LineString line = createCitygmlLines(genericPolygon); // to use for shell
-			LineStringList.add(line);
-			cityGmlBuilding.addBoundary(createBoundaryLine(genericPolygon, line));
+			if(genericPolygon.getCorners().size()>=2){
+				LineString line = createCitygmlLines(genericPolygon); // to use for shell
+				LineStringList.add(line);
+				cityGmlBuilding.addBoundary(createBoundaryLine(genericPolygon, line));
+			}
 		}
 
 		List<SurfaceProperty> surfaceMember = new ArrayList<>();
@@ -124,6 +132,14 @@ public class CityGmlBuilder {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
 		for (Storey storeys : building.getStoreys()) {
 			setLodgeom(cityGmlBuilding, storeys);
+			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
+			cityGmlStorey.setSortKey((double) storeys.getLevel());
+			cityGmlBuilding.getBuildingSubdivisions().add(new AbstractBuildingSubdivisionProperty(cityGmlStorey));
+			for (Room room: storeys.getRooms()){
+				BuildingRoom cityGmlRoom = new BuildingRoom();
+				cityGmlRoom.setDescription(new StringOrRef("Room #" + room.getId()));
+				cityGmlStorey.getBuildingRooms().add(new BuildingRoomProperty(cityGmlRoom));
+			}
 		}
 		return cityGmlBuilding;
 	}
