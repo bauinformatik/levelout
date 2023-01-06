@@ -15,15 +15,15 @@ public class UtilityTests {
 	public void testGetGeoLocations(){
 		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
 		OsmInteractive.getGeolocations(-1, 50.9773653, 11.34782554233, 0, 0);
-		OsmInteractive.getGeolocations(-1, 50.9773653, 11.34782554233, 6, 90);
-		OsmInteractive.getGeolocations(-1, 50.9773653, 11.34782554233, 6, 0);
-		OsmInteractive.getGeolocations(-1, 50.9773653, 11.34782554233, 6, 45);
+		OsmInteractive.getGeolocations(-2, 50.9773653, 11.34782554233, 6, 90);
+		OsmInteractive.getGeolocations(-3, 50.9773653, 11.34782554233, 6, 0);
+		OsmInteractive.getGeolocations(-4, 50.9773653, 11.34782554233, 6, 45);
 		OsmInteractive.osmOutput.complete();
 	}
 	@Test
 	public void testInteractive(){
 		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
-		OsmInteractive.sc = new Scanner("-1\n0\n0\n-2\n0\n6\n-3\n6\n6\n-4\n6\n0\n");
+		OsmInteractive.sc = new Scanner("-1 0 0\n-2 0 6\n-3 6 6\n-4 6 0\n");
 		OsmInteractive.readAndWriteNodeDetails(4);
 		OsmInteractive.osmOutput.complete();
 	}

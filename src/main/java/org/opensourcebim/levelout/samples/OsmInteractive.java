@@ -70,24 +70,28 @@ public class OsmInteractive {
 		double originy = 0;
 		double mapunitdistance = 0.10;
 		for (int i = 0; i < num; i++) {
-			System.out.println("Enter the node details in the following order : id, longitude, latitude");
+			System.out.println("Enter the node details in the following order : id, x, y");
 			long id = sc.nextLong();
-			double lat = sc.nextDouble();
-			double lon = sc.nextDouble();
+			double x = sc.nextDouble();
+			double y = sc.nextDouble();
+			double dist = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+			double angle = Math.atan2(y,x);
+			double angleAdjusted = angle;
+			// getGeolocation(originlat, originlon, x, y);
 			if (i == 0) {
 				getGeolocations(id, originlat, originlon, 0, 0);
-				originx = lon;
-				originy = lat;
+				originx = y;
+				originy = x;
 			} else {
 				double distance = mapunitdistance
-						* (Math.sqrt(Math.pow((lon - originx), 2) + Math.pow((lat - originy), 2)));
-				if (lon != originx && lat == originy) {
+						* (Math.sqrt(Math.pow((y - originx), 2) + Math.pow((x - originy), 2)));
+				if (y != originx && x == originy) {
 					bearing = 90;
 					getGeolocations(id, originlat, originlon, distance, bearing);
-				} else if (lon == originx && lat != originy) {
+				} else if (y == originx && x != originy) {
 					bearing = 0;
 					getGeolocations(id, originlat, originlon, distance, bearing);
-				} else if (lon != originx && lat != originy) {
+				} else if (y != originx && x != originy) {
 					bearing = 45;
 					getGeolocations(id, originlat, originlon, distance, bearing);
 				}
