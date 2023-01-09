@@ -32,7 +32,7 @@ public class OsmBuilder {
 			osmOutput.write(node);
 			nodes.add(node.getId());
 		}
-		nodes.add(nodes.get(0));
+		if(nodes.size()>0) nodes.add(nodes.get(0));
 		List<OsmTag> tags = Arrays.asList (new Tag("indoor", "room"), new Tag("level", level) );
 		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		osmOutput.write(way);
