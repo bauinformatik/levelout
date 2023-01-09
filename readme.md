@@ -133,9 +133,11 @@ Maven build
 Install dependencies
 
 ~~~
-mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=gml-v_3_2_1-2.6.2-SNAPSHOT.jar -Dmaven.repo.local=</path/to/local/repo>
-mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=indoorgml-v_1_0-2.6.2-SNAPSHOT.jar -Dmaven.repo.local=</path/to/local/repo>
+mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile="gml-v_3_2_1-2.6.2-SNAPSHOT.jar"
+mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile="indoorgml-v_1_0-2.6.2-SNAPSHOT.jar"
 ~~~
 
+Quotation marks might be important under Windows,
+additional option `-Dmaven.repo.local=/path/to/local/repo` for non-standard repository locations.
 
 
