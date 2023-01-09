@@ -182,15 +182,47 @@ public class OsmInteractive {
 		double 	xAxisOrdinate = -0.138731399;
 		double 	scale = 0.999998;
 		double rotation = Math.atan2(xAxisAbscissa, xAxisOrdinate); // check order 
+		//double rotationangle = -7.974444;
+		//double rotationrad  = Math.toRadians(rotationangle);
+		
+		// 4 parameters 2D Helmerts transformation 
+		// Assumption of N, E known for the origin of the Engineering coordinate system 
+		double originEastings = 333780.622;
+		double originNorthing = 6246775.891;
+		double ref2Eastings = 333906.644;
+		double ref2Northing = 6246834.938;
+		double xtranslation = originEastings;         
+		double ytranslation = originNorthing;
 		
 		// local coordinates 
+		double  ref1x = 0;
+		double ref1y =  0;
+		double  ref2x = 116.611;
+		double ref2y = 75.960;
+		
+		// using 2D helmerts transformation, solving simultaneous equations 
+		
+		double val1 = 	Math.pow(ref2x, 2) + Math.pow(ref2y, 2) ;
+		double val2 = (ref2Eastings-originEastings)*ref2x + (ref2Northing - originNorthing)*ref2y;
+
+		double val3 = val2 / val1 ;
+		
+		// solving for theta , assuming scale =1 
+		
+		double angle = Math.acos(val3);
+
+		
+		
+		
 		double localx = 0;
 		double localy = 0;
 		double localzh = 0;
 		
-		double a = scale * Math.cos(rotation);
-		double b = scale * Math.sin(rotation);
+		//double a = scale * Math.cos(rotation);
+		//double b = scale * Math.sin(rotation);
 		
+		double a = scale * Math.cos(angle);
+		double b = scale * Math.sin(angle);
 		// map coordinates 
 		double eastingsmap = (a*localx) - (b*localy)+ eastings;
 		double nothingsmap = (b*localx) + (a*localy)+ northings;
