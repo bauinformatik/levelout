@@ -1,7 +1,7 @@
 package org.opensourcebim.levelout.builders;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import net.opengis.gml.v_3_2_1.*;
+import net.opengis.gml.v_3_2.*;
 import net.opengis.indoorgml.core.v_1_0.*;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Room;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class IndoorGmlBuilder {
 	private static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
-	private static final net.opengis.gml.v_3_2_1.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
+	private static final net.opengis.gml.v_3_2.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2.ObjectFactory();
 
 	private PointType createPoint(double x, double y, double z) {
 		PointType point = new PointType();

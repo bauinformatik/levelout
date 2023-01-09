@@ -9,8 +9,6 @@ import net.opengis.indoorgml.core.v_1_0.NodesType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.EdgesType;
 
-import org.locationtech.jts.io.ParseException;
-
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 
 import javax.xml.bind.JAXBException;
@@ -24,7 +22,7 @@ import java.util.List;
 public class IndoorGmlResidential {
 
 
-	public static void main(String[] args) throws JAXBException, ParseException, FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, JAXBException {
 
 		String fileName = "output/outindoor5_6.gml";
 		FileOutputStream fout = new FileOutputStream(fileName);

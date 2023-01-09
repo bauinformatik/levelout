@@ -42,27 +42,38 @@
 		</repository>
 	</repositories>
 	<dependencies>
+		<!-- Opensource BIMserver -->
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
-			<artifactId>shared</artifactId>
+			<artifactId>pluginbase</artifactId>
 			<version>1.5.182</version>
 		</dependency>
-		<!-- TODO: use JAXB 2 maven plugin to generate or install in local repo,
-			now taken from https://github.com/STEMLab/InFactory lib -->
+
+		<!-- IndoorGML -->
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>gml-v_3_2_1</artifactId>
-			<version>2.6.2-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/gml-v_3_2_1-2.6.2-SNAPSHOT.jar</systemPath>
+			<groupId>com.github.highsource.ogc-schemas</groupId>
+			<artifactId>gml-v_3_2</artifactId>
+			<version>18ce89928006eee08ed7e5a6ce6ea016436a444b</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
+			<groupId>com.github.highsource.ogc-schemas</groupId>
 			<artifactId>indoorgml-v_1_0</artifactId>
-			<version>2.6.2-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/indoorgml-v_1_0-2.6.2-SNAPSHOT.jar</systemPath>
+			<version>18ce89928006eee08ed7e5a6ce6ea016436a444b</version>
 		</dependency>
+		<!-- TODO: use JAXB 2 maven plugin to generate OGC schemas on build -->
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.2</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- OpenStreetMap -->
 		<dependency>
 			<groupId>de.topobyte</groupId>
 			<artifactId>osm4j-xml</artifactId>
@@ -70,62 +81,49 @@
 		</dependency>
 		<dependency>
 			<groupId>de.topobyte</groupId>
-			<artifactId>osm4j-geometry</artifactId>
-			<version>0.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.xni06</groupId>
-			<artifactId>JCoord</artifactId>
-			<version>24347197e2364650a6b1cf2cc46d064414edc22a</version>
+			<artifactId>osm4j-core</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.slimjars.trove4j</groupId>
 			<artifactId>trove4j-long-array-list</artifactId>
 			<version>1.0.1</version>
 		</dependency>
+
+		<!-- CityGML4J -->
 		<dependency>
 			<groupId>org.citygml4j</groupId>
 			<artifactId>citygml4j-xml</artifactId>
 			<version>3.0.0-rc.4</version>
 		</dependency>
-		<!-- dependency> <groupId>com.sun.xml.bind</groupId> <artifactId>jaxb-impl</artifactId> 
-			<version>2.3.3</version> </dependency -->
 		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>2.3.2</version>
+			<groupId>org.citygml4j</groupId>
+			<artifactId>citygml4j-core</artifactId>
+			<version>3.0.0-rc.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlobjects.gml</groupId>
+			<artifactId>gml-objects</artifactId>
+			<version>1.0.0-rc.5</version>
 		</dependency>
 
-		<!-- Runtime, com.sun.xml.bind module -->
+		<!-- Various utility libraries -->
 		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<version>2.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.jaxb2_commons</groupId>
-			<artifactId>jaxb2-basics</artifactId>
-			<version>1.11.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hisrc.w3c</groupId>
-			<artifactId>xlink-v_1_0</artifactId>
-			<version>1.4.0</version>
+			<groupId>com.github.xni06</groupId>
+			<artifactId>JCoord</artifactId>
+			<version>24347197e2364650a6b1cf2cc46d064414edc22a</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>31.1-jre</version>
 		</dependency>
-		<!-- Thanks for using https://jar-download.com -->
-
-		<!-- https://mvnrepository.com/artifact/org.wololo/jts2geojson -->
-		<!--   dependency>
-			<groupId>org.wololo</groupId>
-			<artifactId>jts2geojson</artifactId>
-			<version>0.17.0</version>
-		</dependency -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

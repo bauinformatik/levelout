@@ -5,7 +5,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
-import net.opengis.gml.v_3_2_1.*;
+import net.opengis.gml.v_3_2.*;
 import net.opengis.indoorgml.core.v_1_0.*;
 
 import java.lang.Boolean;
@@ -13,7 +13,7 @@ import java.lang.Boolean;
 public class IndoorGmlBasic {
 
 	static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
-	static final net.opengis.gml.v_3_2_1.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2_1.ObjectFactory();
+	static final net.opengis.gml.v_3_2.ObjectFactory gmlFactory = new net.opengis.gml.v_3_2.ObjectFactory();
 	public static void main(String[] args) throws JAXBException {
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType().withPrimalSpaceFeatures(
 			new PrimalSpaceFeaturesPropertyType().withPrimalSpaceFeatures(
