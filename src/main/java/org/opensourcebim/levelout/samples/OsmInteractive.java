@@ -74,8 +74,8 @@ public class OsmInteractive {
 			long id = sc.nextLong();
 			double x = sc.nextDouble();
 			double y = sc.nextDouble();
-			double dist = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
-			double angle = Math.atan2(y,x);
+			double dist = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+			double angle = Math.atan2(y, x);
 			double angleAdjusted = angle;
 			// getGeolocation(originlat, originlon, x, y);
 			if (i == 0) {
@@ -151,8 +151,96 @@ public class OsmInteractive {
 			System.out.println(long2d);
 		}
 	}
+	
+	public static void ifcwgs2Utm2wgs (double x, double y, double lat , double lon)
+	{
+		
+		double lat1 = 56.336468;
+		double long1 = 150.311068 ;
+		UTMRef utm =wgstoProjectedCoorsys(lat1, long1);
+		String str = utm.toString();
+		String[] splited = str.split("\\s+");
+		String zone = splited[0];
+		double easting = Double.valueOf(splited[1]);
+		double northing = Double.valueOf(splited[2]);
+		
+		ifclocaltomapcoord(116.611,75.960,easting, northing, zone);
+		
+		
+		
+	}
 
-	public static void wgstoProjectedCoorsys(double lat, double lon) {
+	public static void ifc2geolocations (double x , double y, double dist) {
+		
+		
+		double lon = 11.34782554233 ;
+		double lat = 50.9773653;
+		double bearing;
+		double distance = dist/1000;
+		// bearing =  Math.toDegrees(Math.atan2(y,x));  
+		 //bearing = (bearing+360)%360;
+		 
+		 
+		
+	
+		
+		if(x==0 && y>0)
+		{
+				bearing = 0;
+		}
+		else if(y==0 && x<0)
+		{
+				bearing = 270;
+		}
+		else if(x==0 && y>0)
+		{
+				bearing = 180;
+		}
+		else if(y==0 && x>0)
+		{
+				bearing = 90;
+		}
+		else
+		{
+		 bearing =   Math.toDegrees(Math.atan2(y,x))    ;                  
+		}
+	/*	else
+		{
+			bearing = 90 - Math.toDegrees(Math.atan2(y,x))    ; 
+		}*/
+		
+		//System.out.println(bearing);
+		
+		 double bearing2 = (bearing+360)%360;
+		 bearing2 = Math.toRadians(bearing2);
+		 System.out.println(bearing2);
+			
+		 
+		double lon1 = Math.toRadians(lon);
+		double lat1 = Math.toRadians(lat);
+		double lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / 6371)
+				+ Math.cos(lat1) * Math.sin(distance / 6371) * Math.cos(bearing2));
+
+		double lon2 = lon1 + Math.atan2(Math.sin(bearing2) * Math.sin(distance / 6371) * Math.cos(lat1),
+				Math.cos(distance/6371) - Math.sin(lat1) * Math.sin(lat2));
+		
+
+		double lat2d = Math.toDegrees(lat2);
+		double long2d = Math.toDegrees(lon2);
+		
+		
+		//	long2d = (long2d+540)%360;
+			//long2d = long2d -180;
+		
+	
+
+		System.out.println("lat "+lat2d);
+		System.out.println("lon"+long2d);
+		
+		
+	}
+	
+	public static UTMRef wgstoProjectedCoorsys(double lat, double lon) {
 		System.out.println("Convert Latitude/Longitude to UTM Reference");
 		LatLng latlon = new LatLng(lat, lon);
 		// LatLng latlon = new LatLng(53.320555, -1.729000);
@@ -160,6 +248,7 @@ public class OsmInteractive {
 		UTMRef utm = latlon.toUTMRef();
 		System.out.println("Converted to UTM Ref: " + utm.toString());
 		System.out.println();
+		return utm;
 	}
 
 	public static void projectedtoWgsCoorsys(double northing, double easting, int zonelon, char zonelat) {
@@ -171,64 +260,82 @@ public class OsmInteractive {
 		System.out.println("Converted to Lat/Long: " + latlong.toString());
 		System.out.println();
 	}
-	
-	public static void ifclocaltomapcoord(double lat, double lon) {
-		//IFC Map Conversion parameters
+
+	public static void ifclocaltomapcoord(double lat, double lon, double easting, double northing, String zone) {
+		// IFC Map Conversion parameters
+
+		double eastings = easting ;//333780.622;
+		double northings = northing;//6246775.891;
+		double orthogonalHeight = 97.457;
+		double xAxisAbscissa = 0.990330045;
+		double xAxisOrdinate = -0.138731399;
+		double scale = 0.999998;
+		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa); // check order
+		String zn = zone;
+		int zonelon = Integer.valueOf(zn.substring(0, 2));
+		char zonelat = zn.charAt(2);
+
+		double localx = lat;
+		double localy = lon;
+		double localzh = 0;
+
+		double a = scale * Math.cos(rotation);
+		double b = scale * Math.sin(rotation);
+
+		// map coordinates
+		double eastingsmap = (a * localx) - (b * localy) + eastings;
+		double northingsmap = (b * localx) + (a * localy) + northings;
+
+		System.out.println("local to Map Grid in x " + eastingsmap);
+		System.out.println("local to Map Grid in y " + northingsmap);
 		
-		double eastings = 333780.622;
-		double	northings =  6246775.891;
-		double 	orthogonalHeight = 97.457;
-		double 	xAxisAbscissa = 0.990330045;
-		double 	xAxisOrdinate = -0.138731399;
-		double 	scale = 0.999998;
-		double rotation = Math.atan2(xAxisAbscissa, xAxisOrdinate); // check order 
-		//double rotationangle = -7.974444;
-		//double rotationrad  = Math.toRadians(rotationangle);
-		
-		// 4 parameters 2D Helmerts transformation 
-		// Assumption of N, E known for the origin of the Engineering coordinate system 
+		projectedtoWgsCoorsys(northingsmap, eastingsmap, zonelon, zonelat);
+
+		double height = localzh + orthogonalHeight;
+	}
+
+	public static void ifc2global2Dhelmert(double x, double y, double z) {
+		// 4 parameters 2D Helmerts transformation
+		// Assumption of N, E known for the origin of the Engineering coordinate system
 		double originEastings = 333780.622;
 		double originNorthing = 6246775.891;
 		double ref2Eastings = 333906.644;
 		double ref2Northing = 6246834.938;
-		double xtranslation = originEastings;         
+		double xtranslation = originEastings;
 		double ytranslation = originNorthing;
-		
-		// local coordinates 
-		double  ref1x = 0;
-		double ref1y =  0;
-		double  ref2x = 116.611;
-		double ref2y = 75.960;
-		
-		// using 2D helmerts transformation, solving simultaneous equations 
-		
-		double val1 = 	Math.pow(ref2x, 2) + Math.pow(ref2y, 2) ;
-		double val2 = (ref2Eastings-originEastings)*ref2x + (ref2Northing - originNorthing)*ref2y;
+		double scale = 0.999998;
 
-		double val3 = val2 / val1 ;
-		
-		// solving for theta , assuming scale =1 
-		
+		// local coordinates
+		double ref1x = 0;
+		double ref1y = 0;
+		double ref2x = 116.611;
+		double ref2y = 75.960;
+
+		// using 2D helmerts transformation, solving simultaneous equations
+
+		double val1 = Math.pow(ref2x, 2) + Math.pow(ref2y, 2);
+		double val2 = (ref2Eastings - originEastings) * ref2x + (ref2Northing - originNorthing) * ref2y;
+
+		double val3 = val2 / val1;
+
+		double localx = x;
+		double localy = y;
+		double localzh = z;
+		// solving for theta , assuming scale =1
+
 		double angle = Math.acos(val3);
 
-		
-		
-		
-		double localx = 0;
-		double localy = 0;
-		double localzh = 0;
-		
-		//double a = scale * Math.cos(rotation);
-		//double b = scale * Math.sin(rotation);
-		
 		double a = scale * Math.cos(angle);
 		double b = scale * Math.sin(angle);
-		// map coordinates 
-		double eastingsmap = (a*localx) - (b*localy)+ eastings;
-		double nothingsmap = (b*localx) + (a*localy)+ northings;
-		
-		double height = localzh + orthogonalHeight;
+
+		double eastingsmap = (a * localx) - (b * localy) + xtranslation;
+		double northingsmap = (b * localx) + (a * localy) + ytranslation;
+
+		System.out.println("local to Map Grid Helmert in x " + eastingsmap);
+		System.out.println("local to Map Grid Helmert in y " + northingsmap);
+
+		// double height = localzh + orthogonalHeight;
+
 	}
-	
 
 }

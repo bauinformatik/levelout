@@ -32,7 +32,7 @@ public class UtilityTests {
 	public void testJCoord(){
 		OsmInteractive.wgstoProjectedCoorsys(53.320555, -1.729000);
 		OsmInteractive.projectedtoWgsCoorsys(5908683.746009846, 584662.2085495128, 30, 'U');
-		OsmInteractive.ifclocaltomapcoord(6,6);
+		//OsmInteractive.ifclocaltomapcoord(6,6);
 	}
 
 	@Test
@@ -43,5 +43,20 @@ public class UtilityTests {
 		Assert.assertEquals(csOrigin.longitude, transformed.longitude, 0.000000001);
 		Assert.assertEquals(csOrigin.latitude, transformed.latitude, 0.000000001);
 		Assert.assertEquals(csOrigin.height, transformed.height, 0.000000001);
+	} 
+	
+	public void testifc2global2Dhelmert()
+	{
+		OsmInteractive.ifc2global2Dhelmert(116.611, 75.960, 0);
+		//OsmInteractive.ifclocaltomapcoord(116.611, 75.960);
+	} 
+	
+	public void testifc2geolocations() 
+	{
+		//OsmInteractive.ifc2geolocations(0, 6, 60);
+	//	OsmInteractive.ifc2geolocations(6, 0, 60);
+		//OsmInteractive.ifc2geolocations(6, 6, 60);
+		//OsmInteractive.ifc2geolocations(0, 6, 60);
+		OsmInteractive.ifcwgs2Utm2wgs(0, 0, 0, 0);
 	}
 }
