@@ -1,6 +1,5 @@
 package org.opensourcebim.levelout.samples;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,8 +25,9 @@ import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
 public class OsmInteractive {
-	public static Scanner sc = new Scanner(System.in);
 	public static OsmXmlOutputStream osmOutput;
+	private static final CRSFactory crsFactory = new CRSFactory();
+	private static final CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
 
 	public static void main(String[] args) throws IOException {
 		String fileName = "output/osmoutput7.osm";
@@ -70,75 +70,48 @@ public class OsmInteractive {
 		return new Way(id, TLongArrayList.wrap(nodes), osmTags);
 	}
 
-	public static ProjCoordinate ifclocalcoord2globalcoordv2(double x, double y, double rotation, double lat,
-			double lon, String epsg) throws FileNotFoundException {
+	public static ProjCoordinate ifclocalcoord2globalcoordv2(double x, double y, double rotation, double lat, double lon, String epsg) {
 
-		long idcount = 0;
-		List<CoordinateReferenceSystem> crslist = createCRSfac(epsg);
-		ProjCoordinate projcoord = createCTfac(crslist.get(0), crslist.get(1), lat, lon);
+		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
+		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg); // use fixed UTM EPSG, we don't have this from IFC
 
-		List<Double> mapcoords = ifctomapcoord(x, y, rotation, projcoord.x, projcoord.y);
-		ProjCoordinate projcoordwgs = createCTfac(crslist.get(1), crslist.get(0), mapcoords.get(1), mapcoords.get(0));
-		idcount = idcount - 1;
-		osmOutput.write(new Node(idcount, projcoordwgs.x, projcoordwgs.y));
+		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
+		ProjCoordinate utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(lon, lat), new ProjCoordinate());
 
-		return projcoordwgs;
+		double a = Math.cos(rotation);
+		double b = Math.sin(rotation);
+		double utmPointX = (a * x) - (b * y) + utmOrigin.x;
+		double utmPointY = (b * x) + (a * y) + utmOrigin.y;
+
+		CoordinateTransform utmToWgs84 = ctFactory.createTransform(utm, wgs84);
+		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY), new ProjCoordinate());
+
+		osmOutput.write(new Node( -1, wgs84Point.x, wgs84Point.y));
+
+		return wgs84Point;
 
 	}
 
 	public static ProjCoordinate ifclocalcoordtoglobalcoordv4(double x, double y, double eastings, double northings,
 			double xAxisAbscissa, double xAxisOrdinate, String epsg) {
-		// IFC Map Conversion parameters
-		long idcount = 0;
+
 		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa);
-
 		double a = Math.cos(rotation);
 		double b = Math.sin(rotation);
+		// TODO just normalize, not need for trigonometric functions
 
 		double eastingsmap = (a * x) - (b * y) + eastings;
 		double northingsmap = (b * x) + (a * y) + northings;
 
-		List<CoordinateReferenceSystem> crslist = createCRSfac(epsg);
-		ProjCoordinate projcoordwgs = createCTfac(crslist.get(1), crslist.get(0), northingsmap, eastingsmap);
-		idcount = idcount - 1;
-		osmOutput.write(new Node(idcount, projcoordwgs.x, projcoordwgs.y));
-
-		return projcoordwgs;
-	}
-
-	private static List<Double> ifctomapcoord(double x, double y, double rotation, double eastings, double northings) {
-
-		double a = Math.cos(rotation);
-		double b = Math.sin(rotation);
-
-		// map coordinates
-		double eastingsmap = (a * x) - (b * y) + eastings;
-		double northingsmap = (b * x) + (a * y) + northings;
-
-		List<Double> mapcoords = Arrays.asList(eastingsmap, northingsmap);
-
-		return mapcoords;
-	}
-
-	private static List<CoordinateReferenceSystem> createCRSfac(String epsg) {
-
-		CRSFactory crsFactory = new CRSFactory();
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
-		CoordinateReferenceSystem ifcproj = crsFactory.createFromName(epsg);
+		CoordinateReferenceSystem originCRS = crsFactory.createFromName(epsg);
 
-		List<CoordinateReferenceSystem> crs = Arrays.asList(wgs84, ifcproj);
-		return crs;
-	}
+		CoordinateTransform originCrsToWgs84 = ctFactory.createTransform(originCRS, wgs84);
+		ProjCoordinate resultcoord = originCrsToWgs84.transform(new ProjCoordinate(eastingsmap, northingsmap), new ProjCoordinate());
 
-	private static ProjCoordinate createCTfac(CoordinateReferenceSystem crs1, CoordinateReferenceSystem crs2,
-			double xcoord, double ycoord) {
+		osmOutput.write(new Node(-1, resultcoord.x, resultcoord.y));
 
-		CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
-		CoordinateTransform coordtransformer = ctFactory.createTransform(crs1, crs2);
-		ProjCoordinate resultcoord = new ProjCoordinate();
-		coordtransformer.transform(new ProjCoordinate(ycoord, xcoord), resultcoord);
 		return resultcoord;
-
 	}
 
 }

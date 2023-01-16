@@ -11,8 +11,6 @@ import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Scanner;
 
 public class UtilityTests {
 	
@@ -26,8 +24,31 @@ public class UtilityTests {
 		Assert.assertEquals(csOrigin.latitude, transformed.latitude, 0.000000001);
 		Assert.assertEquals(csOrigin.height, transformed.height, 0.000000001);
 	}
-	
-	@Test 
+
+	@Test
+	public void testCartesianToWgs84BuildingSmart(){
+		// origin WGS84 lat=56.336468, long=150.311068
+		// rotation xAxis abscissa=0.990330045, ordinate=-0.138731399
+		// point x=116.611, y=75.960
+
+		// Map Grid of Australia Zone 56
+		// Ref1 E = 333,780.622 N = 6,246,775.891 H = 97.457
+		// Ref2 E = 333,906.644 N = 6,246,834.938 H = 98.291
+		// Ref1 X = 0.000 Y = 0.000 Z = 0.000
+		// Ref2 X = 116.611 Y = 75.960 Z = 0.834
+		// Eastings = 333,780.622
+		//Northings = 6,246,775.891
+		//OrthogonalHeight = 97.457
+		//XAxisAbscissa = 0.990330045
+		//XAxisOrdinate = -0.138731399
+		//Scale = 0.999998
+
+		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
+		OsmInteractive.ifclocalcoordtoglobalcoordv4(115.611, 75.960, 333780.622, 6246755.891, 0.990330045, -0.138731399, "epsg:28356");
+		OsmInteractive.osmOutput.complete();
+	}
+
+	@Test
 	public void writeNodeandWaydetails() throws IOException
 	{
 		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
@@ -39,8 +60,6 @@ public class UtilityTests {
 		OsmInteractive.writeWayDetails(-1, nodeList, "indoortags1");
 		OsmInteractive.osmOutput.complete();
 	}
-	
-	
 
 	@Test
 	public void testifc2geolocations() throws FileNotFoundException {
