@@ -134,6 +134,19 @@
 			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.locationtech.proj4j/proj4j -->
+		<dependency>
+			<groupId>org.locationtech.proj4j</groupId>
+			<artifactId>proj4j</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.locationtech.proj4j/proj4j-epsg -->
+		<dependency>
+			<groupId>org.locationtech.proj4j</groupId>
+			<artifactId>proj4j-epsg</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
 
 	</dependencies>
 
