@@ -1,9 +1,9 @@
 package org.opensourcebim.levelout.samples;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +24,6 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
-import uk.me.jstott.jcoord.LatLng;
-import uk.me.jstott.jcoord.MGRSRef;
-import uk.me.jstott.jcoord.UTMRef;
 
 public class OsmInteractive {
 	public static Scanner sc = new Scanner(System.in);
@@ -36,51 +33,22 @@ public class OsmInteractive {
 		String fileName = "output/osmoutput7.osm";
 		OutputStream output = new FileOutputStream(fileName);
 		osmOutput = new OsmXmlOutputStream(output, true);
-		System.out.println("Enter the number of nodes");
-		int num = sc.nextInt();
-		readAndWriteNodeDetails(num);
-		Map<String, List<OsmTag>> tags = createTagSets();
-		writeWayDetails(tags);
 		osmOutput.complete();
 	}
 
-	private static void writeWayDetails(Map<String, List<OsmTag>> alltags) throws IOException {
-		System.out.println("Enter the number of ways of the way list");
-
-		int waynum = sc.nextInt();
-		for (int j = 0; j < waynum; j++) {
-			System.out.println("Enter way id ");
-			long wayid = sc.nextLong();
-			sc.nextLine();
-			System.out.println("Enter the name of the tag set");
-			String tagname = sc.nextLine();
-
-			if (alltags.containsKey(tagname)) {
-				List<OsmTag> osmtags = alltags.get(tagname);
-				for (OsmTag e : osmtags) {
-					System.out.println(e);
-				}
-				System.out.println("Enter the list of node id's constituting the ways");
-				long[] nodeList = readNodeList();
-				OsmWay way = createOsmWay(wayid, nodeList, osmtags);
-				osmOutput.write(way);
-			}
-
-		}
+	public static void WriteNodeDetails(long id, double lat, double lon) {
+		// TODO Auto-generated method stub
+		osmOutput.write(new Node(id, lon, lat));
 	}
 
-	public static void readAndWriteNodeDetails(int num) {
-		List<Node> nodeList = new ArrayList<>();
-		
-		for (int i = 0; i < num; i++) {
-			System.out.println("Enter the node details in the following order : id, x, y");
-			long id = sc.nextLong();
-			double x = sc.nextDouble();
-			double y = sc.nextDouble();
-			double dist = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-			double angle = Math.atan2(y, x);
-			double angleAdjusted = angle;
-			// getGeolocation(originlat, originlon, x, y);
+	public static void writeWayDetails(long wayid, long[] nodeList, String osmtag) throws IOException {
+
+		Map<String, List<OsmTag>> alltags = createTagSets();
+		if (alltags.containsKey(osmtag)) {
+			List<OsmTag> osmtags = alltags.get(osmtag);
+
+			OsmWay way = createOsmWay(wayid, nodeList, osmtags);
+			osmOutput.write(way);
 		}
 
 	}
@@ -102,36 +70,26 @@ public class OsmInteractive {
 		return new Way(id, TLongArrayList.wrap(nodes), osmTags);
 	}
 
-	private static long[] readNodeList() {
-		long[] nodeList = new long[5];
-		for (int i = 0; i < 5; i++) {
-			nodeList[i] = sc.nextLong();
-		}
-		return nodeList;
-	}
-
-	
-
 	public static ProjCoordinate ifclocalcoord2globalcoordv2(double x, double y, double rotation, double lat,
-			double lon, String epsg) {
+			double lon, String epsg) throws FileNotFoundException {
 
-		long idcount = 0 ;
+		long idcount = 0;
 		List<CoordinateReferenceSystem> crslist = createCRSfac(epsg);
 		ProjCoordinate projcoord = createCTfac(crslist.get(0), crslist.get(1), lat, lon);
 
-		
-
 		List<Double> mapcoords = ifctomapcoord(x, y, rotation, projcoord.x, projcoord.y);
 		ProjCoordinate projcoordwgs = createCTfac(crslist.get(1), crslist.get(0), mapcoords.get(1), mapcoords.get(0));
-	 idcount = idcount-1;
+		idcount = idcount - 1;
 		osmOutput.write(new Node(idcount, projcoordwgs.x, projcoordwgs.y));
+
 		return projcoordwgs;
 
 	}
+
 	public static ProjCoordinate ifclocalcoordtoglobalcoordv4(double x, double y, double eastings, double northings,
 			double xAxisAbscissa, double xAxisOrdinate, String epsg) {
 		// IFC Map Conversion parameters
-long idcount = 0;
+		long idcount = 0;
 		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa);
 
 		double a = Math.cos(rotation);
@@ -140,16 +98,16 @@ long idcount = 0;
 		double eastingsmap = (a * x) - (b * y) + eastings;
 		double northingsmap = (b * x) + (a * y) + northings;
 
-		
 		List<CoordinateReferenceSystem> crslist = createCRSfac(epsg);
 		ProjCoordinate projcoordwgs = createCTfac(crslist.get(1), crslist.get(0), northingsmap, eastingsmap);
-		 idcount = idcount-1;
-			osmOutput.write(new Node(idcount, projcoordwgs.x, projcoordwgs.y));
+		idcount = idcount - 1;
+		osmOutput.write(new Node(idcount, projcoordwgs.x, projcoordwgs.y));
+
 		return projcoordwgs;
 	}
 
 	private static List<Double> ifctomapcoord(double x, double y, double rotation, double eastings, double northings) {
-		
+
 		double a = Math.cos(rotation);
 		double b = Math.sin(rotation);
 
@@ -157,12 +115,7 @@ long idcount = 0;
 		double eastingsmap = (a * x) - (b * y) + eastings;
 		double northingsmap = (b * x) + (a * y) + northings;
 
-		
-
-		List<Double> mapcoords = new ArrayList<>();
-
-		mapcoords.add(eastingsmap);
-		mapcoords.add(northingsmap);
+		List<Double> mapcoords = Arrays.asList(eastingsmap, northingsmap);
 
 		return mapcoords;
 	}
@@ -187,7 +140,5 @@ long idcount = 0;
 		return resultcoord;
 
 	}
-
-	
 
 }
