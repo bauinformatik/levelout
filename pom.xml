@@ -99,6 +99,11 @@
 			<artifactId>proj4j</artifactId>
 			<version>1.2.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.locationtech.proj4j</groupId>
+			<artifactId>proj4j-epsg</artifactId>
+			<version>1.2.2</version>
+		</dependency>
 
 		<!-- CityGML4J -->
 		<dependency>
@@ -119,11 +124,6 @@
 
 		<!-- Various utility libraries -->
 		<dependency>
-			<groupId>com.github.xni06</groupId>
-			<artifactId>JCoord</artifactId>
-			<version>24347197e2364650a6b1cf2cc46d064414edc22a</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>31.1-jre</version>
@@ -133,18 +133,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
 			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.locationtech.proj4j/proj4j -->
-		<dependency>
-			<groupId>org.locationtech.proj4j</groupId>
-			<artifactId>proj4j</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.locationtech.proj4j/proj4j-epsg -->
-		<dependency>
-			<groupId>org.locationtech.proj4j</groupId>
-			<artifactId>proj4j-epsg</artifactId>
-			<version>1.2.2</version>
 		</dependency>
 
 
