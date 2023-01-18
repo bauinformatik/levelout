@@ -10,11 +10,9 @@ import org.citygml4j.core.model.construction.Elevation;
 import org.citygml4j.core.model.construction.ElevationProperty;
 import org.citygml4j.core.model.core.AbstractCityObjectProperty;
 import org.citygml4j.core.model.core.CityModel;
-import org.citygml4j.xml.CityGMLContext;
 import org.citygml4j.xml.CityGMLContextException;
-import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.citygml4j.xml.writer.CityGMLWriteException;
-import org.citygml4j.xml.writer.CityGMLWriter;
+import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.xmlobjects.gml.model.basictypes.Code;
 import org.xmlobjects.gml.model.geometry.DirectPosition;
 
@@ -27,10 +25,7 @@ public class CityGmlBasic {
 		Elevation elevation = new Elevation(new Code("floorFinish"), new DirectPosition(3.00));
 		storey.setElevations(List.of(new ElevationProperty(elevation)));
 		building.getBuildingSubdivisions().add(new AbstractBuildingSubdivisionProperty(storey));
-		CityGMLOutputFactory cityGmlOutputFactory = CityGMLContext.newInstance().createCityGMLOutputFactory(CityGMLVersion.v3_0);
-		CityGMLWriter writer = cityGmlOutputFactory.createCityGMLWriter(System.out).withIndent("  ").withDefaultPrefixes();
-		writer.write(cityModel);
-		writer.flush();
+		new CityGmlBuilder().write(System.out, building);
 	}
 }
 
