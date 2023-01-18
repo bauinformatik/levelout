@@ -24,6 +24,14 @@ public class UtilityTests {
 		Assert.assertEquals(csOrigin.latitude, transformed.latitude, 0.000000001);
 		Assert.assertEquals(csOrigin.height, transformed.height, 0.000000001);
 	}
+	@Test
+	public void testCartesianWithWgs84OriginToWgs84O(){
+		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
+		ProjCoordinate projCoordinate = OsmInteractive.ifclocalcoord2globalcoordv2(0, 0, 0, -1.729000, 53.320555, "epsg:28356");
+		Assert.assertEquals(-1.729000, projCoordinate.y, 0.00000001);
+		Assert.assertEquals( 53.320555, projCoordinate.x, 0.00000001);
+		OsmInteractive.osmOutput.complete();
+	}
 
 	@Test
 	public void testCartesianToWgs84BuildingSmart(){
@@ -37,11 +45,11 @@ public class UtilityTests {
 		// Ref1 X = 0.000 Y = 0.000 Z = 0.000
 		// Ref2 X = 116.611 Y = 75.960 Z = 0.834
 		// Eastings = 333,780.622
-		//Northings = 6,246,775.891
-		//OrthogonalHeight = 97.457
-		//XAxisAbscissa = 0.990330045
-		//XAxisOrdinate = -0.138731399
-		//Scale = 0.999998
+		// Northings = 6,246,775.891
+		// OrthogonalHeight = 97.457
+		// XAxisAbscissa = 0.990330045
+		// XAxisOrdinate = -0.138731399
+		// Scale = 0.999998
 
 		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
 		OsmInteractive.ifclocalcoordtoglobalcoordv4(115.611, 75.960, 333780.622, 6246755.891, 0.990330045, -0.138731399, "epsg:28356");
