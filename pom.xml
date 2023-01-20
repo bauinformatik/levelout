@@ -11,7 +11,7 @@
 	<properties>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
-		<bimserver.version>1.5.184-SNAPSHOT</bimserver.version>
+		<bimserver.version>1.5.183</bimserver.version>
 	</properties>
 	<build>
 		<resources>
