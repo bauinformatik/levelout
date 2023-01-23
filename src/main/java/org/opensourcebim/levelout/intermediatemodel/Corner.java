@@ -3,6 +3,11 @@ package org.opensourcebim.levelout.intermediatemodel;
 import java.util.Arrays;
 import java.util.List;
 
+import org.opensourcebim.levelout.util.CoordinateConversion;
+import org.opensourcebim.levelout.util.CoordinateConversion.CartesianPoint;
+import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
+import org.opensourcebim.levelout.util.CoordinateConversion.ProjectedPoint;
+
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.impl.Node;
 
@@ -20,8 +25,22 @@ public class Corner {
 		this.z = z;
 	}
 
-	public OsmNode createOsmNode() {
-		return new Node(id * -1, x, y);
+	public OsmNode createOsmNode(int ifcVersion) {
+		CartesianPoint a = new CartesianPoint(x, y, z);
+		Object b = MapConversion.getMapparameters(ifcVersion, a);
+		double xval = 0, yval = 0 ;
+		if (b instanceof GeodeticPoint)
+		{
+			xval = ((GeodeticPoint)b).latitude;
+			yval = ((GeodeticPoint)b).longitude;
+		}
+		if (b instanceof ProjectedPoint)
+		{
+			xval = ((ProjectedPoint)b).eastings;
+			yval = ((ProjectedPoint)b).northings;
+		}
+		
+		return new Node(id * -1, xval, yval);
 	}
 
 	public List<Double> asCoordinateList() {

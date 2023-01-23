@@ -4,6 +4,7 @@ package org.opensourcebim.levelout.samples;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
+import org.opensourcebim.levelout.intermediatemodel.MapConversion;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
@@ -93,10 +94,12 @@ public class IntermediateResidential {
 				return;
 			};
 		}
-		Building gbld = new Building(10, storeys );
-		new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
-		new OsmBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test.osm"));
-		new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));
+		int ifcVersion = 4;
+		
+		Building gbld = new Building(10, storeys);
+	//	new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
+		new OsmBuilder().createAndWriteBuilding(gbld,ifcVersion, new FileOutputStream("output/test.osm"));
+	//	new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));
 	}
 }
 
