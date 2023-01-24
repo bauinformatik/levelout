@@ -7,6 +7,10 @@ import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 import java.io.OutputStream;
 
 public class IndoorGmlSerializer extends AbstractLevelOutSerializer {
+    IndoorGmlSerializer(boolean extractionMethod) {
+        super(extractionMethod);
+    }
+
     @Override
     public void writeToOutputStream(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
         try {

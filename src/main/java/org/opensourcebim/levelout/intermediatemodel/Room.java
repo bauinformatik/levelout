@@ -17,6 +17,7 @@ public class Room {
 	}
 
 	public List<Double> computeCentroid() {
+		if(corners.isEmpty()) return null;
 		double minX = corners.get(0).getX();
 		double minY = corners.get(0).getY();
 		double minZ = corners.get(0).getZ();

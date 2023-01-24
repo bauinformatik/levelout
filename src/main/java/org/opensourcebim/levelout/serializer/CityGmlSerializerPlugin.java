@@ -7,7 +7,7 @@ public class CityGmlSerializerPlugin extends GmlSerializerPlugin {
 
     @Override
     public Serializer createSerializer(PluginConfiguration pluginConfiguration) {
-        return new CityGmlSerializer();
+        return new CityGmlSerializer(getIfcExtractionMethod(pluginConfiguration));
     }
 
 }

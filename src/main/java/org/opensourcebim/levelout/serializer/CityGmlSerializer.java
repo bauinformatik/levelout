@@ -7,6 +7,10 @@ import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import java.io.OutputStream;
 
 public class CityGmlSerializer extends AbstractLevelOutSerializer {
+    CityGmlSerializer(boolean extractionMethod) {
+        super(extractionMethod);
+    }
+
     @Override
     public void writeToOutputStream(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
         try {

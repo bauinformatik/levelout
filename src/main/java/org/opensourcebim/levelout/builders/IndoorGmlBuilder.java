@@ -133,7 +133,9 @@ public class IndoorGmlBuilder {
 	}
 	private void setStatePos(StateType state, Room room) {
 		List<Double> centroid = room.computeCentroid();
-		setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
+		if(centroid!=null){
+			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
+		}
 	}
 	public void addState(NodesType nodes, StateType state) {
 		StateMemberType stateMember = new StateMemberType();

@@ -2,6 +2,7 @@ package org.opensourcebim.levelout.serializer;
 
 import org.bimserver.BimserverDatabaseException;
 import org.bimserver.emf.IfcModelInterface;
+import org.bimserver.models.ifc4.*;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.Serializer;
 import org.bimserver.plugins.serializers.SerializerException;
@@ -11,15 +12,23 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
+    boolean extractionMethod = false;
     Building building;
 
+    AbstractLevelOutSerializer(boolean extractionMethod){
+        this.extractionMethod = extractionMethod;
+    }
     @Override
     public void init(IfcModelInterface ifcModelInterface, ProjectInfo projectInfo, boolean b) throws SerializerException {
-        // TODO map IFC to intermediate model
+        if(extractionMethod) initStructure(ifcModelInterface); else initSample(); // TODO: depending on serializer settings use other init function
+    }
+    private void initSample(){
         Corner p1 = new Corner(0,0,0.,0);
         Corner p2 = new Corner(1, 0, 10, 0);
         Corner p3 = new Corner(2, 10, 10, 0);
@@ -43,7 +52,26 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
             ), Collections.emptyList())
         ));
     }
-
+    private void initStructure(IfcModelInterface ifcModelInterface){
+        List<Storey> loStoreys = new ArrayList<>();
+        building = new Building(1, loStoreys);
+        List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
+        int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
+        int roomId = 1;
+        for(IfcBuildingStorey storey: storeys){
+            List<Room> rooms = new ArrayList<>();
+            Storey loStorey = new Storey(level++, rooms, Collections.emptyList());
+            loStoreys.add(loStorey);
+            storey.getElevation(); // TODO: use for sorting and in intermediate model
+            storey.getName(); /* TODO: use in intermediate model (OSM has "name" tag, but also "level:ref" for short keys) */for (IfcRelAggregates contained: storey.getIsDecomposedBy()){
+                for (IfcSpace space : contained.getRelatedObjects().stream().filter( IfcSpace.class::isInstance ).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
+                    Room room = new Room(roomId++, "floor", Collections.emptyList());
+                    rooms.add(room);
+                    space.getName(); // TODO: use in intermediate model
+                }
+            }
+        }
+    }
     @Override
     public boolean write(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
         this.writeToOutputStream(outputStream, null);

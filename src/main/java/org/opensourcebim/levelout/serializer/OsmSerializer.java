@@ -7,6 +7,10 @@ import org.opensourcebim.levelout.builders.OsmBuilder;
 import java.io.OutputStream;
 
 public class OsmSerializer extends AbstractLevelOutSerializer {
+    OsmSerializer(boolean extractionMethod) {
+        super(extractionMethod);
+    }
+
     @Override
     public void writeToOutputStream(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
         try {

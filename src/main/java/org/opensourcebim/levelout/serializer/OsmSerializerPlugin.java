@@ -17,7 +17,7 @@ public class OsmSerializerPlugin extends AbstractLevelOutSerializerPlugin {
 
 	@Override
 	public Serializer createSerializer(PluginConfiguration pluginConfiguration) {
-		return new OsmSerializer();
+		return new OsmSerializer(getIfcExtractionMethod(pluginConfiguration));
 	}
 
 	@Override
