@@ -4,6 +4,7 @@ import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.locationtech.proj4j.ProjCoordinate;
+import org.opensourcebim.levelout.builders.OsmBuilder;
 import org.opensourcebim.levelout.samples.OsmInteractive;
 import org.opensourcebim.levelout.util.CoordinateConversion;
 import org.opensourcebim.levelout.util.CoordinateConversion.CartesianPoint;
@@ -93,18 +94,17 @@ public class UtilityTests {
 		Assert.assertEquals(-33.9058082188758, transformed2.northings, 0.000000001);
 		Assert.assertEquals(csOrigin2.height, transformed2.height, 0.000000001);
 
-	}
+	} 
 
-	@Test
-	public void writeNodeandWaydetails() throws IOException {
-		OsmInteractive.osmOutput = new OsmXmlOutputStream(System.out, true);
-		OsmInteractive.WriteNodeDetails(-1, 0, 0);
-		OsmInteractive.WriteNodeDetails(-2, 6, 0);
-		OsmInteractive.WriteNodeDetails(-3, 6, 6);
-		OsmInteractive.WriteNodeDetails(-4, 0, 6);
-		long[] nodeList = new long[] { -1, -2, -3, -4, -1 };
-		OsmInteractive.writeWayDetails(-1, nodeList, "indoortags1");
-		OsmInteractive.osmOutput.complete();
-	}
+
+/*	@Test
+	
+	public void topotoGeo() {
+	
+		CartesianPoint pointToTransform = new CartesianPoint(0, 0, 0);
+		GeodeticPoint csOrigin2 = new GeodeticPoint(-33.90632062825244, 151.20215639320887, 97.457);
+		CoordinateConversion.convertCartesianToWGS842(csOrigin2, pointToTransform);
+
+	}*/
 
 }

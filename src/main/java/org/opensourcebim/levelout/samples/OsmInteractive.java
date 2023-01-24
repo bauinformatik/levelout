@@ -31,52 +31,16 @@ public class OsmInteractive {
 		String fileName = "output/osmoutput7.osm";
 		OutputStream output = new FileOutputStream(fileName);
 		osmOutput = new OsmXmlOutputStream(output, true);
-		OsmBuilder.WriteNodeDetails(-1, 0, 0, osmOutput);
-		OsmBuilder.WriteNodeDetails(-2, 6, 0, osmOutput);
-		OsmBuilder.WriteNodeDetails(-3, 6, 6, osmOutput);
-		OsmBuilder.WriteNodeDetails(-4, 0, 6, osmOutput);
+		osmOutput.write(OsmBuilder.WriteNodeDetails(-1, 0, 0));
+		osmOutput.write(OsmBuilder.WriteNodeDetails(-2, 6, 0));
+		osmOutput.write(OsmBuilder.WriteNodeDetails(-3, 6, 6));
+		osmOutput.write(OsmBuilder.WriteNodeDetails(-4, 0, 6));
 		long[] nodeList = new long[] { -1, -2, -3, -4, -1 };
 		List<OsmTag> outlinetags = List.of(new Tag("building", "residential"), new Tag("building:levels", "2"),
 				new Tag("roof:shape", "flat"), new Tag("min_level", "0"), new Tag("max_level", "1"));
-	OsmBuilder.writeWayDetails(-1, nodeList, outlinetags, osmOutput);
-		
+		osmOutput.write(OsmBuilder.writeWayDetails(-1, nodeList, outlinetags));
+
 		osmOutput.complete();
 	}
-
-	public static void WriteNodeDetails(long id, double lat, double lon) {
-		// TODO Auto-generated method stub
-		osmOutput.write(new Node(id, lon, lat));
-	}
-
-	public static void writeWayDetails(long wayid, long[] nodeList, String osmtag) throws IOException {
-
-		Map<String, List<OsmTag>> alltags = createTagSets();
-		if (alltags.containsKey(osmtag)) {
-			List<OsmTag> osmtags = alltags.get(osmtag);
-
-			OsmWay way = createOsmWay(wayid, nodeList, osmtags);
-			osmOutput.write(way);
-		}
-
-	}
-
-	private static Map<String, List<OsmTag>> createTagSets() {
-		Map<String, List<OsmTag>> alltags = new HashMap<>();
-		List<OsmTag> outlinetags = List.of(new Tag("building", "residential"), new Tag("building:levels", "2"),
-				new Tag("roof:shape", "flat"), new Tag("min_level", "0"), new Tag("max_level", "1"));
-		List<OsmTag> indoortags1 = List.of(new Tag("indoor", "room"), new Tag("level", "0"));
-		List<OsmTag> indoortags2 = List.of(new Tag("indoor", "room"), new Tag("level", "1"));
-
-		alltags.put("outlinetags", outlinetags);
-		alltags.put("indoortags1", indoortags1);
-		alltags.put("indoortags2", indoortags2);
-		return alltags;
-	}
-
-	private static OsmWay createOsmWay(long id, long[] nodes, List<OsmTag> osmTags) throws IOException {
-		return new Way(id, TLongArrayList.wrap(nodes), osmTags);
-	}
-
-	
 
 }
