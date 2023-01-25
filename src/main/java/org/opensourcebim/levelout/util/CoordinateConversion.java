@@ -6,7 +6,6 @@ import org.locationtech.proj4j.CoordinateTransform;
 import org.locationtech.proj4j.CoordinateTransformFactory;
 import org.locationtech.proj4j.ProjCoordinate;
 
-import de.topobyte.osm4j.core.model.impl.Node;
 import uk.me.jstott.jcoord.LatLng;
 import uk.me.jstott.jcoord.UTMRef;
 
@@ -14,7 +13,7 @@ public class CoordinateConversion {
 	private static final CRSFactory crsFactory = new CRSFactory();
 	private static final CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
 
-	public static GeodeticPoint convertCartesianToWGS84(GeodeticPoint origin, CartesianPoint point) {
+	public static GeodeticPoint originWGS84viaGeoCentric(GeodeticPoint origin, CartesianPoint point) {
 		// https://epsg.io/9837-method
 		// https://proj.org/operations/conversions/topocentric.html
 		// tests:
@@ -41,7 +40,7 @@ public class CoordinateConversion {
 
 	}
 
-	public static void convertCartesianToWGS842(GeodeticPoint origin, CartesianPoint point) {
+	public static void originWGS84viaGeoCentric2(GeodeticPoint origin, CartesianPoint point) {
 		CoordinateReferenceSystem WGS842 = crsFactory.createFromParameters("WGS84",
 				"+proj=longlat +datum=WGS84 +no_defs");
 		CoordinateReferenceSystem step1 = crsFactory.createFromParameters("geotoGC",
@@ -56,12 +55,8 @@ public class CoordinateConversion {
 
 	}
 
-	public static GeodeticPoint cartesianWithWGS84OriginToWGS84viaUTM() {
-		return new GeodeticPoint(0, 0, 0);
-	}
-
-	public static GeodeticPoint CartesianWithWgs84OriginToWgs84O(GeodeticPoint origin, CartesianPoint point,
-			double rotation) {
+	public static GeodeticPoint originWGS84viaUTM(GeodeticPoint origin, CartesianPoint point,
+												  double rotation) {
 
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
 		String epsg = "epsg:" + getEpsg(origin);
@@ -87,7 +82,7 @@ public class CoordinateConversion {
 
 	}
 
-	public static String getEpsg(GeodeticPoint origin) {
+	private static String getEpsg(GeodeticPoint origin) {
 
 		System.out.println("Convert Latitude/Longitude to UTM Reference");
 		LatLng latlon = new LatLng(origin.latitude, origin.longitude);
@@ -103,8 +98,8 @@ public class CoordinateConversion {
 
 	}
 
-	public static ProjectedPoint CartesianToWgs84BuildingSmart(CartesianPoint point, ProjectedPoint projOrigin,
-			double xAxisAbscissa, double xAxisOrdinate, String epsg) {
+	public static ProjectedPoint originArbitraryCRS(CartesianPoint point, ProjectedPoint projOrigin,
+													double xAxisAbscissa, double xAxisOrdinate, String epsg) {
 
 		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa);
 		double a = Math.cos(rotation);

@@ -1,15 +1,9 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.opensourcebim.levelout.util.CoordinateConversion;
 import org.opensourcebim.levelout.util.CoordinateConversion.CartesianPoint;
 import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
 import org.opensourcebim.levelout.util.CoordinateConversion.ProjectedPoint;
-
-import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
 public class MapConversion {
 
@@ -25,11 +19,11 @@ public class MapConversion {
 			double rotation =-0.13918031137;
 			if (ifcVersion == 2)
 			{
-				return transformedgp = CoordinateConversion.CartesianWithWgs84OriginToWgs84O(csOrigin, pointToTransform,rotation);
+				return transformedgp = CoordinateConversion.originWGS84viaUTM(csOrigin, pointToTransform,rotation);
 			}
 			else
 			{
-				return transformedpp = CoordinateConversion.CartesianToWgs84BuildingSmart(pointToTransform, csOriginprj,
+				return transformedpp = CoordinateConversion.originArbitraryCRS(pointToTransform, csOriginprj,
 						0.990330045, -0.138731399, "epsg:28356");
 			}
 			
