@@ -55,7 +55,7 @@ public class CoordinateConversion {
 
 	}
 
-	public static GeodeticPoint originWGS84viaUTM(GeodeticPoint origin, CartesianPoint point,
+	public static GeodeticPoint originWGS84viaUTM(CartesianPoint point, GeodeticPoint origin,
 												  double rotation) {
 
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");

@@ -16,11 +16,9 @@ public class MapConversion {
 			ProjectedPoint csOriginprj = new ProjectedPoint(333780.622, 6246775.891, 0);
 			double rotation =-0.13918031137;
 			return  (ifcVersion == 2)
-				? CoordinateConversion.originWGS84viaUTM(csOrigin, pointToTransform,rotation)
+				? CoordinateConversion.originWGS84viaUTM(pointToTransform, csOrigin, rotation)
 				: CoordinateConversion.originArbitraryCRS(pointToTransform, csOriginprj, 0.990330045, -0.138731399, "epsg:28356");
-
 		}
-
 
 		public MapConversion(int ifcVersion) {
 			super();
