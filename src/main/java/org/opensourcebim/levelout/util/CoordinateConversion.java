@@ -98,7 +98,7 @@ public class CoordinateConversion {
 
 	}
 
-	public static ProjectedPoint originArbitraryCRS(CartesianPoint point, ProjectedPoint projOrigin,
+	public static GeodeticPoint originArbitraryCRS(CartesianPoint point, ProjectedPoint projOrigin,
 													double xAxisAbscissa, double xAxisOrdinate, String epsg) {
 
 		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa);
@@ -116,8 +116,7 @@ public class CoordinateConversion {
 		ProjCoordinate resultcoord = originCrsToWgs84.transform(new ProjCoordinate(eastingsmap, northingsmap),
 				new ProjCoordinate());
 
-		ProjectedPoint transformed = new ProjectedPoint(resultcoord.x, resultcoord.y, projOrigin.height);
-		return transformed;
+		return new GeodeticPoint(resultcoord.x, resultcoord.y, projOrigin.height);
 	}
 
 	public static class GeodeticPoint {

@@ -55,20 +55,20 @@ public class UtilityTests {
 		// Scale = 0.999998
 		CartesianPoint pointToTransform = new CartesianPoint(0, 0, 0);
 		ProjectedPoint csOrigin = new ProjectedPoint(333780.622, 6246775.891, 0);
-		ProjectedPoint transformed = CoordinateConversion.originArbitraryCRS(pointToTransform, csOrigin,
+		GeodeticPoint transformed = CoordinateConversion.originArbitraryCRS(pointToTransform, csOrigin,
 			0.990330045, -0.138731399, "epsg:28356");
-		Assert.assertEquals(151.20215639320887, transformed.eastings, 0.000000001);
-		Assert.assertEquals(-33.90632062825244, transformed.northings, 0.000000001);
+		Assert.assertEquals(151.20215639320887, transformed.longitude, 0.000000001);
+		Assert.assertEquals(-33.90632062825244, transformed.latitude, 0.000000001);
 		Assert.assertEquals(csOrigin.height, transformed.height, 0.000000001);
 	}
 	@Test
 		public void testOriginArbitraryCRSconvertOtherPoint(){
 		CartesianPoint pointToTransform2 = new CartesianPoint(116.611, 75.960, 0);
 		ProjectedPoint csOrigin2 = new ProjectedPoint(333780.622, 6246775.891, 0);
-		ProjectedPoint transformed2 = CoordinateConversion.originArbitraryCRS(pointToTransform2, csOrigin2,
+		GeodeticPoint transformed2 = CoordinateConversion.originArbitraryCRS(pointToTransform2, csOrigin2,
 				0.990330045, -0.138731399, "epsg:28356");
-		Assert.assertEquals(151.203530034203, transformed2.eastings, 0.000000001);
-		Assert.assertEquals(-33.9058082188758, transformed2.northings, 0.000000001);
+		Assert.assertEquals(151.203530034203, transformed2.longitude, 0.000000001);
+		Assert.assertEquals(-33.9058082188758, transformed2.latitude, 0.000000001);
 		Assert.assertEquals(csOrigin2.height, transformed2.height, 0.000000001);
 
 	}

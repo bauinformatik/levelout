@@ -94,11 +94,10 @@ public class IntermediateResidential {
 				return;
 			};
 		}
-		int ifcVersion = 4;
-		
+
 		Building gbld = new Building(10, storeys);
 	//	new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
-		new OsmBuilder().createAndWriteBuilding(gbld, ifcVersion, new FileOutputStream("output/test.osm"));
+		new OsmBuilder().createAndWriteBuilding(gbld, 4, new FileOutputStream("output/test.osm"));
 	//	new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));
 	}
 }
