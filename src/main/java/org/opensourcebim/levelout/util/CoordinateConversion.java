@@ -9,6 +9,8 @@ import org.locationtech.proj4j.ProjCoordinate;
 import uk.me.jstott.jcoord.LatLng;
 import uk.me.jstott.jcoord.UTMRef;
 
+
+
 public class CoordinateConversion {
 	private static final CRSFactory crsFactory = new CRSFactory();
 	private static final CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
@@ -44,9 +46,16 @@ public class CoordinateConversion {
 		CoordinateReferenceSystem WGS842 = crsFactory.createFromParameters("WGS84",
 				"+proj=longlat +datum=WGS84 +no_defs");
 		CoordinateReferenceSystem step1 = crsFactory.createFromParameters("geotoGC",
-				"+proj=longlat +datum=ED50 +no_defs");
+				"+proj=cart +ellps=GRS80 +no_defs");
+//double a = 6378137;
+//double b = 6356752.31414;
+//double e2 = 0.00669438002;
+//double Po = 0;
+//double Lo =0;
+//double height = 
 
-		CoordinateTransform geotoGCtrans = ctFactory.createTransform(WGS842, step1);
+		//double  e = 
+		CoordinateTransform geotoGCtrans = ctFactory.createTransform(step1, WGS842);
 		ProjCoordinate geotoGC = geotoGCtrans.transform(new ProjCoordinate(origin.longitude, origin.latitude),
 				new ProjCoordinate());
 
@@ -84,15 +93,19 @@ public class CoordinateConversion {
 
 	private static String getEpsg(GeodeticPoint origin) {
 
-		System.out.println("Convert Latitude/Longitude to UTM Reference");
-		LatLng latlon = new LatLng(origin.latitude, origin.longitude);
-		UTMRef utm = latlon.toUTMRef();
-		int longzonenum = utm.getLngZone();
+	
+		// TODO : Account for special cases: Norway and Svalbard
+		int num = 0;
+		
+		if (origin.latitude<=84 && (origin.latitude>-80))
+		{
+			num = (int) ((Math.floor((origin.longitude + 180) / 6 ) % 60) + 1) ;
+		}
 		String epsg;
 		if (origin.latitude > 0) {
-			epsg = "326" + Integer.toString(longzonenum);
+			epsg = "326" + Integer.toString(num);
 		} else {
-			epsg = "327" + Integer.toString(longzonenum);
+			epsg = "327" + Integer.toString(num);
 		}
 		return epsg;
 

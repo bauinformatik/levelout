@@ -25,6 +25,7 @@ public class Corner {
 		this.z = z;
 	}
 
+
 	public List<Double> asCoordinateList() {
 		return Arrays.asList(x, y, z);
 	}

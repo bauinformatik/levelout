@@ -25,7 +25,7 @@ public class OsmBuilder {
 
 	private long createAndWriteOsmNode(Corner pt) throws IOException {
 		CoordinateConversion.CartesianPoint cartesian = new CoordinateConversion.CartesianPoint(pt.getX(), pt.getY(), pt.getZ());
-		CoordinateConversion.GeodeticPoint geodetic = MapConversion.getMapparameters(ifcVersion, cartesian);
+		CoordinateConversion.GeodeticPoint geodetic = GeospatialParameters.getMapparameters(ifcVersion, cartesian);
 		Node node = new Node(pt.getId() * -1, geodetic.latitude, geodetic.longitude);
 		osmOutput.write(node);
 		return node.getId();
