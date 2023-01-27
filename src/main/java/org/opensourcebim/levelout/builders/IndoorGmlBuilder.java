@@ -13,7 +13,14 @@ import javax.xml.bind.Marshaller;
 import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 public class IndoorGmlBuilder {
 	private static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
@@ -130,6 +137,7 @@ public class IndoorGmlBuilder {
 		PointPropertyType pointProperty = new PointPropertyType();
 		pointProperty.setPoint(point);
 		state.setGeometry(pointProperty);
+		//state.getGeometry().getPoint().getCoordinates()
 	}
 	private void setStatePos(StateType state, Room room) {
 		List<Double> centroid = room.computeCentroid();
@@ -157,6 +165,9 @@ public class IndoorGmlBuilder {
 		TransitionMemberType transitionMember = new TransitionMemberType();
 		transitionMember.setTransition(transition);
 		edges.getTransitionMember().add(transitionMember);
+	}
+	private void findneighbours(CellSpaceType cs, Room room) {
+	//	cs.getCellSpaceGeometry().getGeometry2D().getAbstractSurface()
 	}
 	private void setDualCellSpaceForState(StateType state, CellSpaceType cellSpace) {
 		CellSpacePropertyType cellSpaceProperty = new CellSpacePropertyType();
@@ -221,20 +232,139 @@ public class IndoorGmlBuilder {
 		IndoorFeaturesType indoorFeatures = createIndoorFeatures();
 		PrimalSpaceFeaturesType primalSpace = getPrimalSpace(indoorFeatures);
 		SpaceLayerType dualSpace = getFirstDualSpaceLayer(indoorFeatures);
+		List<Room> roomslist = new ArrayList<>();
+		List<CellSpaceType> cellspacelist = new ArrayList<>();
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
 				CellSpaceType cs = createCellSpace(room);
+				roomslist.add(room);
+				cellspacelist.add(cs);
 				add2DGeometry(cs, room);
+			//	cellspacelist.add(Arrays.asList(cs,room));
 				addCellSpace(primalSpace, cs);
 				StateType state = createState(room);
 				setStatePos(state, room);
 				addState(dualSpace.getNodes().get(0), state);
+				TransitionType transition = createTransition(room);
 				setDuality(cs, state);
 			}
+			
+			
+			findconnectedStates(findneighbourrooms(roomslist),cellspacelist);
+			
 		}
 		return indoorFeatures;
 	}
 
+
+	private TransitionType createTransition(Room room) {
+		return createTransition("tran"+room.getId());
+		
+	}
+	private void findconnectedStates(List<List> findneighbourrooms, List<CellSpaceType> cellspacelist) {
+		
+		for(int i=0;i<findneighbourrooms.size();i++)
+		{
+			 String cellspace1 = "cs"+ (findneighbourrooms.get(i).get(0)).toString();
+			 String cellspace2 = "cs"+ (findneighbourrooms.get(i).get(1)).toString();
+			 StatePropertyType state1 = new StatePropertyType();
+			 StatePropertyType state2 = new StatePropertyType();
+			 List<StatePropertyType> statelist = new ArrayList<>();
+			 
+			
+			 for(int j=0;j<cellspacelist.size();j++)
+			 {
+				 if (cellspacelist.get(j).getId().equals(cellspace1))
+				 {
+					  state1= cellspacelist.get(j).getDuality();
+					  statelist.add(state1);
+					  
+				 }
+				 else if (cellspacelist.get(j).getId().equals(cellspace2))
+				 {
+					  state2= cellspacelist.get(j).getDuality();
+					  statelist.add(state2);
+				 }
+				 
+				
+			
+			 }
+			 
+			 	state1.getState().getGeometry().getPoint().getCoordinates();
+				TransitionType transition = createTransition("tran"+state1.getState().getId().substring(1));
+				transition.setConnects(statelist);
+			 
+	/*		int csindex1 = cellspacelist.indexOf(cellspace1);
+			int csindex2 = cellspacelist.indexOf(cellspace2);
+			if((csindex1!=-1)&& (csindex2!=-1))
+			{
+				StatePropertyType state1= cellspacelist.get(csindex1).getDuality();
+				state1.getHref().substring(1);
+				
+				StatePropertyType state2= cellspacelist.get(csindex2).getDuality();
+				state2.getHref().substring(1);
+				
+				
+			}*/
+					
+			
+			 
+			 
+		}
+		
+		
+	}
+	private List<List> findneighbourrooms(List<Room> roomslist) {
+		// TODO Auto-generated method stub
+		List<List> cellpairsList = new ArrayList<>();
+		for (int i=0;i<roomslist.size()-1;i++)
+		{
+			List a = (roomslist.get(i).getCorners());
+			 List b = (roomslist.get(i+1).getCorners());
+			 List c = new ArrayList<>(b);
+			 	c.retainAll(a);
+			 	
+			 	if (c.size()>=2)
+			 	{
+			 		List<Long> cellneighbours = Arrays.asList(roomslist.get(i).getId(),roomslist.get(i+1).getId());
+			 		cellpairsList.add(cellneighbours);
+			 		}
+		}
+		return cellpairsList;
+		
+	}
+	private void findneighbours(List<List<CellSpaceType>> cellspacelist) {
+		// TODO Auto-generated method stub
+		int count = 0;
+		List<List> ls = new ArrayList<>();
+		int i =0;
+		for (i=0;i<cellspacelist.size();i++)
+		{
+		//	if(cellspacelist.get(i).get(1).getCorners()
+		}
+		
+		
+	/*	for (Entry<CellSpaceType, Room> entry : cellspacelist.entrySet()) {
+			 Entry<CellSpaceType, Room> prev = cellspacelist.lowerEntry(entry.getKey());
+			 Entry<CellSpaceType, Room> next = cellspacelist.higherEntry(entry.getKey());
+			if(next.getValue().getCorners().stream().anyMatch(prev.getValue().getCorners()::contains)== true)
+			{
+				count+=1;
+			}
+			
+			if (count>=2)
+			{
+				ls.add(Arrays.asList(prev.getKey(),next.getKey()));
+				count =0;
+			}*/
+			
+			
+			
+				    
+		
+		
+		
+	}
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
 		write(outStream, createIndoorFeatures(building));
 	}
