@@ -4,6 +4,8 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import net.opengis.gml.v_3_2.*;
 import net.opengis.indoorgml.core.v_1_0.*;
 import org.opensourcebim.levelout.intermediatemodel.Building;
+import org.opensourcebim.levelout.intermediatemodel.Corner;
+import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
 
@@ -236,10 +238,13 @@ public class IndoorGmlBuilder {
 		List<CellSpaceType> cellspacelist = new ArrayList<>();
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
+				Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
+				for(Door door : storey.getDoors()) {
 				CellSpaceType cs = createCellSpace(room);
 				roomslist.add(room);
 				cellspacelist.add(cs);
 				add2DGeometry(cs, room);
+			doorboundaries.putAll(add2DGeometrydoor(cs, room, door));
 			//	cellspacelist.add(Arrays.asList(cs,room));
 				addCellSpace(primalSpace, cs);
 				StateType state = createState(room);
@@ -247,6 +252,9 @@ public class IndoorGmlBuilder {
 				addState(dualSpace.getNodes().get(0), state);
 				TransitionType transition = createTransition(room);
 				setDuality(cs, state);
+			}
+				
+				
 			}
 			
 			
@@ -257,6 +265,32 @@ public class IndoorGmlBuilder {
 	}
 
 
+	private Map<CellSpaceType, Door> add2DGeometrydoor(CellSpaceType cs, Room room, Door door) {
+		
+		add2DGeometry(cs, room.asCoordinateList());
+		Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
+		for (int i=0;i<room.asCoordinateList().size();i++)
+		{
+		Corner roomcorner =	room.getCorners().get(i);
+		Corner doorcorner = door.getCorners().get(i);
+		double crossZ =	roomcorner.getX()*doorcorner.getY() - roomcorner.getY()*doorcorner.getX();
+		double crossY = roomcorner.getZ()*doorcorner.getX() - roomcorner.getX()*doorcorner.getZ();
+		double crossX = roomcorner.getY()*doorcorner.getZ() - roomcorner.getZ()*doorcorner.getY();
+		
+		if (crossX== 0 && crossY == 0 && crossZ == 0)
+			
+		{
+			doorboundaries.put(cs, door);
+		}
+		}
+		
+		return doorboundaries;
+	}
+	private void setCellspaceBoundary(CellSpaceType cs, Door door) {
+		
+		cs.setPartialboundedBy(null);
+		
+	}
 	private TransitionType createTransition(Room room) {
 		return createTransition("tran"+room.getId());
 		
