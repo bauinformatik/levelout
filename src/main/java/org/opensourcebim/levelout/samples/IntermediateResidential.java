@@ -9,12 +9,15 @@ import org.opensourcebim.levelout.intermediatemodel.Storey;
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 import org.opensourcebim.levelout.builders.OsmBuilder;
+import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.opensourcebim.levelout.util.CoordinateConversion.*;
 
 public class IntermediateResidential {
 
@@ -66,7 +69,7 @@ public class IntermediateResidential {
 		List<Corner> nodes2 = Arrays.asList(n4, n6, n7, n8);
 	//	List<Corner> nodes3 = Arrays.asList(n9, n10, n11, n12);
 		//List<Corner> nodes3 = Arrays.asList(n6, n10, n11, n12);
-			List<Corner> nodes3 = Arrays.asList(n6, n3, n11, n7);
+		List<Corner> nodes3 = Arrays.asList(n6, n3, n11, n7);
 		
 		List<Corner> nodes4 = Arrays.asList(n13, n14, n15, n16);
 		List<Corner> nodes5 = Arrays.asList(n16, n18, n19, n20);
@@ -98,10 +101,12 @@ public class IntermediateResidential {
 			};
 		}
 
-
 		Building gbld = new Building(10, storeys);
-	//	new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
-	//	new OsmBuilder().createAndWriteBuilding(gbld, 4, new FileOutputStream("output/test.osm"));
+
+		new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
+		CoordinateReference crs = new ProjectedOriginCRS(new ProjectedPoint(333780.622, 6246775.891, 0), 0.990330045, -0.138731399, "epsg:28356");
+		new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
+		new OsmBuilder().createAndWriteBuilding(gbld, crs, new FileOutputStream("output/test.osm"));
 		new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));
 
 	}

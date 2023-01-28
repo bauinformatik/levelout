@@ -238,14 +238,12 @@ public class IndoorGmlBuilder {
 		List<CellSpaceType> cellspacelist = new ArrayList<>();
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
-				Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
 				for(Door door : storey.getDoors()) {
 				CellSpaceType cs = createCellSpace(room);
 				roomslist.add(room);
 				cellspacelist.add(cs);
 				add2DGeometry(cs, room);
-			doorboundaries.putAll(add2DGeometrydoor(cs, room, door));
-			//	cellspacelist.add(Arrays.asList(cs,room));
+				// Map<CellSpaceType, Door> doorboundaries = add2DGeometrydoor(cs, room, door);
 				addCellSpace(primalSpace, cs);
 				StateType state = createState(room);
 				setStatePos(state, room);
@@ -258,7 +256,7 @@ public class IndoorGmlBuilder {
 			}
 			
 			
-			findconnectedStates(findneighbourrooms(roomslist),cellspacelist);
+			// findconnectedStates(findneighbourrooms(roomslist),cellspacelist);
 			
 		}
 		return indoorFeatures;
@@ -278,7 +276,7 @@ public class IndoorGmlBuilder {
 		double crossX = roomcorner.getY()*doorcorner.getZ() - roomcorner.getZ()*doorcorner.getY();
 		
 		if (crossX== 0 && crossY == 0 && crossZ == 0)
-			
+
 		{
 			doorboundaries.put(cs, door);
 		}

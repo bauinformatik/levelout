@@ -116,11 +116,6 @@
 			<artifactId>proj4j-epsg</artifactId>
 			<version>1.2.2</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.xni06</groupId>
-			<artifactId>JCoord</artifactId>
-			<version>24347197e2364650a6b1cf2cc46d064414edc22a</version>
-		</dependency>
 
 		<!-- CityGML4J -->
 		<dependency>

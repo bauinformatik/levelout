@@ -6,10 +6,6 @@ import org.locationtech.proj4j.CoordinateTransform;
 import org.locationtech.proj4j.CoordinateTransformFactory;
 import org.locationtech.proj4j.ProjCoordinate;
 
-import uk.me.jstott.jcoord.LatLng;
-import uk.me.jstott.jcoord.UTMRef;
-
-
 
 public class CoordinateConversion {
 	private static final CRSFactory crsFactory = new CRSFactory();
@@ -85,9 +81,7 @@ public class CoordinateConversion {
 		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY),
 				new ProjCoordinate());
 
-		GeodeticPoint transformed = new GeodeticPoint(wgs84Point.y, wgs84Point.x, origin.height);
-
-		return transformed;
+		return new GeodeticPoint(wgs84Point.y, wgs84Point.x, origin.height);
 
 	}
 
@@ -133,7 +127,6 @@ public class CoordinateConversion {
 	}
 
 	public static class GeodeticPoint {
-		// TODO: add CS ref
 		public double latitude;
 		public double longitude;
 		public double height;
@@ -155,7 +148,6 @@ public class CoordinateConversion {
 			this.y = y;
 			this.z = z;
 		}
-
 	}
 
 	public static class ProjectedPoint {
@@ -165,12 +157,48 @@ public class CoordinateConversion {
 		public double height;
 
 		public ProjectedPoint(double eastings, double northings, double height) {
-			super();
 			this.eastings = eastings;
 			this.northings = northings;
 			this.height = height;
 		}
 
+	}
+
+	public abstract static class CoordinateReference{
+		public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart);
+
+	}
+
+	public static class GeodeticOriginCRS extends CoordinateReference {
+		private final GeodeticPoint origin;
+		private final double rotation;
+
+		public GeodeticOriginCRS(GeodeticPoint origin, double rotation){
+			this.origin = origin;
+			this.rotation = rotation;
+		}
+
+		@Override
+		public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
+			return CoordinateConversion.originWGS84viaUTM(cart, origin, rotation);
+		}
+	}
+	public static class ProjectedOriginCRS extends CoordinateReference {
+		private final ProjectedPoint origin;
+		private final double xAxisAbscissa;
+		private final double xAxisOrdinate;
+		private final String epsg;
+
+		public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, String epsg){
+			this.origin = origin;
+			this.xAxisAbscissa = xAxisAbscissa;
+			this.xAxisOrdinate =xAxisOrdinate;
+			this.epsg = epsg;
+		}
+		@Override
+		public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
+			return CoordinateConversion.originArbitraryCRS(cart, origin, xAxisAbscissa, xAxisOrdinate, epsg);
+		}
 	}
 
 }

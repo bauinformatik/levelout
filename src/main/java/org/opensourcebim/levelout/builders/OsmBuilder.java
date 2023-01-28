@@ -11,7 +11,9 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import org.opensourcebim.levelout.intermediatemodel.*;
-import org.opensourcebim.levelout.util.CoordinateConversion;
+import org.opensourcebim.levelout.util.CoordinateConversion.CartesianPoint;
+import org.opensourcebim.levelout.util.CoordinateConversion.CoordinateReference;
+import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,11 +23,11 @@ import java.util.List;
 
 public class OsmBuilder {
 	private OsmOutputStream osmOutput;
-	private int ifcVersion;
+	private CoordinateReference crs;
 
 	private long createAndWriteOsmNode(Corner pt) throws IOException {
-		CoordinateConversion.CartesianPoint cartesian = new CoordinateConversion.CartesianPoint(pt.getX(), pt.getY(), pt.getZ());
-		CoordinateConversion.GeodeticPoint geodetic = GeospatialParameters.getMapparameters(ifcVersion, cartesian);
+		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY(), pt.getZ());
+		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node node = new Node(pt.getId() * -1, geodetic.latitude, geodetic.longitude);
 		osmOutput.write(node);
 		return node.getId();
@@ -55,19 +57,16 @@ public class OsmBuilder {
 	}
 
 	public static OsmWay writeWayDetails(long wayid, long[] nodeList, List<OsmTag> osmtag) {
-
 		return new Way(wayid, TLongArrayList.wrap(nodeList), osmtag);
-
 	}
 
 	public static OsmNode WriteNodeDetails(long id, double lat, double lon) {
-		// TODO Auto-generated method stub
-		return (new Node(id, lon, lat));
+		return new Node(id, lon, lat);
 	}
 
-	public void createAndWriteBuilding(Building building, int ifcVersion, OutputStream outputStream)
+	public void createAndWriteBuilding(Building building, CoordinateReference crs, OutputStream outputStream)
 			throws IOException {
-		this.ifcVersion = ifcVersion;
+		this.crs = crs;
 		this.osmOutput = new OsmXmlOutputStream(outputStream, true);
 		int id = -building.getId();
 		OsmWay way = new Way(id, TLongArrayList.wrap(new long[] {}), List.of(new Tag("building", "residential")));
