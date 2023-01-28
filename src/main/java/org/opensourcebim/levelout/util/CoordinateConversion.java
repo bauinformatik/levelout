@@ -38,7 +38,7 @@ public class CoordinateConversion {
 
 	}
 
-	public static void originWGS84viaGeoCentric2(GeodeticPoint origin, CartesianPoint point) {
+	static void originWGS84viaGeoCentric2(GeodeticPoint origin, CartesianPoint point) {
 		CoordinateReferenceSystem WGS842 = crsFactory.createFromParameters("WGS84",
 				"+proj=longlat +datum=WGS84 +no_defs");
 		CoordinateReferenceSystem step1 = crsFactory.createFromParameters("geotoGC",
@@ -60,13 +60,12 @@ public class CoordinateConversion {
 
 	}
 
-	public static GeodeticPoint originWGS84viaUTM(CartesianPoint point, GeodeticPoint origin,
+	private static GeodeticPoint originWGS84viaUTM(CartesianPoint point, GeodeticPoint origin,
 												  double rotation) {
 
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
 		String epsg = "epsg:" + getEpsg(origin);
-		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg); // use fixed UTM EPSG, we don't have this from
-		// IFC
+		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
 
 		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
 		ProjCoordinate utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
@@ -85,7 +84,7 @@ public class CoordinateConversion {
 
 	}
 
-	public static String getEpsg(GeodeticPoint origin) {
+	static String getEpsg(GeodeticPoint origin) {
 		// TODO : Account for special cases: Norway and Svalbard
 		int num = 0;  // TODO throw  IllegalArgumentException if outside valid latitudes, should not be 32600 / 32700 in that case
 		if (origin.latitude<=84 && (origin.latitude>-80)) {
@@ -94,7 +93,7 @@ public class CoordinateConversion {
 		return origin.latitude > 0 ? "326" + num : "327" + num; // TODO pad with 0 for zone numbers 1-9
 	}
 
-	public static GeodeticPoint originArbitraryCRS(CartesianPoint point, ProjectedPoint projOrigin,
+	private static GeodeticPoint originArbitraryCRS(CartesianPoint point, ProjectedPoint projOrigin,
 													double xAxisAbscissa, double xAxisOrdinate, String epsg) {
 
 		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa);
@@ -112,7 +111,7 @@ public class CoordinateConversion {
 		ProjCoordinate resultcoord = originCrsToWgs84.transform(new ProjCoordinate(eastingsmap, northingsmap),
 				new ProjCoordinate());
 
-		return new GeodeticPoint(resultcoord.x, resultcoord.y, projOrigin.height);
+		return new GeodeticPoint(resultcoord.y, resultcoord.x, projOrigin.height);
 	}
 
 	public static class GeodeticPoint {
