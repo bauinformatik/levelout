@@ -10,6 +10,22 @@ import org.opensourcebim.levelout.util.CoordinateConversion.ProjectedPoint;
 public class UtilityTests {
 
 	@Test
+	public void testEpsgNorth(){
+		GeodeticPoint weimar = new GeodeticPoint(50.9795, 11.3235, 0);
+		Assert.assertEquals("32632", CoordinateConversion.getEpsg(weimar));
+	}
+
+	@Test
+	public void testEpsgSouth(){
+		GeodeticPoint sydney= new GeodeticPoint(-33.90632062825244, 151.20215639320887, 0);
+		Assert.assertEquals("32756", CoordinateConversion.getEpsg(sydney));
+	}
+	@Test
+	public void testEpsgSingleDigitLongZone(){
+		GeodeticPoint anchorage = new GeodeticPoint(61.2163129, -149.8948520, 0);
+		Assert.assertEquals("32606", CoordinateConversion.getEpsg(anchorage));
+	}
+	@Test
 	public void testOriginWGS84viaUTMconvertOrigin() {
 		// http://rcn.montana.edu/resources/Converter.aspx
 		// Ref1 E = 333,780.622 N = 6,246,775.891 MGA GRS80 , Zone : 56 South
