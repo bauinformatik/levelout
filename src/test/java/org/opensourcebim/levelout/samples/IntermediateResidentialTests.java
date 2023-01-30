@@ -25,7 +25,7 @@ public class IntermediateResidentialTests {
 
 	@Before
 	public void setup(){
-		building = IntermediateResidential.createCompact();
+		building = IntermediateResidential.create();
 		if(!new File("output").exists()){
 			if(!new File("output").mkdir()){
 				return;
