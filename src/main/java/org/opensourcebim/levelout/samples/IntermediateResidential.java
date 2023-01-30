@@ -9,15 +9,13 @@ import org.opensourcebim.levelout.intermediatemodel.Storey;
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 import org.opensourcebim.levelout.builders.OsmBuilder;
-import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
+import org.opensourcebim.levelout.intermediatemodel.geo.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.opensourcebim.levelout.util.CoordinateConversion.*;
 
 public class IntermediateResidential {
 
@@ -98,7 +96,7 @@ public class IntermediateResidential {
 		if(!new File("output").exists()){
 			if(!new File("output").mkdir()){
 				return;
-			};
+			}
 		}
 
 		Building gbld = new Building(10, storeys);

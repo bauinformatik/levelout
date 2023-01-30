@@ -1,8 +1,7 @@
-package org.opensourcebim.levelout.util;
+package org.opensourcebim.levelout.intermediatemodel.geo;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensourcebim.levelout.util.CoordinateConversion.*;
 
 public class CoordinateConversionTests {
 

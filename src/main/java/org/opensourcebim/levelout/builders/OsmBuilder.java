@@ -11,9 +11,9 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 import org.opensourcebim.levelout.intermediatemodel.*;
-import org.opensourcebim.levelout.util.CoordinateConversion.CartesianPoint;
-import org.opensourcebim.levelout.util.CoordinateConversion.CoordinateReference;
-import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
+import org.opensourcebim.levelout.intermediatemodel.geo.CartesianPoint;
+import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticPoint;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -11,9 +11,9 @@ import org.opensourcebim.levelout.intermediatemodel.Storey;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Room;
-import org.opensourcebim.levelout.util.CoordinateConversion.CoordinateReference;
-import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticOriginCRS;
-import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
+import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticOriginCRS;
+import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticPoint;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -22,14 +22,14 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
-    boolean extractionMethod = false;
+    boolean extractionMethod;
     Building building;
     CoordinateReference crs;
     AbstractLevelOutSerializer(boolean extractionMethod){
         this.extractionMethod = extractionMethod;
     }
     @Override
-    public void init(IfcModelInterface ifcModelInterface, ProjectInfo projectInfo, boolean b) throws SerializerException {
+    public void init(IfcModelInterface ifcModelInterface, ProjectInfo projectInfo, boolean b) {
         if(extractionMethod) initStructure(ifcModelInterface); else initSample();
     }
     private void initSample(){

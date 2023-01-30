@@ -3,14 +3,6 @@ package org.opensourcebim.levelout.intermediatemodel;
 import java.util.Arrays;
 import java.util.List;
 
-import org.opensourcebim.levelout.util.CoordinateConversion;
-import org.opensourcebim.levelout.util.CoordinateConversion.CartesianPoint;
-import org.opensourcebim.levelout.util.CoordinateConversion.GeodeticPoint;
-import org.opensourcebim.levelout.util.CoordinateConversion.ProjectedPoint;
-
-import de.topobyte.osm4j.core.model.iface.OsmNode;
-import de.topobyte.osm4j.core.model.impl.Node;
-
 public class Corner {
 
 	private final long id;
