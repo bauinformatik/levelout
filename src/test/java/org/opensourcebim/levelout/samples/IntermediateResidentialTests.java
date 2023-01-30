@@ -41,11 +41,11 @@ public class IntermediateResidentialTests {
 		new CityGmlBuilder().createAndWriteBuilding(building, new FileOutputStream("output/test-city.gml"));
 	}
 	@Test
-	public void testIndoorGml() throws IOException {
-		new OsmBuilder().createAndWriteBuilding(building, crs, new FileOutputStream("output/test.osm"));
+	public void testIndoorGml() throws FileNotFoundException, JAXBException {
+		new IndoorGmlBuilder().createAndWriteBuilding(building, new FileOutputStream("output/test-indoor.gml"));
 	}
 	@Test
-	public void testOsm() throws FileNotFoundException, JAXBException {
-		new IndoorGmlBuilder().createAndWriteBuilding(building, new FileOutputStream("output/test-indoor.gml"));
+	public void testOsm() throws IOException {
+		new OsmBuilder().createAndWriteBuilding(building, crs, new FileOutputStream("output/test.osm"));
 	}
 }
