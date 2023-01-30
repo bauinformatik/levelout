@@ -4,23 +4,23 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.opensourcebim.levelout.util.CoordinateConversion.*;
 
-public class UtilityTests {
+public class CoordinateConversionTests {
 
 	@Test
 	public void testEpsgNorth(){
 		GeodeticPoint weimar = new GeodeticPoint(50.9795, 11.3235, 0);
-		Assert.assertEquals("32632", CoordinateConversion.getEpsg(weimar));
+		Assert.assertEquals("32632", CoordinateReference.getEpsg(weimar));
 	}
 
 	@Test
 	public void testEpsgSouth(){
 		GeodeticPoint sydney= new GeodeticPoint(-33.90632062825244, 151.20215639320887, 0);
-		Assert.assertEquals("32756", CoordinateConversion.getEpsg(sydney));
+		Assert.assertEquals("32756", CoordinateReference.getEpsg(sydney));
 	}
 	@Test
 	public void testEpsgSingleDigitLongZone(){
 		GeodeticPoint anchorage = new GeodeticPoint(61.2163129, -149.8948520, 0);
-		Assert.assertEquals("32606", CoordinateConversion.getEpsg(anchorage));
+		Assert.assertEquals("32606", CoordinateReference.getEpsg(anchorage));
 	}
 	@Test
 	public void testOriginWGS84viaUTMconvertOrigin() {
@@ -90,7 +90,7 @@ public class UtilityTests {
 	public void topotoGeo() {
 		CartesianPoint pointToTransform = new CartesianPoint(0, 0, 0);
 		GeodeticPoint csOrigin2 = new GeodeticPoint(-33.90632062825244, 151.20215639320887, 97.457);
-		CoordinateConversion.originWGS84viaGeoCentric2(csOrigin2, pointToTransform);
+		new GeodeticOriginCRS(csOrigin2, 0).cartesianToGeodeticViaGeoCentric(pointToTransform);
 	}
 
 }
