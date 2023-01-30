@@ -74,7 +74,7 @@ public class CoordinateConversionTests {
 		Assert.assertEquals(csOrigin.height, transformed.height, 0.000000001);
 	}
 	@Test
-		public void testOriginArbitraryCRSconvertOtherPoint(){
+	public void testOriginArbitraryCRSconvertOtherPoint(){
 		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960, 0);
 		ProjectedPoint csOrigin = new ProjectedPoint(333780.622, 6246775.891, 0);
 		CoordinateReference crs = new ProjectedOriginCRS(csOrigin,0.990330045, -0.138731399, "epsg:28356" );

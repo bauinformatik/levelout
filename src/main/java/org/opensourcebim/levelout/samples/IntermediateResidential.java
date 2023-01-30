@@ -6,20 +6,14 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
-import org.opensourcebim.levelout.builders.CityGmlBuilder;
-import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
-import org.opensourcebim.levelout.builders.OsmBuilder;
-import org.opensourcebim.levelout.intermediatemodel.geo.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class IntermediateResidential {
 
-	public static void main(String[] args) throws Exception {
+	public static Building create(){
 		// set1 ground
 		Corner n1 = new Corner(1, 0, 0, 0);
 		Corner n2 = new Corner(2, 0, 6, 0);
@@ -92,21 +86,34 @@ public class IntermediateResidential {
 		Storey st2 = new Storey(1, polygons2, Collections.emptyList());
 
 		List<Storey> storeys = Arrays.asList(st1, st2);
+		return new Building(10, storeys);
+	}
 
-		if(!new File("output").exists()){
-			if(!new File("output").mkdir()){
-				return;
-			}
-		}
-
-		Building gbld = new Building(10, storeys);
-
-		new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
-		CoordinateReference crs = new ProjectedOriginCRS(new ProjectedPoint(333780.622, 6246775.891, 0), 0.990330045, -0.138731399, "epsg:28356");
-		new CityGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-city.gml"));
-		new OsmBuilder().createAndWriteBuilding(gbld, crs, new FileOutputStream("output/test.osm"));
-		new IndoorGmlBuilder().createAndWriteBuilding(gbld, new FileOutputStream("output/test-indoor.gml"));
+	public static Building createCompact(){
+		Corner p1 = new Corner(0,0,0.,0);
+		Corner p2 = new Corner(1, 0, 10, 0);
+		Corner p3 = new Corner(2, 10, 10, 0);
+		Corner p4 = new Corner(3, 10,0,0);
+		Corner p5 = new Corner(4, 15, 10, 0);
+		Corner p6 = new Corner(5, 15, 0, 0);
+		Corner p11 = new Corner(0,0,0,3);
+		Corner p12 = new Corner(1, 0, 10, 3);
+		Corner p13 = new Corner(2, 10, 10, 3);
+		Corner p14 = new Corner(3, 10,0,3);
+		Corner p15 = new Corner(4, 15, 10, 3);
+		Corner p16 = new Corner(5, 15, 0, 3);
+		return new Building(1, Arrays.asList(
+			new Storey(0, Arrays.asList(
+				new Room(2, "floor", Arrays.asList( p1,p2,p3,p4 )),
+				new Room(3, "floor", Arrays.asList( p4,p3,p5,p6 ))
+			), Collections.emptyList()),
+			new Storey(0, Arrays.asList(
+				new Room(4, "floor", Arrays.asList( p11,p12,p13,p14 )),
+				new Room(5, "floor", Arrays.asList( p14,p13,p15,p16 ))
+			), Collections.emptyList())
+		));
 
 	}
+
 }
 
