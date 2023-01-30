@@ -238,12 +238,13 @@ public class IndoorGmlBuilder {
 		List<CellSpaceType> cellspacelist = new ArrayList<>();
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
+				Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
 				for(Door door : storey.getDoors()) {
 				CellSpaceType cs = createCellSpace(room);
 				roomslist.add(room);
 				cellspacelist.add(cs);
 				add2DGeometry(cs, room);
-				// Map<CellSpaceType, Door> doorboundaries = add2DGeometrydoor(cs, room, door);
+				doorboundaries.putAll(add2DGeometrydoor(cs, room, door));
 				addCellSpace(primalSpace, cs);
 				StateType state = createState(room);
 				setStatePos(state, room);
@@ -252,7 +253,7 @@ public class IndoorGmlBuilder {
 				setDuality(cs, state);
 			}
 				
-				
+				setCellspaceBoundary(doorboundaries);
 			}
 			
 			
@@ -284,11 +285,43 @@ public class IndoorGmlBuilder {
 		
 		return doorboundaries;
 	}
-	private void setCellspaceBoundary(CellSpaceType cs, Door door) {
+	private void setCellspaceBoundary(Map<CellSpaceType, Door> doorboundaries) {
 		
-		cs.setPartialboundedBy(null);
+		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
+		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
+		cellspaceboundaries.add(cellspaceboundaryProp);
+	
+		for (Door value : doorboundaries.values()) {
+			for(int i=0;i<2;i++)
+			{
+			CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(value);
+			CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
+			LineStringType linestring = createLineString(value.asCoordinateList());
+			CurvePropertyType curveProp = new CurvePropertyType ();
+			curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+			csbgeom.setGeometry2D(curveProp);
+			cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
+			cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
+			for (CellSpaceType cellspace : doorboundaries.keySet()) {
+				cellspace.setPartialboundedBy(cellspaceboundaries);
+			}
+			}
+		}
 		
 	}
+	private CellSpaceBoundaryType createCellspaceBoundary(Door value) {
+		// TODO Auto-generated method stub
+		return createCellspaceBoundary("csb"+value.getId());
+		
+	}
+	private CellSpaceBoundaryType createCellspaceBoundary(String id) {
+		// TODO Auto-generated method stub
+		CellSpaceBoundaryType cellSpaceBoundary = new CellSpaceBoundaryType();
+		cellSpaceBoundary.setId(id);
+		return cellSpaceBoundary;
+		
+	}
+
 	private TransitionType createTransition(Room room) {
 		return createTransition("tran"+room.getId());
 		
