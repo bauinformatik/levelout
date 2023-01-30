@@ -126,6 +126,11 @@ public class IndoorGmlBuilder {
 		cellSpaceMember.setCellSpace(indoorObjectFactory.createCellSpace(cellSpace));
 		primalSpaceFeatures.getCellSpaceMember().add(cellSpaceMember);
 	}
+	public void addCellSpaceBoundaryMembers(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceBoundaryType cellSpaceBoundary) {
+		CellSpaceBoundaryMemberType cellSpaceBoundaryMember = new CellSpaceBoundaryMemberType();
+		cellSpaceBoundaryMember.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
+		primalSpaceFeatures.getCellSpaceBoundaryMember().add(cellSpaceBoundaryMember);
+	}
 	public StateType createState(String id) {
 		StateType name = new StateType();
 		name.setId(id);
@@ -243,7 +248,7 @@ public class IndoorGmlBuilder {
 				CellSpaceType cs = createCellSpace(room);
 				roomslist.add(room);
 				cellspacelist.add(cs);
-				add2DGeometry(cs, room);
+			//	add2DGeometry(cs, room);
 				doorboundaries.putAll(add2DGeometrydoor(cs, room, door));
 				addCellSpace(primalSpace, cs);
 				StateType state = createState(room);
@@ -257,32 +262,65 @@ public class IndoorGmlBuilder {
 			}
 			
 			
-			// findconnectedStates(findneighbourrooms(roomslist),cellspacelist);
+			 findconnectedStates(cellspacelist);
 			
 		}
 		return indoorFeatures;
 	}
 
 
+	private void findconnectedStates(List<CellSpaceType> cellspacelist) {
+		// TODO Auto-generated method stub
+		
+		
+		
+		for(int i=0;i<cellspacelist.size()-1;i++)
+		{
+			List<CellSpaceBoundaryPropertyType> boundarieslist1= cellspacelist.get(i).getPartialboundedBy();
+			List<CellSpaceBoundaryPropertyType> boundarieslist2 = cellspacelist.get(i+1).getPartialboundedBy();
+			List<CellSpaceBoundaryPropertyType> common = new ArrayList<>(boundarieslist1);
+			if(common.retainAll(boundarieslist2)== true)
+			{
+				StatePropertyType state1 = cellspacelist.get(i).getDuality();
+				StatePropertyType  state2 =cellspacelist.get(i+1).getDuality();
+				List<StatePropertyType> statelist = new ArrayList<>();
+				statelist.add(state1);
+				statelist.add(state2);
+				
+				
+				TransitionType transition =   createTransition("tran"+i);
+				transition.setConnects(statelist);
+				statelist.remove(statelist);
+				
+				
+			}
+			}
+		
+	}
 	private Map<CellSpaceType, Door> add2DGeometrydoor(CellSpaceType cs, Room room, Door door) {
 		
 		add2DGeometry(cs, room.asCoordinateList());
 		Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
-		for (int i=0;i<room.asCoordinateList().size();i++)
+		for (int i=0;i<room.getCorners().size()-1;i++)
 		{
+			//Check cross product formula
 		Corner roomcorner =	room.getCorners().get(i);
-		Corner doorcorner = door.getCorners().get(i);
-		double crossZ =	roomcorner.getX()*doorcorner.getY() - roomcorner.getY()*doorcorner.getX();
-		double crossY = roomcorner.getZ()*doorcorner.getX() - roomcorner.getX()*doorcorner.getZ();
-		double crossX = roomcorner.getY()*doorcorner.getZ() - roomcorner.getZ()*doorcorner.getY();
+		Corner doorcorner1 = door.getCorners().get(0);
+		Corner doorcorner2 = door.getCorners().get(1);
+		double crossZ =	roomcorner.getX()*doorcorner1.getY() - roomcorner.getY()*doorcorner1.getX();
+		double crossY = roomcorner.getZ()*doorcorner1.getX() - roomcorner.getX()*doorcorner1.getZ();
+		double crossX = roomcorner.getY()*doorcorner1.getZ() - roomcorner.getZ()*doorcorner1.getY();
 		
-		if (crossX== 0 && crossY == 0 && crossZ == 0)
+		double crossZ2 =	crossX*doorcorner2.getY() - crossY*doorcorner2.getX();
+		double crossY2 = crossZ*doorcorner2.getX() - crossX*doorcorner2.getZ();
+		double crossX2 = crossY*doorcorner2.getZ() - crossZ*doorcorner2.getY();
+		if (crossX2== 0 && crossY2 == 0 && crossZ2 == 0)
 
 		{
 			doorboundaries.put(cs, door);
 		}
-		}
 		
+		}
 		return doorboundaries;
 	}
 	private void setCellspaceBoundary(Map<CellSpaceType, Door> doorboundaries) {
@@ -292,7 +330,7 @@ public class IndoorGmlBuilder {
 		cellspaceboundaries.add(cellspaceboundaryProp);
 	
 		for (Door value : doorboundaries.values()) {
-			for(int i=0;i<2;i++)
+			for(int i=0;i<doorboundaries.size();i++)
 			{
 			CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(value);
 			CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();

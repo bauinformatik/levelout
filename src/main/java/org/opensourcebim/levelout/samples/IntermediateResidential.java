@@ -102,11 +102,17 @@ public class IntermediateResidential {
 		Corner p14 = new Corner(3, 10,0,3);
 		Corner p15 = new Corner(4, 15, 10, 3);
 		Corner p16 = new Corner(5, 15, 0, 3);
+		Corner p17 = new Corner(37, 1, 0, 0);
+		Corner p18 = new Corner(38, 2, 0, 0);
+		Corner p19 = new Corner(39, 6, 4, 0);
+		Corner p20 = new Corner(40, 6, 5, 0);
+		Door gp10 = new Door(10, "door", Arrays.asList(p17,p18));
+		Door gp11 = new Door(10, "door", Arrays.asList(p19,p20));
 		return new Building(1, Arrays.asList(
 			new Storey(0, Arrays.asList(
 				new Room(2, "floor", Arrays.asList( p1,p2,p3,p4 )),
 				new Room(3, "floor", Arrays.asList( p4,p3,p5,p6 ))
-			), Collections.emptyList()),
+			), Arrays.asList(gp10,gp11)),
 			new Storey(0, Arrays.asList(
 				new Room(4, "floor", Arrays.asList( p11,p12,p13,p14 )),
 				new Room(5, "floor", Arrays.asList( p14,p13,p15,p16 ))
