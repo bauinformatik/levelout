@@ -59,6 +59,9 @@ public class IndoorGmlResidential {
 		StateType st6 = indoorGmlBuilder.createState("s6");
 		
 		TransitionType t1 = indoorGmlBuilder.createTransition("t1");
+		// TODO SK 1: move the following to builder method createTransition("t1", st1, st2)
+		// createTransition(Room room1, Room room2)  - look up states for rooms
+		// createTransition(Door door) - look up rooms for door (from analysis)
 		List<StatePropertyType> stateProplist = new ArrayList<>();
 		
 		StatePropertyType stateProp = new StatePropertyType ();

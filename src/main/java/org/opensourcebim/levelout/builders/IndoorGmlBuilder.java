@@ -20,13 +20,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 public class IndoorGmlBuilder {
 	private static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
 	private static final net.opengis.gml.v_3_2.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2.ObjectFactory();
+	private Map<Room, StateType> roomsMap = new HashMap<>();
 
 	private PointType createPoint(double x, double y, double z) {
 		PointType point = new PointType();
@@ -35,6 +33,7 @@ public class IndoorGmlBuilder {
 		point.setPos(directPosition);
 		return point;
 	}
+
 	private LineStringType createLineString(List<Double> coordinates) {
 		LineStringType linestring = new LineStringType();
 		DirectPositionListType dirPositions = new DirectPositionListType();
@@ -42,6 +41,7 @@ public class IndoorGmlBuilder {
 		dirPositions.setValue(coordinates);
 		return linestring;
 	}
+
 	private static PolygonType createSurface(List<Double> coordinates) {
 		DirectPositionListType directPositions = new DirectPositionListType();
 		directPositions.setValue(coordinates);
@@ -53,6 +53,7 @@ public class IndoorGmlBuilder {
 		polygon.setExterior(abstractRingProperty);
 		return polygon;
 	}
+
 	private static SolidType createSolid(PolygonType polygon) {
 		SurfacePropertyType surfaceProperty = new SurfacePropertyType();
 		surfaceProperty.setAbstractSurface(gmlObjectFactory.createPolygon(polygon));
@@ -64,6 +65,7 @@ public class IndoorGmlBuilder {
 		solid.setExterior(shellProperty);
 		return solid;
 	}
+
 	private ExternalReferenceType createExternalReference(String externalUri) {
 		// resource at external URI represents whole object
 		ExternalObjectReferenceType externalObjectReference = new ExternalObjectReferenceType();
@@ -72,6 +74,7 @@ public class IndoorGmlBuilder {
 		externalReference.setExternalObject(externalObjectReference);
 		return externalReference;
 	}
+
 	private ExternalReferenceType createExternalReference(String externalUri, String externalId) {
 		// resource at external URI represents multiple objects, one of which is identified by externalId
 		ExternalObjectReferenceType externalObjectReference = new ExternalObjectReferenceType();
@@ -81,21 +84,26 @@ public class IndoorGmlBuilder {
 		externalReference.setExternalObject(externalObjectReference);
 		return externalReference;
 	}
-	private void addExternalReference(CellSpaceType cellspace, ExternalReferenceType externalReference){
+
+	private void addExternalReference(CellSpaceType cellspace, ExternalReferenceType externalReference) {
 		cellspace.getExternalReference().add(externalReference);
 	}
+
 	public CellSpaceType createCellSpace(String id) {
 		CellSpaceType cellSpace = new CellSpaceType();
 		cellSpace.setId(id);
 		return cellSpace;
 	}
+
 	private CellSpaceType createCellSpace(Room room) {
-		return createCellSpace("cs"+room.getId());
+		return createCellSpace("cs" + room.getId());
 	}
-	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates){
+
+	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
 		PolygonType polygon = createSurface(coordinates);
 		add2DGeometry(cellSpace, polygon);
 	}
+
 	private void add2DGeometry(CellSpaceType cellSpace, PolygonType polygon) {
 		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
 		SurfacePropertyType surfaceProperty = new SurfacePropertyType();
@@ -103,14 +111,17 @@ public class IndoorGmlBuilder {
 		cellSpaceGeometry.setGeometry2D(surfaceProperty);
 		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
 	}
+
 	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
 		add2DGeometry(cellSpace, room.asCoordinateList());
 	}
+
 	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
 		PolygonType polygon = createSurface(coordinates);
 		SolidType solid = createSolid(polygon);
 		add3DGeometry(cellSpace, solid);
 	}
+
 	private void add3DGeometry(CellSpaceType cellSpace, SolidType solid) {
 		SolidPropertyType solidProperty = new SolidPropertyType();
 		solidProperty.setAbstractSolid(gmlObjectFactory.createSolid(solid));
@@ -118,27 +129,33 @@ public class IndoorGmlBuilder {
 		cellSpaceGeometry.setGeometry3D(solidProperty);
 		cellSpace.setCellSpaceGeometry(cellSpaceGeometry);
 	}
+
 	private void add3DGeometry(CellSpaceType cellSpace, Room room) {
 		add3DGeometry(cellSpace, room.asCoordinateList());
 	}
+
 	public void addCellSpace(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceType cellSpace) {
 		CellSpaceMemberType cellSpaceMember = new CellSpaceMemberType();
 		cellSpaceMember.setCellSpace(indoorObjectFactory.createCellSpace(cellSpace));
 		primalSpaceFeatures.getCellSpaceMember().add(cellSpaceMember);
 	}
+
 	public void addCellSpaceBoundaryMembers(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceBoundaryType cellSpaceBoundary) {
 		CellSpaceBoundaryMemberType cellSpaceBoundaryMember = new CellSpaceBoundaryMemberType();
 		cellSpaceBoundaryMember.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
 		primalSpaceFeatures.getCellSpaceBoundaryMember().add(cellSpaceBoundaryMember);
 	}
+
 	public StateType createState(String id) {
 		StateType name = new StateType();
 		name.setId(id);
 		return name;
 	}
+
 	private StateType createState(Room room) {
 		return createState("st" + room.getId());
 	}
+
 	public void setStatePos(StateType state, double x, double y, double z) {
 		PointType point = createPoint(x, y, z);
 		PointPropertyType pointProperty = new PointPropertyType();
@@ -146,51 +163,60 @@ public class IndoorGmlBuilder {
 		state.setGeometry(pointProperty);
 		//state.getGeometry().getPoint().getCoordinates()
 	}
+
 	private void setStatePos(StateType state, Room room) {
 		List<Double> centroid = room.computeCentroid();
-		if(centroid!=null){
+		if (centroid != null) {
 			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
 		}
 	}
+
 	public void addState(NodesType nodes, StateType state) {
 		StateMemberType stateMember = new StateMemberType();
 		stateMember.setState(state);
 		nodes.getStateMember().add(stateMember);
 	}
+
 	public TransitionType createTransition(String id) {
 		TransitionType name = new TransitionType();
 		name.setId(id);
 		return name;
 	}
+
 	public void setTransitionPos(TransitionType trans, List<Double> coordinates) {
 		LineStringType linestring = createLineString(coordinates);
-		CurvePropertyType curveProp = new CurvePropertyType ();
+		CurvePropertyType curveProp = new CurvePropertyType();
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
 		trans.setGeometry(curveProp);
 	}
+
 	public void addTransition(EdgesType edges, TransitionType transition) {
 		TransitionMemberType transitionMember = new TransitionMemberType();
 		transitionMember.setTransition(transition);
 		edges.getTransitionMember().add(transitionMember);
 	}
+
 	private void findneighbours(CellSpaceType cs, Room room) {
-	//	cs.getCellSpaceGeometry().getGeometry2D().getAbstractSurface()
+		//	cs.getCellSpaceGeometry().getGeometry2D().getAbstractSurface()
 	}
+
 	private void setDualCellSpaceForState(StateType state, CellSpaceType cellSpace) {
 		CellSpacePropertyType cellSpaceProperty = new CellSpacePropertyType();
 		cellSpaceProperty.setHref("#" + cellSpace.getId());
 		state.setDuality(cellSpaceProperty);
 	}
+
 	private void setDualStateForCellSpace(CellSpaceType cellSpace, StateType state) {
 		StatePropertyType stateProperty = new StatePropertyType();
 		stateProperty.setHref("#" + state.getId());
 		cellSpace.setDuality(stateProperty);
 	}
-	public void setDuality(CellSpaceType cellSpace, StateType state){
+
+	public void setDuality(CellSpaceType cellSpace, StateType state) {
 		setDualCellSpaceForState(state, cellSpace);
 		setDualStateForCellSpace(cellSpace, state);
 	}
-	
+
 	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
 		return indoorFeatures.getMultiLayeredGraph().getMultiLayeredGraph().getSpaceLayers().get(0).getSpaceLayerMember().get(0).getSpaceLayer();
 
@@ -244,26 +270,28 @@ public class IndoorGmlBuilder {
 		for (Storey storey : building.getStoreys()) {
 			for (Room room : storey.getRooms()) {
 				Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
-				for(Door door : storey.getDoors()) {
-				CellSpaceType cs = createCellSpace(room);
-				roomslist.add(room);
-				cellspacelist.add(cs);
-			//	add2DGeometry(cs, room);
-				doorboundaries.putAll(add2DGeometrydoor(cs, room, door));
-				addCellSpace(primalSpace, cs);
-				StateType state = createState(room);
-				setStatePos(state, room);
-				addState(dualSpace.getNodes().get(0), state);
-				TransitionType transition = createTransition(room);
-				setDuality(cs, state);
-			}
-				
+				for (Door door : storey.getDoors()) {
+					// TODO SK 4: remove this loop - it will create duplicate cell spaces!
+					CellSpaceType cs = createCellSpace(room);
+					roomslist.add(room);
+					cellspacelist.add(cs);
+					//	add2DGeometry(cs, room);
+					doorboundaries.putAll(add2DGeometrydoor(cs, room, door));
+					addCellSpace(primalSpace, cs);
+					StateType state = createState(room);
+					setStatePos(state, room);
+					addState(dualSpace.getNodes().get(0), state);
+					TransitionType transition = createTransition(room);
+					setDuality(cs, state);
+				}
+
 				setCellspaceBoundary(doorboundaries);
 			}
-			
-			
-			 findconnectedStates(cellspacelist);
-			
+
+
+			// TODO SK 5 move all these methods (regarding geometric analysis and inference to utility class
+			findconnectedStates(cellspacelist);
+
 		}
 		return indoorFeatures;
 	}
@@ -271,131 +299,123 @@ public class IndoorGmlBuilder {
 
 	private void findconnectedStates(List<CellSpaceType> cellspacelist) {
 		// TODO Auto-generated method stub
-		
-		
-		
-		for(int i=0;i<cellspacelist.size()-1;i++)
-		{
-			List<CellSpaceBoundaryPropertyType> boundarieslist1= cellspacelist.get(i).getPartialboundedBy();
-			List<CellSpaceBoundaryPropertyType> boundarieslist2 = cellspacelist.get(i+1).getPartialboundedBy();
+
+
+		for (int i = 0; i < cellspacelist.size() - 1; i++) {
+			List<CellSpaceBoundaryPropertyType> boundarieslist1 = cellspacelist.get(i).getPartialboundedBy();
+			List<CellSpaceBoundaryPropertyType> boundarieslist2 = cellspacelist.get(i + 1).getPartialboundedBy();
 			List<CellSpaceBoundaryPropertyType> common = new ArrayList<>(boundarieslist1);
-			if(common.retainAll(boundarieslist2)== true)
-			{
+			if (common.retainAll(boundarieslist2) == true) {
 				StatePropertyType state1 = cellspacelist.get(i).getDuality();
-				StatePropertyType  state2 =cellspacelist.get(i+1).getDuality();
+				StatePropertyType state2 = cellspacelist.get(i + 1).getDuality();
 				List<StatePropertyType> statelist = new ArrayList<>();
 				statelist.add(state1);
 				statelist.add(state2);
-				
-				
-				TransitionType transition =   createTransition("tran"+i);
+
+
+				TransitionType transition = createTransition("tran" + i);
 				transition.setConnects(statelist);
 				statelist.remove(statelist);
-				
-				
+
+
 			}
-			}
-		
+		}
+
 	}
+
 	private Map<CellSpaceType, Door> add2DGeometrydoor(CellSpaceType cs, Room room, Door door) {
-		
+
 		add2DGeometry(cs, room.asCoordinateList());
 		Map<CellSpaceType, Door> doorboundaries = new HashMap<>();
-		for (int i=0;i<room.getCorners().size()-1;i++)
-		{
+		for (int i = 0; i < room.getCorners().size() - 1; i++) {
 			//Check cross product formula
-		Corner roomcorner =	room.getCorners().get(i);
-		Corner doorcorner1 = door.getCorners().get(0);
-		Corner doorcorner2 = door.getCorners().get(1);
-		double crossZ =	roomcorner.getX()*doorcorner1.getY() - roomcorner.getY()*doorcorner1.getX();
-		double crossY = roomcorner.getZ()*doorcorner1.getX() - roomcorner.getX()*doorcorner1.getZ();
-		double crossX = roomcorner.getY()*doorcorner1.getZ() - roomcorner.getZ()*doorcorner1.getY();
-		
-		double crossZ2 =	crossX*doorcorner2.getY() - crossY*doorcorner2.getX();
-		double crossY2 = crossZ*doorcorner2.getX() - crossX*doorcorner2.getZ();
-		double crossX2 = crossY*doorcorner2.getZ() - crossZ*doorcorner2.getY();
-		if (crossX2== 0 && crossY2 == 0 && crossZ2 == 0)
+			Corner roomcorner = room.getCorners().get(i);
+			Corner doorcorner1 = door.getCorners().get(0);
+			Corner doorcorner2 = door.getCorners().get(1);
+			double crossZ = roomcorner.getX() * doorcorner1.getY() - roomcorner.getY() * doorcorner1.getX();
+			double crossY = roomcorner.getZ() * doorcorner1.getX() - roomcorner.getX() * doorcorner1.getZ();
+			double crossX = roomcorner.getY() * doorcorner1.getZ() - roomcorner.getZ() * doorcorner1.getY();
 
-		{
-			doorboundaries.put(cs, door);
-		}
-		
+			double crossZ2 = crossX * doorcorner2.getY() - crossY * doorcorner2.getX();
+			double crossY2 = crossZ * doorcorner2.getX() - crossX * doorcorner2.getZ();
+			double crossX2 = crossY * doorcorner2.getZ() - crossZ * doorcorner2.getY();
+			if (crossX2 == 0 && crossY2 == 0 && crossZ2 == 0) {
+				doorboundaries.put(cs, door);
+			}
+
 		}
 		return doorboundaries;
 	}
+
 	private void setCellspaceBoundary(Map<CellSpaceType, Door> doorboundaries) {
-		
+
 		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
 		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
 		cellspaceboundaries.add(cellspaceboundaryProp);
-	
+
 		for (Door value : doorboundaries.values()) {
-			for(int i=0;i<doorboundaries.size();i++)
-			{
-			CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(value);
-			CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
-			LineStringType linestring = createLineString(value.asCoordinateList());
-			CurvePropertyType curveProp = new CurvePropertyType ();
-			curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
-			csbgeom.setGeometry2D(curveProp);
-			cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
-			cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
-			for (CellSpaceType cellspace : doorboundaries.keySet()) {
-				cellspace.setPartialboundedBy(cellspaceboundaries);
-			}
+			for (int i = 0; i < doorboundaries.size(); i++) {
+				CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(value);
+				CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
+				LineStringType linestring = createLineString(value.asCoordinateList());
+				CurvePropertyType curveProp = new CurvePropertyType();
+				curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+				csbgeom.setGeometry2D(curveProp);
+				cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
+				cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
+				for (CellSpaceType cellspace : doorboundaries.keySet()) {
+					cellspace.setPartialboundedBy(cellspaceboundaries);
+				}
 			}
 		}
-		
+
 	}
+
 	private CellSpaceBoundaryType createCellspaceBoundary(Door value) {
 		// TODO Auto-generated method stub
-		return createCellspaceBoundary("csb"+value.getId());
-		
+		return createCellspaceBoundary("csb" + value.getId());
+
 	}
+
 	private CellSpaceBoundaryType createCellspaceBoundary(String id) {
 		// TODO Auto-generated method stub
 		CellSpaceBoundaryType cellSpaceBoundary = new CellSpaceBoundaryType();
 		cellSpaceBoundary.setId(id);
 		return cellSpaceBoundary;
-		
+
 	}
 
 	private TransitionType createTransition(Room room) {
-		return createTransition("tran"+room.getId());
-		
+		return createTransition("tran" + room.getId());
+
 	}
+
 	private void findconnectedStates(List<List> findneighbourrooms, List<CellSpaceType> cellspacelist) {
-		
-		for(int i=0;i<findneighbourrooms.size();i++)
-		{
-			 String cellspace1 = "cs"+ (findneighbourrooms.get(i).get(0)).toString();
-			 String cellspace2 = "cs"+ (findneighbourrooms.get(i).get(1)).toString();
-			 StatePropertyType state1 = new StatePropertyType();
-			 StatePropertyType state2 = new StatePropertyType();
-			 List<StatePropertyType> statelist = new ArrayList<>();
-			 
-			
-			 for(int j=0;j<cellspacelist.size();j++)
-			 {
-				 if (cellspacelist.get(j).getId().equals(cellspace1))
-				 {
-					  state1= cellspacelist.get(j).getDuality();
-					  statelist.add(state1);
-					  
-				 }
-				 else if (cellspacelist.get(j).getId().equals(cellspace2))
-				 {
-					  state2= cellspacelist.get(j).getDuality();
-					  statelist.add(state2);
-				 }
-				 
-				
-			
-			 }
-			 
-			 	state1.getState().getGeometry().getPoint().getCoordinates();
-				TransitionType transition = createTransition("tran"+state1.getState().getId().substring(1));
-				transition.setConnects(statelist);
+
+		for (int i = 0; i < findneighbourrooms.size(); i++) {
+			String cellspace1 = "cs" + (findneighbourrooms.get(i).get(0)).toString();
+			String cellspace2 = "cs" + (findneighbourrooms.get(i).get(1)).toString();
+			StatePropertyType state1 = new StatePropertyType();
+			StatePropertyType state2 = new StatePropertyType();
+			List<StatePropertyType> statelist = new ArrayList<>();
+
+
+			for (int j = 0; j < cellspacelist.size(); j++) {
+				if (cellspacelist.get(j).getId().equals(cellspace1)) {
+					state1 = cellspacelist.get(j).getDuality();
+					statelist.add(state1);
+
+				} else if (cellspacelist.get(j).getId().equals(cellspace2)) {
+					state2 = cellspacelist.get(j).getDuality();
+					statelist.add(state2);
+				}
+
+
+			}
+
+			state1.getState().getGeometry().getPoint().getCoordinates();
+			TransitionType transition = createTransition("tran" + state1.getState().getId().substring(1));
+			transition.setConnects(statelist);
 			 
 	/*		int csindex1 = cellspacelist.indexOf(cellspace1);
 			int csindex2 = cellspacelist.indexOf(cellspace2);
@@ -409,41 +429,38 @@ public class IndoorGmlBuilder {
 				
 				
 			}*/
-					
-			
-			 
-			 
+
+
 		}
-		
-		
+
+
 	}
+
 	private List<List> findneighbourrooms(List<Room> roomslist) {
 		// TODO Auto-generated method stub
 		List<List> cellpairsList = new ArrayList<>();
-		for (int i=0;i<roomslist.size()-1;i++)
-		{
+		for (int i = 0; i < roomslist.size() - 1; i++) {
 			List a = (roomslist.get(i).getCorners());
-			 List b = (roomslist.get(i+1).getCorners());
-			 List c = new ArrayList<>(b);
-			 	c.retainAll(a);
-			 	
-			 	if (c.size()>=2)
-			 	{
-			 		List<Long> cellneighbours = Arrays.asList(roomslist.get(i).getId(),roomslist.get(i+1).getId());
-			 		cellpairsList.add(cellneighbours);
-			 		}
+			List b = (roomslist.get(i + 1).getCorners());
+			List c = new ArrayList<>(b);
+			c.retainAll(a);
+
+			if (c.size() >= 2) {
+				List<Long> cellneighbours = Arrays.asList(roomslist.get(i).getId(), roomslist.get(i + 1).getId());
+				cellpairsList.add(cellneighbours);
+			}
 		}
 		return cellpairsList;
-		
+
 	}
+
 	private void findneighbours(List<List<CellSpaceType>> cellspacelist) {
 		// TODO Auto-generated method stub
 		int count = 0;
 		List<List> ls = new ArrayList<>();
-		int i =0;
-		for (i=0;i<cellspacelist.size();i++)
-		{
-		//	if(cellspacelist.get(i).get(1).getCorners()
+		int i = 0;
+		for (i = 0; i < cellspacelist.size(); i++) {
+			//	if(cellspacelist.get(i).get(1).getCorners()
 		}
 		
 		
@@ -460,14 +477,10 @@ public class IndoorGmlBuilder {
 				ls.add(Arrays.asList(prev.getKey(),next.getKey()));
 				count =0;
 			}*/
-			
-			
-			
-				    
-		
-		
-		
+
+
 	}
+
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
 		write(outStream, createIndoorFeatures(building));
 	}

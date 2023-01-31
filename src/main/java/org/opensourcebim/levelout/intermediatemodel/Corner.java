@@ -37,4 +37,14 @@ public class Corner {
 	public long getId() {
 		return id;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Corner){
+			Corner c = (Corner) obj;
+			return this.x==c.x && this.y == c.y && this.z== z;
+		} else {
+			return false;
+		}
+	}
 }
