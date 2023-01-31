@@ -19,7 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class IntermediateResidentialTests {
+public class IntermediateResidentialTest {
 	private ProjectedOriginCRS crs;
 	private Building building;
 

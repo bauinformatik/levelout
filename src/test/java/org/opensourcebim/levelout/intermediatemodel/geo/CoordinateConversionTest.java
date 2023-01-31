@@ -3,7 +3,7 @@ package org.opensourcebim.levelout.intermediatemodel.geo;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CoordinateConversionTests {
+public class CoordinateConversionTest {
 
 	@Test
 	public void testEpsgNorth(){

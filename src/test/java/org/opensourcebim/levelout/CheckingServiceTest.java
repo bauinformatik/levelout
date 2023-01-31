@@ -7,11 +7,11 @@ import org.bimserver.database.berkeley.DatabaseInitException;
 import org.bimserver.interfaces.objects.*;
 import org.bimserver.models.log.AccessMethod;
 import org.bimserver.resources.ClasspathResourceFetcher;
-import org.bimserver.shared.ChannelConnectionException;
 import org.bimserver.shared.exceptions.*;
 import org.bimserver.webservices.ServiceMap;
 import org.bimserver.webservices.authorization.SystemAuthorization;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.activation.DataHandler;
@@ -27,10 +27,13 @@ import java.util.concurrent.TimeUnit;
 
 public class CheckingServiceTest {
 	boolean online = false;
+	boolean clean = false;
 	String home = "tmptestdata/home";
-	@Test
-	public void setupBimServerHome() throws IOException, ServiceException, ChannelConnectionException, BimServerClientException, DatabaseInitException, BimserverDatabaseException, PluginException, DatabaseRestartRequiredException, InterruptedException {
+
+	@Before
+	public void setupBimServerHome() throws IOException, ServiceException, DatabaseInitException, BimserverDatabaseException, PluginException, DatabaseRestartRequiredException, InterruptedException {
 		Path homePath = Paths.get(this.home);
+		if(!clean && homePath.toFile().exists()) return;
 		if(homePath.toFile().isDirectory())
 			FileUtils.deleteDirectory(homePath.toFile());
 		else
@@ -98,6 +101,9 @@ public class CheckingServiceTest {
 		System.out.write(services.getServiceInterface().getFile(extendedData.getFileId()).getData());
 		bimServer.stop();
 	}
+
+	@Test
+	public void test(){}
 
 	private BimServer createBimServer(Path home) {
 		BimServerConfig config = new BimServerConfig();
