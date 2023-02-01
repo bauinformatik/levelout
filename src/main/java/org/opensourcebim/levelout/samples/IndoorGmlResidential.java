@@ -21,7 +21,6 @@ import java.util.List;
 
 public class IndoorGmlResidential {
 
-
 	public static void main(String[] args) throws FileNotFoundException, JAXBException {
 
 		String fileName = "output/outindoor5_6.gml";
@@ -34,12 +33,23 @@ public class IndoorGmlResidential {
 		CellSpaceType cs4 = indoorGmlBuilder.createCellSpace("c4");
 		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5");
 		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6");
+		
+		List<CellSpaceType> cellspacelist = List.of(cs1, cs2, cs3, cs4, cs5, cs6);
 
-		List<Double> coordinates = Arrays.asList(0.,0.,0.,10.,0.,0.,10.,10.,0.,0.,10.,0.);
-		for(CellSpaceType cs : List.of(cs1, cs2, cs3, cs4, cs5,cs6)){
-			indoorGmlBuilder.add2DGeometry(cs, coordinates);
-			indoorGmlBuilder.add3DGeometry(cs, coordinates);
+		List<Double> coordinates1 = Arrays.asList(0., 0., 0., 0., 6., 0., 6., 6., 0., 6., 0., 0.);
+		List<Double> coordinates2 = Arrays.asList(6., 0., 0., 6., 2., 0., 10., 2., 0., 10., 0., 0.);
+		List<Double> coordinates3 = Arrays.asList(6., 2., 0., 6., 6., 0., 10., 6., 0., 10., 2., 0.);
+		List<Double> coordinates4 = Arrays.asList(0., 0., 3., 0., 6., 3., 6., 6., 3., 6., 0., 3.);
+		List<Double> coordinates5 = Arrays.asList(6., 0., 3., 6., 2., 3., 10., 2., 3., 10., 0., 3.);
+		List<Double> coordinates6 = Arrays.asList(6., 2., 3., 6., 6., 3., 10., 6., 3., 10., 2., 3.);
+		
+		List<List> coordinateslist =  List.of(coordinates1, coordinates2, coordinates3, coordinates4, coordinates5,
+				coordinates6);
+		for (int i=0;i<cellspacelist.size();i++)
+		{
+			indoorGmlBuilder.add2DGeometry(cellspacelist.get(i), coordinateslist.get(i));
 		}
+		
 
 		IndoorFeaturesType indoorFeatures = indoorGmlBuilder.createIndoorFeatures();
 		PrimalSpaceFeaturesType primalSpaceFeature = indoorGmlBuilder.getPrimalSpace(indoorFeatures);
@@ -57,31 +67,32 @@ public class IndoorGmlResidential {
 		StateType st4 = indoorGmlBuilder.createState("s4");
 		StateType st5 = indoorGmlBuilder.createState("s5");
 		StateType st6 = indoorGmlBuilder.createState("s6");
-		
+
 		TransitionType t1 = indoorGmlBuilder.createTransition("t1");
-		// TODO SK 1: move the following to builder method createTransition("t1", st1, st2)
-		// createTransition(Room room1, Room room2)  - look up states for rooms
+		// TODO SK 1: move the following to builder method createTransition("t1", st1,
+		// st2)
+		// createTransition(Room room1, Room room2) - look up states for rooms
 		// createTransition(Door door) - look up rooms for door (from analysis)
 		List<StatePropertyType> stateProplist = new ArrayList<>();
-		
-		StatePropertyType stateProp = new StatePropertyType ();
+
+		StatePropertyType stateProp = new StatePropertyType();
 		stateProplist.add(stateProp);
 		stateProp.setState(st1);
-		
-		StatePropertyType stateProp2 = new StatePropertyType ();
+
+		StatePropertyType stateProp2 = new StatePropertyType();
 		stateProplist.add(stateProp2);
 		stateProp2.setState(st2);
 
 		t1.setConnects(stateProplist);
 
-		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(5.,5.,5.,5.,5.,15.));
+		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(5., 5., 5., 5., 5., 15.));
 
-		indoorGmlBuilder.setStatePos(st1, 5.0, 5.0, 5.0);
-		indoorGmlBuilder.setStatePos(st2, 5.0, 5.0, 15.0);
-		indoorGmlBuilder.setStatePos(st3, 15.0, 2.5, 5.0);
-		indoorGmlBuilder.setStatePos(st4, 15.0, 2.5, 15.0);
-		indoorGmlBuilder.setStatePos(st5, 15.0, 7.5, 5.0);
-		indoorGmlBuilder.setStatePos(st6, 15.0, 7.5, 15.0);
+		indoorGmlBuilder.setStatePos(st1, 3.0, 3.0, 1.5);
+		indoorGmlBuilder.setStatePos(st2,8.0, 1.0, 1.5 );
+		indoorGmlBuilder.setStatePos(st3, 8.0, 4, 1.5);
+		indoorGmlBuilder.setStatePos(st4, 3.0, 3.0, 4.5);
+		indoorGmlBuilder.setStatePos(st5,8.0, 1.0, 4.5 );
+		indoorGmlBuilder.setStatePos(st6, 8.0, 4, 4.5);
 
 		NodesType nodes = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getNodes().get(0);
 		nodes.setId("n1");
@@ -104,7 +115,7 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.setDuality(cs5, st5);
 		indoorGmlBuilder.setDuality(cs6, st6);
 
-		new IndoorGmlBuilder().write(fout,indoorFeatures);
+		new IndoorGmlBuilder().write(fout, indoorFeatures);
 	}
 
 }
