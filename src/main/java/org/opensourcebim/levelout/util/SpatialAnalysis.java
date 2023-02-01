@@ -8,6 +8,8 @@ import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,55 @@ public class SpatialAnalysis {
 			}
 		}
 		return result;
+	}
+	public static void adjacentRooms(List<Room> rooms) {
+		List<List<Corner>> cornerpairs = new ArrayList<>();
+		
+		List<List<List<Corner>>> cornerpairstotal = new ArrayList<>();
+		
+		
+	for(int i=0;i<rooms.size();i++)
+	{
+		for (int j=0;i<rooms.get(i).getCorners().size()-1;j++)
+		{
+	cornerpairs.add(createPair(rooms.get(i).getCorners().get(j),rooms.get(i).getCorners().get(j+1)));
+	
+		
+	}
+		cornerpairstotal.add(cornerpairs);
+		cornerpairs.removeAll(cornerpairs);
+			
+	}
+	
+	
+	for (int i=0;i<cornerpairstotal.size();i++)
+	{
+		
+		
+		for (int j=0;j<cornerpairstotal.size()-1;j++)
+		{
+			 Corner c1 = cornerpairstotal.get(i).get(i).get(0);
+			Corner c2 = cornerpairstotal.get(i).get(i).get(1);
+			Corner c3 = cornerpairstotal.get(i).get(i).get(0);
+			Corner c4 = cornerpairstotal.get(i).get(i).get(1);
+			
+			if((c1.equals(c3) && c2.equals(c4))||(c1.equals(c4)&& c2.equals(c3)))
+			{
+				
+			}
+				
+			
+			 
+		}
+	  
+		
+	}
+	}
+	public static  List<Corner> createPair(Corner corner1, Corner corner2) {
+	
+		
+		return List.of(corner1, corner2);
+		
 	}
 
 	private static boolean isDoorInRoom(Room room, Door door) {
