@@ -77,8 +77,6 @@ public class IntermediateResidential {
 		Room gp6 = new Room(6, "floor", nodes6);
 		Door gp10 = new Door(10, "door", corners10);
 		Door gp11 = new Door(11, "door", corners11);
-		// TODO SK 2: only exterior doors? why two? draw geometry
-		// TODO SK 3: make samples: a) with just one room and exterior door, b) with two rooms and interior door
 		// TODO SK 7: adjacency transitions only: a) use utility method to infer, b) explicit in model
 		// TODO SK 8: doors in basic form (direct creation), only then move on to create from intermediate
 

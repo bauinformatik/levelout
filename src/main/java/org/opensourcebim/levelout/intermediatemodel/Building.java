@@ -17,6 +17,11 @@ public class Building {
 		return Collections.unmodifiableList(storeys);
 	}
 
+	public List<Room> getAllRooms(){
+		// TODO implement
+		return List.of();
+	}
+
 	public int getId() {
 		return id;
 	}
