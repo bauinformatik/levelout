@@ -6,6 +6,7 @@ import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 import net.opengis.indoorgml.core.v_1_0.TransitionType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
+import net.opengis.indoorgml.core.v_1_0.CellSpaceBoundaryType;
 import net.opengis.indoorgml.core.v_1_0.CellSpaceType;
 import net.opengis.indoorgml.core.v_1_0.EdgesType;
 
@@ -33,7 +34,7 @@ public class IndoorGmlResidential {
 		CellSpaceType cs4 = indoorGmlBuilder.createCellSpace("c4");
 		CellSpaceType cs5 = indoorGmlBuilder.createCellSpace("c5");
 		CellSpaceType cs6 = indoorGmlBuilder.createCellSpace("c6");
-		
+
 		List<CellSpaceType> cellspacelist = List.of(cs1, cs2, cs3, cs4, cs5, cs6);
 
 		indoorGmlBuilder.add2DGeometry(cs1, Arrays.asList(0., 0., 0., 0., 6., 0., 6., 6., 0., 6., 0., 0.));
@@ -42,7 +43,7 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.add2DGeometry(cs4, Arrays.asList(0., 0., 3., 0., 6., 3., 6., 6., 3., 6., 0., 3.));
 		indoorGmlBuilder.add2DGeometry(cs5, Arrays.asList(6., 0., 3., 6., 2., 3., 10., 2., 3., 10., 0., 3.));
 		indoorGmlBuilder.add2DGeometry(cs6, Arrays.asList(6., 2., 3., 6., 6., 3., 10., 6., 3., 10., 2., 3.));
-		
+
 		IndoorFeaturesType indoorFeatures = indoorGmlBuilder.createIndoorFeatures();
 		PrimalSpaceFeaturesType primalSpaceFeature = indoorGmlBuilder.getPrimalSpace(indoorFeatures);
 
@@ -60,14 +61,11 @@ public class IndoorGmlResidential {
 		StateType st5 = indoorGmlBuilder.createState("s5");
 		StateType st6 = indoorGmlBuilder.createState("s6");
 
-		TransitionType t1 = indoorGmlBuilder.createTransition("t1", st1, st2);
-		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(5., 5., 5., 5., 5., 15.));
-
 		indoorGmlBuilder.setStatePos(st1, 3.0, 3.0, 1.5);
-		indoorGmlBuilder.setStatePos(st2,8.0, 1.0, 1.5 );
+		indoorGmlBuilder.setStatePos(st2, 8.0, 1.0, 1.5);
 		indoorGmlBuilder.setStatePos(st3, 8.0, 4, 1.5);
 		indoorGmlBuilder.setStatePos(st4, 3.0, 3.0, 4.5);
-		indoorGmlBuilder.setStatePos(st5,8.0, 1.0, 4.5 );
+		indoorGmlBuilder.setStatePos(st5, 8.0, 1.0, 4.5);
 		indoorGmlBuilder.setStatePos(st6, 8.0, 4, 4.5);
 
 		NodesType nodes = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getNodes().get(0);
@@ -80,9 +78,25 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.addState(nodes, st5);
 		indoorGmlBuilder.addState(nodes, st6);
 
+		TransitionType t1 = indoorGmlBuilder.createTransition("t1", st1, st2);
+		indoorGmlBuilder.setTransitionPos(t1, Arrays.asList(3., 3., 1.5, 3., 3., 4.5));
+
 		EdgesType edges = indoorGmlBuilder.getFirstDualSpaceLayer(indoorFeatures).getEdges().get(0);
 		edges.setId("e1");
 		indoorGmlBuilder.addTransition(edges, t1);
+
+		CellSpaceBoundaryType csb1 = indoorGmlBuilder.createCellspaceBoundary("csb1");
+		CellSpaceBoundaryType csb2 = indoorGmlBuilder.createCellspaceBoundary("csb2");
+
+		indoorGmlBuilder.add2DGeometry(csb1, Arrays.asList(1., 0., 0., 2., 0., 0.));
+		indoorGmlBuilder.add2DGeometry(csb2, Arrays.asList(6., 4., 0., 6., 5., 0.));
+
+		//indoorGmlBuilder.setCellSpaceBoundary(cs1, List.of(csb1, csb2));
+		indoorGmlBuilder.setCellSpaceBoundary(cs3, List.of(csb2));
+		
+
+		indoorGmlBuilder.addCellSpaceBoundaryMembers(primalSpaceFeature, csb1);
+		indoorGmlBuilder.addCellSpaceBoundaryMembers(primalSpaceFeature, csb2);
 
 		indoorGmlBuilder.setDuality(cs1, st1);
 		indoorGmlBuilder.setDuality(cs2, st2);

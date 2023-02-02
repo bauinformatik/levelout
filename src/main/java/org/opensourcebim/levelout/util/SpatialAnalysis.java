@@ -29,10 +29,11 @@ public class SpatialAnalysis {
 		}
 		return result;
 	}
-	public static void adjacentRooms(List<Room> rooms) {
+	public static List<Long> adjacentRooms(List<Room> rooms) {
 		List<List<Corner>> cornerpairs = new ArrayList<>();
 		
 		List<List<List<Corner>>> cornerpairstotal = new ArrayList<>();
+		List<Long> roomIds = new ArrayList<>();
 		
 		
 	for(int i=0;i<rooms.size();i++)
@@ -41,11 +42,13 @@ public class SpatialAnalysis {
 		{
 	cornerpairs.add(createPair(rooms.get(i).getCorners().get(j),rooms.get(i).getCorners().get(j+1)));
 	
+	 
+	
 		
 	}
 		cornerpairstotal.add(cornerpairs);
 		cornerpairs.removeAll(cornerpairs);
-			
+		roomIds.add(rooms.get(i).getId());
 	}
 	
 	
@@ -57,12 +60,15 @@ public class SpatialAnalysis {
 		{
 			 Corner c1 = cornerpairstotal.get(i).get(i).get(0);
 			Corner c2 = cornerpairstotal.get(i).get(i).get(1);
-			Corner c3 = cornerpairstotal.get(i).get(i).get(0);
-			Corner c4 = cornerpairstotal.get(i).get(i).get(1);
+			Corner c3 = cornerpairstotal.get(i).get(j).get(0);
+			Corner c4 = cornerpairstotal.get(i).get(j).get(1);
 			
 			if((c1.equals(c3) && c2.equals(c4))||(c1.equals(c4)&& c2.equals(c3)))
 			{
+			
 				
+				
+				return List.of(roomIds.get(i),roomIds.get(j));
 			}
 				
 			
@@ -71,6 +77,7 @@ public class SpatialAnalysis {
 	  
 		
 	}
+	return roomIds;
 	}
 	public static  List<Corner> createPair(Corner corner1, Corner corner2) {
 	

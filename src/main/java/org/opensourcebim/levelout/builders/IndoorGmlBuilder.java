@@ -103,6 +103,22 @@ public class IndoorGmlBuilder {
 		PolygonType polygon = createSurface(coordinates);
 		add2DGeometry(cellSpace, polygon);
 	}
+	public void add2DGeometry(CellSpaceBoundaryType cellSpaceBoundary, List<Double> coordinates) {
+		
+		LineStringType linestring = createLineString(coordinates);
+		add2DGeometry(cellSpaceBoundary, linestring);
+		
+	}
+
+	private void add2DGeometry(CellSpaceBoundaryType cellSpaceBoundary, LineStringType linestring) {
+		// TODO Auto-generated method stub
+		CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
+		CurvePropertyType curveProp = new CurvePropertyType();
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		csbgeom.setGeometry2D(curveProp);
+		cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
+		
+	}
 
 	private void add2DGeometry(CellSpaceType cellSpace, PolygonType polygon) {
 		CellSpaceGeometryType cellSpaceGeometry = new CellSpaceGeometryType();
@@ -214,6 +230,18 @@ public class IndoorGmlBuilder {
 
 	private void findneighbours(CellSpaceType cs, Room room) {
 		//	cs.getCellSpaceGeometry().getGeometry2D().getAbstractSurface()
+	}
+	
+	public void setCellSpaceBoundary(CellSpaceType cellspace, List<CellSpaceBoundaryType> cellspaceBoundaries) {
+		List<CellSpaceBoundaryPropertyType> cellspaceboundarieslist = new ArrayList<>();
+		
+		for(CellSpaceBoundaryType csb : cellspaceBoundaries)
+		{
+		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
+		cellspaceboundaryProp.setHref("#" + csb.getId());
+		cellspaceboundarieslist.add(cellspaceboundaryProp);
+		}
+		cellspace.setPartialboundedBy(cellspaceboundarieslist);
 	}
 
 	private void setDualCellSpaceForState(StateType state, CellSpaceType cellSpace) {
@@ -344,7 +372,7 @@ public class IndoorGmlBuilder {
 
 	}
 
-	private CellSpaceBoundaryType createCellspaceBoundary(String id) {
+	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
 		// TODO Auto-generated method stub
 		CellSpaceBoundaryType cellSpaceBoundary = new CellSpaceBoundaryType();
 		cellSpaceBoundary.setId(id);
