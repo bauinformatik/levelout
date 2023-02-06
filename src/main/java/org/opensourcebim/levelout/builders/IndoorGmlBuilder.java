@@ -309,9 +309,8 @@ public class IndoorGmlBuilder {
 		IndoorFeaturesType indoorFeatures = createIndoorFeatures();
 		PrimalSpaceFeaturesType primalSpace = getPrimalSpace(indoorFeatures);
 		SpaceLayerType dualSpace = getFirstDualSpaceLayer(indoorFeatures);
-		Map<Door, List<Room>> analysisResult = SpatialAnalysis.analyzeRooms(building.getAllRooms(), List.of()); // TODO get all doors
-
 		for (Storey storey : building.getStoreys()) {
+			Map<Door, List<Room>> analysisResult = SpatialAnalysis.analyzeRooms(storey.getRooms(), storey.getDoors());
 			for (Room room : storey.getRooms()) {
 				CellSpaceType cs = createCellSpace(room);
 				addCellSpace(primalSpace, cs);
@@ -322,11 +321,13 @@ public class IndoorGmlBuilder {
 				add2DGeometry(cs, room);
 			}
 			for (Door door : storey.getDoors()) {
-				List<Room> boundedRooms = analysisResult.get(door);
-				Room room1; Room room2;
-				TransitionType transition = createTransition("door" + door.getId()); // look up states from roomsMap
+				List<Room> boundedRooms = analysisResult.get(door); // alternative: keep rooms as door attributes
+				Room room1 = boundedRooms.get(0);
+				Room room2 = boundedRooms.get(1);
+				TransitionType transition = createTransition("door" + door.getId()); // TODO look up states from roomsMap
+				setCellspaceBoundaries(door, room1, room2);
+				// TODO duality boundary - transition
 			}
-			setCellspaceBoundary(analysisResult); // TODO remove door door loop in this method and do it in above loop
 		}
 		return indoorFeatures;
 	}
@@ -336,10 +337,7 @@ public class IndoorGmlBuilder {
 
 	}
 
-	private void setCellspaceBoundary(Map<Door, List<Room>> doorboundaries) {  // Room, Room, Door (or just Door)
-		for(Map.Entry<Door, List<Room>> entry: doorboundaries.entrySet()){ }
-
-		for (Door door : doorboundaries.keySet()) {
+	private void setCellspaceBoundaries(Door door, Room room1, Room room2) {
 				CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(door);
 				CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
 				LineStringType linestring = createLineString(door.asCoordinateList());
@@ -351,12 +349,8 @@ public class IndoorGmlBuilder {
 				CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
 				cellspaceboundaries.add(cellspaceboundaryProp);
 				cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
-				// TODO duality of the boundary: transition
-				for (Room room: doorboundaries.get(door)) {
-					roomsMap.get(room).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
-				}
-		}
-
+				roomsMap.get(room1).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
+				roomsMap.get(room2).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
 	}
 
 	private CellSpaceBoundaryType createCellspaceBoundary(Door value) {

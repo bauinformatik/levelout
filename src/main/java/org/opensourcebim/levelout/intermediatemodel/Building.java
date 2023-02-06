@@ -1,5 +1,6 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,12 +18,8 @@ public class Building {
 		return Collections.unmodifiableList(storeys);
 	}
 
-	public List<Room> getAllRooms(){
-		// TODO implement
-		return List.of();
-	}
-
 	public int getId() {
 		return id;
 	}
+
 }
