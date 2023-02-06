@@ -338,19 +338,19 @@ public class IndoorGmlBuilder {
 	}
 
 	private void setCellspaceBoundaries(Door door, Room room1, Room room2) {
-				CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(door);
-				CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
-				LineStringType linestring = createLineString(door.asCoordinateList());
-				CurvePropertyType curveProp = new CurvePropertyType();
-				curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
-				csbgeom.setGeometry2D(curveProp);
-				cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
-				List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
-				CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
-				cellspaceboundaries.add(cellspaceboundaryProp);
-				cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
-				roomsMap.get(room1).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
-				roomsMap.get(room2).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
+		CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(door);
+		CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
+		LineStringType linestring = createLineString(door.asCoordinateList());
+		CurvePropertyType curveProp = new CurvePropertyType();
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		csbgeom.setGeometry2D(curveProp);
+		cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
+		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
+		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
+		cellspaceboundaries.add(cellspaceboundaryProp);
+		cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
+		roomsMap.get(room1).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
+		roomsMap.get(room2).getDuality().getCellSpace().getValue().setPartialboundedBy(cellspaceboundaries);
 	}
 
 	private CellSpaceBoundaryType createCellspaceBoundary(Door value) {
