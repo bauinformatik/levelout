@@ -32,7 +32,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
         if(extractionMethod) initStructure(ifcModelInterface); else initSample();
     }
     private void initSample(){
-        building = IntermediateResidential.createCompact();
+        building = IntermediateResidential.create();
         crs = new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
     }
     private void initStructure(IfcModelInterface ifcModelInterface){
