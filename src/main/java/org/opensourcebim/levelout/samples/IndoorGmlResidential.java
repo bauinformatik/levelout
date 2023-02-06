@@ -2,7 +2,6 @@ package org.opensourcebim.levelout.samples;
 
 import net.opengis.indoorgml.core.v_1_0.IndoorFeaturesType;
 import net.opengis.indoorgml.core.v_1_0.PrimalSpaceFeaturesType;
-import net.opengis.indoorgml.core.v_1_0.StatePropertyType;
 import net.opengis.indoorgml.core.v_1_0.StateType;
 import net.opengis.indoorgml.core.v_1_0.TransitionType;
 import net.opengis.indoorgml.core.v_1_0.NodesType;
@@ -16,7 +15,6 @@ import javax.xml.bind.JAXBException;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -92,7 +90,7 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.add2DGeometry(csb2, Arrays.asList(6., 4., 0., 6., 5., 0.));
 
 		//indoorGmlBuilder.setCellSpaceBoundary(cs1, List.of(csb1, csb2));
-		indoorGmlBuilder.setCellSpaceBoundary(cs3, List.of(csb2));
+		indoorGmlBuilder.createAndAddCellSpaceBoundary(cs3, List.of(csb2));
 		
 
 		indoorGmlBuilder.addCellSpaceBoundaryMembers(primalSpaceFeature, csb1);
