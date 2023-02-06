@@ -102,9 +102,6 @@ public class CheckingServiceTest {
 		bimServer.stop();
 	}
 
-	@Test
-	public void test(){}
-
 	private BimServer createBimServer(Path home) {
 		BimServerConfig config = new BimServerConfig();
 		config.setHomeDir(home);

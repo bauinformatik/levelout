@@ -35,20 +35,37 @@ public class SpatialAnalysisTests {
 	}
 
 	@Test
-	public void testCollinearity(){
+	public void testDoorOnSegment(){
 		Door door = new Door(1,"dummy", Arrays.asList(
 			new Corner(2, 1,0,0),
 			new Corner(3, 2,0,0)
 		));
-		Assert.assertTrue(SpatialAnalysis.testColinear(door, corner1, corner2));
+		Assert.assertTrue(SpatialAnalysis.isDoorOnSegment(door, corner1, corner2));
 	}
 	@Test
-	public void testParallelNonCollinear(){
+	public void testDoorParallelNotOnSegment(){
 		Door door = new Door(1,"dummy", Arrays.asList(
 			new Corner(2, 1,6,0),
 			new Corner(3, 2,6,0)
 		));
-		Assert.assertFalse(SpatialAnalysis.testColinear(door, corner1, corner2));
+		Assert.assertFalse(SpatialAnalysis.isDoorOnSegment(door, corner1, corner2));
+	}
+
+	@Test
+	public void testColinear(){
+		Assert.assertTrue(SpatialAnalysis.isColinear(
+			new Corner(1,0,0, 0),
+			new Corner(2, 6, 0, 0),
+			new Corner(3, 2, 0, 0)
+		));
+	}
+    @Test
+	public void testNotColinear(){
+		Assert.assertFalse(SpatialAnalysis.isColinear(
+			new Corner(1, 0,0,0),
+			new Corner(2, 6, 0, 0),
+			new Corner(3, 2, 6,0)
+		));
 	}
 
 	@Test
