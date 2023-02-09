@@ -89,9 +89,9 @@ public class IndoorGmlResidential {
 		indoorGmlBuilder.add2DGeometry(csb1, Arrays.asList(1., 0., 0., 2., 0., 0.));
 		indoorGmlBuilder.add2DGeometry(csb2, Arrays.asList(6., 4., 0., 6., 5., 0.));
 
+
 		//indoorGmlBuilder.setCellSpaceBoundary(cs1, List.of(csb1, csb2));
 		indoorGmlBuilder.createAndAddCellSpaceBoundary(cs3, List.of(csb2));
-		
 
 		indoorGmlBuilder.addCellSpaceBoundaryMembers(primalSpaceFeature, csb1);
 		indoorGmlBuilder.addCellSpaceBoundaryMembers(primalSpaceFeature, csb2);

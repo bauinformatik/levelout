@@ -14,43 +14,49 @@ import java.util.Map;
 
 public class SpatialAnalysis {
 	static boolean isDoorOnSegment(Door door, Corner corner1, Corner corner2) { // Corner p1, p2, p3
-		return isColinear(door.getCorners().get(0), corner1, corner2) && isColinear(door.getCorners().get(1), corner1, corner2);
+		return isColinear(door.getCorners().get(0), corner1, corner2)
+				&& isColinear(door.getCorners().get(1), corner1, corner2);
 	}
 
 	public static Map<Door, List<Room>> analyzeRooms(List<Room> rooms, List<Door> doors) {
 		Map<Room, Door> result = new HashMap<>();
-		Map<Door, List<Room>> assignment = new HashMap<>(); // (list of one or two rooms) or assign rooms to doors in intermediate model
+		Map<Door, List<Room>> assignment = new HashMap<>(); // (list of one or two rooms) or assign rooms to doors in
+															// intermediate model
 		for (Room room : rooms) {
 			for (Door door : doors) {
-				if (isDoorInRoom(room, door)) result.put(room, door);
+				if (isDoorInRoom(room, door))
+					result.put(room, door);
 			}
 		}
 		return assignment;
 	}
 
-	public static List<Long> adjacentRooms(List<Room> rooms) {
+	public static List<List<Long>> adjacentRooms(List<Room> rooms) {
+
 		List<List<Corner>> cornerpairs = new ArrayList<>();
 
 		List<List<List<Corner>>> cornerpairstotal = new ArrayList<>();
 		List<Long> roomIds = new ArrayList<>();
 
+		List<List<Long>> roomsadjacent = new ArrayList<>();
 
 		for (int i = 0; i < rooms.size(); i++) {
-			for (int j = 0; i < rooms.get(i).getCorners().size() - 1; j++) {
-				cornerpairs.add(createPair(rooms.get(i).getCorners().get(j), rooms.get(i).getCorners().get(j + 1)));
+			for (int j = 0; j < rooms.get(i).getCorners().size() - 1; j++) {
 
+				int k = j % (rooms.get(i).getCorners().size());
+				cornerpairs.add(createPair(rooms.get(i).getCorners().get(j), rooms.get(i).getCorners().get(k)));
+				cornerpairstotal.add(cornerpairs);
 
 			}
-			cornerpairstotal.add(cornerpairs);
-			cornerpairs.removeAll(cornerpairs);
+
+			cornerpairs.remove(cornerpairs);
 			roomIds.add(rooms.get(i).getId());
 		}
 
+		int size = cornerpairstotal.size();
+		for (int i = 0; i < cornerpairstotal.size() - 1; i++) {
 
-		for (int i = 0; i < cornerpairstotal.size(); i++) {
-
-
-			for (int j = 0; j < cornerpairstotal.size() - 1; j++) {
+			for (int j = 0; j < (j % cornerpairstotal.size() - 1); j++) {
 				Corner c1 = cornerpairstotal.get(i).get(i).get(0);
 				Corner c2 = cornerpairstotal.get(i).get(i).get(1);
 				Corner c3 = cornerpairstotal.get(i).get(j).get(0);
@@ -58,19 +64,20 @@ public class SpatialAnalysis {
 
 				if ((c1.equals(c3) && c2.equals(c4)) || (c1.equals(c4) && c2.equals(c3))) {
 
+					roomsadjacent.add(List.of(roomIds.get(i), roomIds.get(j)));
 
-					return List.of(roomIds.get(i), roomIds.get(j));
 				}
-
 
 			}
 
-
 		}
-		return roomIds;
+
+		return roomsadjacent;
+
 	}
 
 	public static List<Corner> createPair(Corner corner1, Corner corner2) {
+
 		return List.of(corner1, corner2);
 	}
 
@@ -112,7 +119,6 @@ public class SpatialAnalysis {
 				statelist.add(state1);
 				statelist.add(state2);
 				statelist.remove(statelist);
-
 
 			}
 		}
