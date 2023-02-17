@@ -82,12 +82,20 @@ public class SpatialAnalysis {
 	}
 
 	private static boolean isDoorInRoom(Room room, Door door) {
-		for (int i = 0; i < room.getCorners().size() - 1; i++) {
-			// look at last point / pair as well
-			// Check cross product formula
-			Corner roomcorner = room.getCorners().get(i);
+		
 			Corner doorcorner1 = door.getCorners().get(0);
 			Corner doorcorner2 = door.getCorners().get(1);
+			double slopedoor = (doorcorner2.getY()-doorcorner1.getY())/(doorcorner2.getX()-doorcorner1.getX());
+			for (int i = 0; i < room.getCorners().size() - 1; i++) {
+				// look at last point / pair as well
+				// Check cross product formula
+				Corner roomcorner1 = room.getCorners().get(i);
+				Corner roomcorner2 = room.getCorners().get(i+1);
+				double sloperoom = (roomcorner2.getY()-roomcorner1.getY())/(roomcorner2.getX()-roomcorner1.getX());
+				if(sloperoom == slopedoor) // the lines are parallel
+				{
+					
+				}
 			if (isColinear(roomcorner, doorcorner1, doorcorner2)) {
 				return true;
 			}
