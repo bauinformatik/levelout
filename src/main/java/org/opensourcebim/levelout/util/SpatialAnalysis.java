@@ -82,23 +82,43 @@ public class SpatialAnalysis {
 	}
 
 	private static boolean isDoorInRoom(Room room, Door door) {
-		
-			Corner doorcorner1 = door.getCorners().get(0);
-			Corner doorcorner2 = door.getCorners().get(1);
-			double slopedoor = (doorcorner2.getY()-doorcorner1.getY())/(doorcorner2.getX()-doorcorner1.getX());
-			for (int i = 0; i < room.getCorners().size() - 1; i++) {
-				// look at last point / pair as well
-				// Check cross product formula
-				Corner roomcorner1 = room.getCorners().get(i);
-				Corner roomcorner2 = room.getCorners().get(i+1);
-				double sloperoom = (roomcorner2.getY()-roomcorner1.getY())/(roomcorner2.getX()-roomcorner1.getX());
-				if(sloperoom == slopedoor) // the lines are parallel
-				{
-					
+
+		Corner doorcorner1 = door.getCorners().get(0);
+		Corner doorcorner2 = door.getCorners().get(1);
+		double slopedoor = (doorcorner2.getY() - doorcorner1.getY()) / (doorcorner2.getX() - doorcorner1.getX());
+		for (int i = 0; i < room.getCorners().size() - 1; i++) {
+			// look at last point / pair as well
+			// Check cross product formula
+			Corner roomcorner1 = room.getCorners().get(i);
+			Corner roomcorner2 = room.getCorners().get(i + 1);
+			double sloperoom = (roomcorner2.getY() - roomcorner1.getY()) / (roomcorner2.getX() - roomcorner1.getX());
+			double crosspro = ((doorcorner1.getY() - roomcorner1.getY()) * (roomcorner2.getX() - roomcorner1.getX()))
+					+ ((doorcorner1.getX() - roomcorner1.getX()) * (roomcorner2.getY() - roomcorner1.getY()));
+			if (sloperoom == slopedoor) // the lines are parallel or coincident
+			{
+				if ((roomcorner1.getX() == doorcorner1.getX() && roomcorner1.getX() == doorcorner2.getX())
+						|| (roomcorner1.getY() == doorcorner1.getY() && roomcorner1.getY() == doorcorner2.getY())
+						|| crosspro == 0) {
+
+					double dotpro = ((doorcorner1.getX() - roomcorner1.getX())
+							* (roomcorner2.getX() - roomcorner1.getX()))
+							+ ((doorcorner1.getY() - roomcorner1.getY()) * (roomcorner2.getY() - roomcorner1.getY()));
+
+					if (dotpro > 0) {
+						double walllength = ((roomcorner2.getX() - roomcorner1.getX())
+								* (roomcorner2.getX() - roomcorner1.getX()))
+								+ ((roomcorner2.getY() - roomcorner1.getY())
+										* (roomcorner2.getY() - roomcorner1.getY())); // checks whether point lies between the wall corners
+
+						if (dotpro < walllength) {
+							return true;
+						}
+					}
+
 				}
-			if (isColinear(roomcorner, doorcorner1, doorcorner2)) {
-				return true;
+
 			}
+
 		}
 		return false;
 	}
