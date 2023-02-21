@@ -45,6 +45,19 @@ public class SpatialAnalysisTests {
 	}
 
 	@Test
+	public void testDoorinRoom() {
+		Door door = new Door(1, "dummy", Arrays.asList(new Corner(2, 1, 6, 0), new Corner(3, 2, 6, 0)));
+		Door door2 = new Door(2, "dummy", Arrays.asList(new Corner(4, 1, 7, 0), new Corner(5, 2, 7, 0)));
+		Door door3 = new Door(6, "dummy", Arrays.asList(new Corner(7, 6, 1, 0), new Corner(8, 6, 2, 0)));
+		Door door5 = new Door(6, "dummy", Arrays.asList(new Corner(7, 6, 1, 0), new Corner(8, 6, 11, 0)));
+		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room1, door));
+		Assert.assertFalse(SpatialAnalysis.isDoorInRoom(room1, door2));
+		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room2, door3));
+		Assert.assertFalse(SpatialAnalysis.isDoorInRoom(room2, door5));
+		
+	}
+
+	@Test
 	public void testColinear() {
 		Assert.assertTrue(
 				SpatialAnalysis.isColinear(new Corner(1, 0, 0, 0), new Corner(2, 6, 0, 0), new Corner(3, 2, 0, 0)));

@@ -10,6 +10,7 @@ public class Door {
 	
 	private final String type;
 	private final List<Corner> corners;
+	//private final List<Room> connectedRooms;
 
 	public Door(long id, String type, List<Corner> corners) {
 		super();
