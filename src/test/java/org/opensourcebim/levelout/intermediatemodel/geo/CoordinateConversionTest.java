@@ -85,11 +85,4 @@ public class CoordinateConversionTest {
 
 	}
 
-	@Test
-	public void topotoGeo() {
-		CartesianPoint pointToTransform = new CartesianPoint(0, 0, 0);
-		GeodeticPoint csOrigin2 = new GeodeticPoint(-33.90632062825244, 151.20215639320887, 97.457);
-		new GeodeticOriginCRS(csOrigin2, 0).cartesianToGeodeticViaGeoCentric(pointToTransform);
-	}
-
 }

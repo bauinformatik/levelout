@@ -322,11 +322,14 @@ public class IndoorGmlBuilder {
 			}
 			for (Door door : storey.getDoors()) {
 				List<Room> boundedRooms = analysisResult.get(door); // alternative: keep rooms as door attributes
-				Room room1 = boundedRooms.get(0);
-				Room room2 = boundedRooms.get(1);
-				TransitionType transition = createTransition("door" + door.getId()); // TODO look up states from roomsMap
-				createAndAddCellSpaceBoundary(door, room1, room2);
+				if(boundedRooms.size()==2){  // interior door
+					Room room1 = boundedRooms.get(0);
+					Room room2 = boundedRooms.get(1);
+					TransitionType transition = createTransition("door" + door.getId()); // TODO look up states from roomsMap
+					createAndAddCellSpaceBoundary(door, room1, room2);
+				}
 				// TODO duality boundary - transition
+				// TODO exterior doors
 			}
 		}
 		return indoorFeatures;
