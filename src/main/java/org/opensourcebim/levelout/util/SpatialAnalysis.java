@@ -22,12 +22,22 @@ public class SpatialAnalysis {
 		Map<Room, Door> result = new HashMap<>();
 		Map<Door, List<Room>> assignment = new HashMap<>(); // (list of one or two rooms) or assign rooms to doors in
 															// intermediate model
-		for (Room room : rooms) {
-			for (Door door : doors) {
-				if (isDoorInRoom(room, door))
-					result.put(room, door);
+		for (Door door : doors) {
+			boolean notexecuted = true;
+			for (Room room : rooms) {
+				if (isDoorInRoom(room, door)) {
+					//result.put(room, door);
+					
+					while(notexecuted)
+					{
+					assignment.put(door, new ArrayList<Room>());
+					notexecuted = false;
+					}
+					assignment.get(door).add(room);
 			}
 		}
+		}
+		
 		return assignment;
 	}
 
@@ -112,14 +122,14 @@ public class SpatialAnalysis {
 							* (roomcorner2.getX() - roomcorner1.getX()))
 							+ ((doorcorner2.getY() - roomcorner1.getY()) * (roomcorner2.getY() - roomcorner1.getY()));
 
-					if (dotpro1 > 0 && dotpro2 > 0) {
+					if (dotpro1 >= 0 && dotpro2 >= 0) {
 						double walllength = ((roomcorner2.getX() - roomcorner1.getX())
 								* (roomcorner2.getX() - roomcorner1.getX()))
 								+ ((roomcorner2.getY() - roomcorner1.getY())
 										* (roomcorner2.getY() - roomcorner1.getY())); // checks whether point lies
 																						// between the wall corners
 
-						if (dotpro1 < walllength && dotpro2 < walllength) {
+						if (dotpro1 <= walllength && dotpro2 <= walllength) {
 							return true;
 						}
 					}

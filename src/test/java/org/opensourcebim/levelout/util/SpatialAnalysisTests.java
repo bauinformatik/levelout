@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.opensourcebim.levelout.intermediatemodel.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SpatialAnalysisTests {
 	private final Corner corner1 = new Corner(0, 0, 0, 0);
@@ -49,12 +51,30 @@ public class SpatialAnalysisTests {
 		Door door = new Door(1, "dummy", Arrays.asList(new Corner(2, 1, 6, 0), new Corner(3, 2, 6, 0)));
 		Door door2 = new Door(2, "dummy", Arrays.asList(new Corner(4, 1, 7, 0), new Corner(5, 2, 7, 0)));
 		Door door3 = new Door(6, "dummy", Arrays.asList(new Corner(7, 6, 1, 0), new Corner(8, 6, 2, 0)));
-		Door door5 = new Door(6, "dummy", Arrays.asList(new Corner(7, 6, 1, 0), new Corner(8, 6, 11, 0)));
+		Door door5 = new Door(7, "dummy", Arrays.asList(new Corner(9, 6, 1, 0), new Corner(10, 6, 11, 0)));
+		Door door6 = new Door(8, "dummy", Arrays.asList(new Corner(11, 6, 0, 0), new Corner(12, 6, 1, 0)));
 		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room1, door));
 		Assert.assertFalse(SpatialAnalysis.isDoorInRoom(room1, door2));
 		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room2, door3));
 		Assert.assertFalse(SpatialAnalysis.isDoorInRoom(room2, door5));
+		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room2, door6));		
+	}
+	@Test
+	public void testanalyzeRooms() {
+		Door door = new Door(1, "dummy", Arrays.asList(new Corner(2, 1, 6, 0), new Corner(3, 2, 6, 0)));
+		Door door2 = new Door(2, "dummy", Arrays.asList(new Corner(4, 1, 7, 0), new Corner(5, 2, 7, 0)));
+		Door door3 = new Door(6, "dummy", Arrays.asList(new Corner(7, 6, 1, 0), new Corner(8, 6, 2, 0)));
+		Door door5 = new Door(7, "dummy", Arrays.asList(new Corner(9, 6, 1, 0), new Corner(10, 6, 11, 0)));
+		Door door6 = new Door(8, "dummy", Arrays.asList(new Corner(11, 6, 0, 0), new Corner(12, 6, 1, 0)));
+		List<Door> doors = Arrays.asList(door,door2,door3,door5,door6);
+		List<Room> rooms = Arrays.asList(room1,room2);
+		Map<Door, List<Room>> receivedresult = SpatialAnalysis.analyzeRooms(rooms, doors);
+		Map<Door, List<Room>> expectedresult = new HashMap<>();
+		expectedresult.put(door6, Arrays.asList(room1,room2));
+		expectedresult.put(door3, Arrays.asList(room1,room2));
+		expectedresult.put(door, Arrays.asList(room1));
 		
+		Assert.assertEquals(expectedresult, receivedresult);
 	}
 
 	@Test
