@@ -91,6 +91,22 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		double longitude = degreesFromMinutes(refLongitude);
 		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation);
 	}
+	private boolean checkGeodeticCRS(IfcModelInterface ifcModelInterface) {
+		// TODO common classes for checking and querying
+		List<IfcSite> site = ifcModelInterface.getAllWithSubTypes(IfcSite.class);
+		List<IfcProject> project = ifcModelInterface.getAllWithSubTypes(IfcProject.class);
+		if (!(project.size() == 1)) return false;
+		if (!(site.size() == 1)) return false;
+		if (!(project.get(0).getIsDecomposedBy().size() == 1)) return false;
+		if (!project.get(0).getIsDecomposedBy().get(0).getRelatingObject().getGlobalId().equals(site.get(0).getGlobalId())) return false; // or even identity on entity level?
+		IfcDirection trueNorth = ((IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0)).getTrueNorth();
+		if (!(trueNorth.getDim() == 2 && trueNorth.getDirectionRatios().size() == 2)) return false;
+		EList<Long> refLatitude = site.get(0).getRefLatitude();
+		if (!(refLatitude != null && refLatitude.size() >= 3)) return false;
+		EList<Long> refLongitude = site.get(0).getRefLongitude();
+		if (!(refLongitude != null && refLongitude.size() >= 3)) return false;
+		return true;
+	}
 
 	private List<Corner> getPolygon(GeometryInfo geometry, double elevation) {
 		if (geometry == null) return null;
