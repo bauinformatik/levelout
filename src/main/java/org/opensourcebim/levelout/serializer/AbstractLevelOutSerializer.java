@@ -2,85 +2,142 @@ package org.opensourcebim.levelout.serializer;
 
 import org.bimserver.BimserverDatabaseException;
 import org.bimserver.emf.IfcModelInterface;
+import org.bimserver.geometry.Matrix;
+import org.bimserver.models.geometry.GeometryInfo;
 import org.bimserver.models.ifc4.*;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.Serializer;
 import org.bimserver.plugins.serializers.SerializerException;
+import org.bimserver.utils.GeometryUtils;
 import org.eclipse.emf.common.util.EList;
-import org.opensourcebim.levelout.intermediatemodel.Storey;
-import org.opensourcebim.levelout.intermediatemodel.Building;
-import org.opensourcebim.levelout.intermediatemodel.Room;
+import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticOriginCRS;
 import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticPoint;
 import org.opensourcebim.levelout.samples.IntermediateResidential;
 
+import java.awt.geom.Area;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
-    boolean extractionMethod;
-    Building building;
-    CoordinateReference crs;
-    AbstractLevelOutSerializer(boolean extractionMethod){
-        this.extractionMethod = extractionMethod;
-    }
-    @Override
-    public void init(IfcModelInterface ifcModelInterface, ProjectInfo projectInfo, boolean b) {
-        if(extractionMethod) initStructure(ifcModelInterface); else initSample();
-    }
-    private void initSample(){
-        building = IntermediateResidential.create();
-        crs = new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
-    }
-    private void initStructure(IfcModelInterface ifcModelInterface){
-        List<Storey> loStoreys = new ArrayList<>();
-        building = new Building(1, loStoreys);
-        List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
-        int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
-        int roomId = 1;
-        for(IfcBuildingStorey storey: storeys){
-            List<Room> rooms = new ArrayList<>();
-            Storey loStorey = new Storey(level++, rooms, Collections.emptyList());
-            loStoreys.add(loStorey);
-            storey.getElevation(); // TODO: use for sorting and in intermediate model
-            storey.getName(); /* TODO: use in intermediate model (OSM has "name" tag, but also "level:ref" for short keys) */for (IfcRelAggregates contained: storey.getIsDecomposedBy()){
-                for (IfcSpace space : contained.getRelatedObjects().stream().filter( IfcSpace.class::isInstance ).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
-                    Room room = new Room(roomId++, "floor", Collections.emptyList());
-                    rooms.add(room);
-                    space.getName(); // TODO: use in intermediate model
-                }
-            }
-        }
-        GeodeticOriginCRS geoCRS = getGeodeticCRS(ifcModelInterface);  // TODO check for map conversion (first, before geo)
-        crs = geoCRS != null ? geoCRS : new GeodeticOriginCRS(new GeodeticPoint(0,0,0), 0); // TODO use some default location in Weimar, Dresden ..
-    }
+	boolean extractionMethod;
+	Building building;
+	CoordinateReference crs;
 
-    private GeodeticOriginCRS getGeodeticCRS(IfcModelInterface ifcModelInterface) {
-        // TODO common classes for checking and querying
-        List<IfcSite> site = ifcModelInterface.getAllWithSubTypes(IfcSite.class);
-        List<IfcProject> project = ifcModelInterface.getAllWithSubTypes(IfcProject.class);
-        if( !(project.size() == 1)) return null;
-        if( !(site.size() == 1)) return null;
-        if( !(project.get(0).getIsDecomposedBy().size() == 1)) return null;
-        if( !project.get(0).getIsDecomposedBy().get(0).getRelatingObject().getGlobalId().equals(site.get(0).getGlobalId())) return null; // or even identity on entity level?
-        IfcDirection trueNorth = ((IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0)).getTrueNorth();
-        if( !(trueNorth.getDim() == 2 && trueNorth.getDirectionRatios().size() == 2)) return null;
-        EList<Long> refLatitude = site.get(0).getRefLatitude();
-        if( !(refLatitude !=null && refLatitude.size()>=3 )) return null;
-        EList<Long> refLongitude= site.get(0).getRefLongitude();
-        if (! (refLongitude !=null && refLongitude.size()>=3)) return null;
-        double rotation = Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0));
-        double latitude = degreesFromMinutes(refLatitude);
-        double longitude = degreesFromMinutes(refLongitude);
-        return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation);
-    }
+	AbstractLevelOutSerializer(boolean extractionMethod) {
+		this.extractionMethod = extractionMethod;
+	}
 
-    private static double degreesFromMinutes(EList<Long> refLatitude) {
-        return refLatitude.get(0) + refLatitude.get(1) / 60. + refLatitude.get(2) / 3600.; // TODO consider optional microseconds
-    }
+	@Override
+	public void init(IfcModelInterface ifcModelInterface, ProjectInfo projectInfo, boolean b) {
+		if (extractionMethod) {
+			initStructure(ifcModelInterface);
+		} else initSample();
+	}
+
+
+	private void initSample() {
+		building = IntermediateResidential.create();
+		crs = new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
+	}
+
+	private void initStructure(IfcModelInterface ifcModelInterface) {
+		List<Storey> loStoreys = new ArrayList<>();
+		building = new Building(1, loStoreys);
+		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
+		int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
+		int roomId = 1;
+		for (IfcBuildingStorey storey : storeys) {
+			List<Room> rooms = new ArrayList<>();
+			List<Door> doors = new ArrayList<>();
+			Storey loStorey = new Storey(level++, rooms, doors);
+			loStoreys.add(loStorey);
+			double elevation = storey.getElevation(); // TODO: use for sorting and in intermediate model
+			storey.getName(); /* TODO: use in intermediate model (OSM has "name" tag, but also "level:ref" for short keys) */
+			Map<IfcSpace, Room> roomsMap = new HashMap<>();
+			for (IfcRelAggregates contained : storey.getIsDecomposedBy()) {
+				for (IfcSpace space : contained.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
+					Room room = new Room(roomId++, "floor", getPolygon(space.getGeometry(), elevation));
+					rooms.add(room);
+					roomsMap.put(space, room); // later needed for assignment to doors
+					space.getName(); // TODO: use in intermediate model
+				}
+			}
+		}
+		GeodeticOriginCRS geoCRS = getGeodeticCRS(ifcModelInterface);  // TODO check for map conversion (first, before geo)
+		crs = geoCRS != null ? geoCRS : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
+	}
+
+	private GeodeticOriginCRS getGeodeticCRS(IfcModelInterface ifcModelInterface) {
+		// TODO common classes for checking and querying
+		List<IfcSite> site = ifcModelInterface.getAllWithSubTypes(IfcSite.class);
+		List<IfcProject> project = ifcModelInterface.getAllWithSubTypes(IfcProject.class);
+		if (!(project.size() == 1)) return null;
+		if (!(site.size() == 1)) return null;
+		if (!(project.get(0).getIsDecomposedBy().size() == 1)) return null;
+		if (!project.get(0).getIsDecomposedBy().get(0).getRelatingObject().getGlobalId().equals(site.get(0).getGlobalId()))
+			return null; // or even identity on entity level?
+		IfcDirection trueNorth = ((IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0)).getTrueNorth();
+		if (!(trueNorth.getDim() == 2 && trueNorth.getDirectionRatios().size() == 2)) return null;
+		EList<Long> refLatitude = site.get(0).getRefLatitude();
+		if (!(refLatitude != null && refLatitude.size() >= 3)) return null;
+		EList<Long> refLongitude = site.get(0).getRefLongitude();
+		if (!(refLongitude != null && refLongitude.size() >= 3)) return null;
+		double rotation = Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0));
+		double latitude = degreesFromMinutes(refLatitude);
+		double longitude = degreesFromMinutes(refLongitude);
+		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation);
+	}
+
+	private List<Corner> getPolygon(GeometryInfo geometry, double elevation) {
+		if (geometry == null) return null;
+		// new IfcTools2D().get2D(space, 1); // only for IFC 2x3
+		int[] indices = GeometryUtils.toIntegerArray(geometry.getData().getIndices().getData());
+		double[] vertices = GeometryUtils.toDoubleArray(geometry.getData().getVertices().getData());
+		double[] matrix = GeometryUtils.toDoubleArray(geometry.getTransformation());
+		int multiplierMillimeters = 1; // TODO necessary? handle units?
+		Area area = new Area();
+		for (int i = 0; i < indices.length; i += 3) {
+			Path2D.Float path = new Path2D.Float();
+			for (int j = 0; j < 3; j++) {
+				int idx = indices[i + j];
+				double[] point = new double[]{vertices[idx * 3], vertices[idx * 3 + 1], vertices[idx * 3 + 2]};
+				double[] res = new double[4];
+				Matrix.multiplyMV(res, 0, matrix, 0, new double[]{point[0], point[1], point[2], 1}, 0);
+				double x = res[0] * multiplierMillimeters;
+				double y = res[1] * multiplierMillimeters;
+				double z = res[2] * multiplierMillimeters;
+				assert z >= elevation;
+				if (j == 0) {
+					path.moveTo(x, y);
+				} else {
+					path.lineTo(x, y);
+				}
+			}
+			path.closePath();
+			area.add(new Area(path));
+		}
+		PathIterator pathIterator = area.getPathIterator(null);
+		float[] coords = new float[6];
+		List<Corner> corners = new ArrayList<>();
+		int firstSegment = pathIterator.currentSegment(coords);
+		assert !pathIterator.isDone() && firstSegment == PathIterator.SEG_MOVETO;
+		corners.add(new Corner(0, coords[0], coords[1], elevation));
+		pathIterator.next();
+		while (!pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_LINETO) {
+			corners.add(new Corner(0, coords[0], coords[1], elevation));
+			pathIterator.next();
+		}
+		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // TODO warn multisegment path
+		return corners;
+	}
+
+	private static double degreesFromMinutes(EList<Long> refLatitude) {
+		return refLatitude.get(0) + refLatitude.get(1) / 60. + refLatitude.get(2) / 3600.; // TODO consider optional microseconds
+	}
 
     @Override
     public boolean write(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
