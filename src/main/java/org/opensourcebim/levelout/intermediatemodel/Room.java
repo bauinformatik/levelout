@@ -7,12 +7,10 @@ import java.util.List;
 
 public class Room {
 	private final long id;
-	private final String type;
 	private final List<Corner> corners;
 
-	public Room(long id, String type, List<Corner> corners) {
+	public Room(long id, List<Corner> corners) {
 		this.id = id; // TODO auto-increment
-		this.type = type; // TODO change to enum if needed at all
 		this.corners = corners;
 	}
 
@@ -49,9 +47,6 @@ public class Room {
 		return List.of(centroidX, centroidY, centroidZ);
 	}
 
-	public String getType() {
-		return type;
-	}
 	public long getId(){
 		return id;
 	}

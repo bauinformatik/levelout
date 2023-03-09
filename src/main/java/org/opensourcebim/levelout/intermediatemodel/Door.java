@@ -6,17 +6,15 @@ import java.util.List;
 
 public class Door {
 
-	private final String type;
 	private final List<Corner> corners;
 	private boolean external = false;
 	private Room room1;
 	private Room room2;
 	//private final List<Room> connectedRooms;
 
-	public Door(long id, String type, List<Corner> corners) {
+	public Door(long id, List<Corner> corners) {
 		super();
 		this.id = id;
-		this.type = type;
 		this.corners = corners;
 	}
 
@@ -24,9 +22,6 @@ public class Door {
 	private final long id;
 	public long getId() {
 		return id;
-	}
-	public String getType() {
-		return type;
 	}
 
 	public List<Corner> getCorners() {

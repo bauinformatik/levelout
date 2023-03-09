@@ -60,7 +60,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates contained : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : contained.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
-					Room room = new Room(roomId++, "floor", getPolygon(space.getGeometry(), elevation));
+					Room room = new Room(roomId++, getPolygon(space.getGeometry(), elevation));
 					rooms.add(room);
 					roomsMap.put(space, room); // later needed for assignment to doors
 					space.getName(); // TODO: use in intermediate model
@@ -69,7 +69,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			for (IfcRelContainedInSpatialStructure contained : storey.getContainsElements()) {
 				for (IfcOpeningElement opening : contained.getRelatedElements().stream().filter(IfcOpeningElement.class::isInstance).map(IfcOpeningElement.class::cast).toArray(IfcOpeningElement[]::new)) {
 					if(opening.getHasFillings().isEmpty() || ! (opening.getHasFillings().get(0).getRelatedBuildingElement() instanceof IfcDoor)) continue; // TODO windows
-					Door door = new Door(0, "dummy", getPolygon(opening.getGeometry(), elevation));
+					Door door = new Door(0, getPolygon(opening.getGeometry(), elevation));
 					doors.add(door);
 					EList<IfcRelSpaceBoundary> openingBoundaries = opening.getProvidesBoundaries();
 					if (populateConnectedRooms(roomsMap, door, openingBoundaries)) continue;

@@ -47,12 +47,12 @@ public class CityGmlBuilder {
 		return geometryFactory.createLineString(coordinates, 3);
 	}
 
-	public AbstractSpaceBoundaryProperty createBoundaryLine(Door door, LineString line) {
-		if (door.getType().contains("wall")) {
-			return processBoundarySurface(new WallSurface(), line);
-		} else if (door.getType().contains("door")) {
-			return processBoundarySurface(new DoorSurface(), line);
-		} else return null;  // TODO: not nice
+	public AbstractSpaceBoundaryProperty createDoorSurface(LineString line) {
+		return processBoundarySurface(new DoorSurface(), line);
+	}
+
+	public AbstractSpaceBoundaryProperty createWallSurface(LineString line){
+		return processBoundarySurface(new WallSurface(), line);
 	}
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
@@ -77,37 +77,25 @@ public class CityGmlBuilder {
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 
-	private AbstractSpaceBoundaryProperty createBoundary(Room room, Polygon polygon) {
-		if (room.getType().contains("ground")) {
-			return processBoundarySurface(new GroundSurface(), polygon);
-		} else if (room.getType().contains("wall")) {
-			return processBoundarySurface(new WallSurface(), polygon);
-		} else if (room.getType().contains("roof")) {
-			return processBoundarySurface(new RoofSurface(), polygon);
-		} else if (room.getType().contains("ceiling")) {
-			return processBoundarySurface(new CeilingSurface(), polygon);
-		} else if (room.getType().contains("door")) {
-				return processBoundarySurface(new DoorSurface(), polygon);
-		} else if (room.getType().contains("floor")) {
-			return processBoundarySurface(new FloorSurface(), polygon);
-		} else return null;  // TODO: not nice
+	private AbstractSpaceBoundaryProperty createFloorSurface(Polygon polygon) {
+		return processBoundarySurface(new FloorSurface(), polygon);
 	}
 
 	private void setLodgeom(org.citygml4j.core.model.building.Building cityGmlBuilding, Storey storey) {
 		List<Polygon> polygonList = new ArrayList<>();
 		List<LineString> LineStringList = new ArrayList<>();
-		for (Room genericPolygon : storey.getRooms()) {
-			if(genericPolygon.getCorners().size()>=3){
-				Polygon poly = createCitygmlPoly(genericPolygon); // to use for shell
+		for (Room room : storey.getRooms()) {
+			if(room.getCorners().size()>=3){
+				Polygon poly = createCitygmlPoly(room); // to use for shell
 				polygonList.add(poly);
-				cityGmlBuilding.addBoundary(createBoundary(genericPolygon, poly));
+				cityGmlBuilding.addBoundary(createFloorSurface(poly));
 			}
 		}
-		for (Door genericPolygon : storey.getDoors()) {
-			if(genericPolygon.getCorners().size()>=2){
-				LineString line = createCitygmlLines(genericPolygon); // to use for shell
+		for (Door door : storey.getDoors()) {
+			if(door.getCorners().size()>=2){
+				LineString line = createCitygmlLines(door); // to use for shell
 				LineStringList.add(line);
-				cityGmlBuilding.addBoundary(createBoundaryLine(genericPolygon, line));
+				cityGmlBuilding.addBoundary(createDoorSurface(line));
 			}
 		}
 
