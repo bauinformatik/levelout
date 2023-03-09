@@ -1,5 +1,6 @@
 package org.opensourcebim.levelout.checkingservice;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -201,8 +202,8 @@ public class LevelOutChecking extends AbstractAddExtendedDataService {
 	        txt.append("\n");
 
 	        
-	        
-        addExtendedData(txt.toString().getBytes(), "stats.txt", "Statistics", "text/plain", bimServerClientInterface, roid);
+
+        addExtendedData(txt.toString().getBytes(StandardCharsets.UTF_8), "stats.txt", "Statistics", "text/plain", bimServerClientInterface, roid);
         
     }
 }
