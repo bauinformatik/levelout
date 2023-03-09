@@ -6,10 +6,11 @@ import java.util.List;
 
 public class Door {
 
-	
-	
 	private final String type;
 	private final List<Corner> corners;
+	private boolean external = false;
+	private Room room1;
+	private Room room2;
 	//private final List<Room> connectedRooms;
 
 	public Door(long id, String type, List<Corner> corners) {
@@ -38,5 +39,16 @@ public class Door {
 			coordinates.addAll(corner.asCoordinateList());
 		}
 		return coordinates;
+	}
+
+	public void setExternal(Room room) {
+		external = true;
+		room1 = room;
+	}
+
+	public void setInternal(Room room1, Room room2) {
+		external = false;
+		this.room1 = room1;
+		this.room2 = room2;
 	}
 }

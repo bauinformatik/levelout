@@ -66,9 +66,71 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 					space.getName(); // TODO: use in intermediate model
 				}
 			}
+			for (IfcRelContainedInSpatialStructure contained : storey.getContainsElements()) {
+				for (IfcOpeningElement opening : contained.getRelatedElements().stream().filter(IfcOpeningElement.class::isInstance).map(IfcOpeningElement.class::cast).toArray(IfcOpeningElement[]::new)) {
+					if(opening.getHasFillings().isEmpty() || ! (opening.getHasFillings().get(0).getRelatedBuildingElement() instanceof IfcDoor)) continue; // TODO windows
+					Door door = new Door(0, "dummy", getPolygon(opening.getGeometry(), elevation));
+					doors.add(door);
+					EList<IfcRelSpaceBoundary> openingBoundaries = opening.getProvidesBoundaries();
+					if (populateConnectedRooms(roomsMap, door, openingBoundaries)) continue;
+
+					// if no space boundary for opening, try fillings
+					EList<IfcRelFillsElement> hasFillings = opening.getHasFillings();
+					if(hasFillings.isEmpty() || hasFillings.get(0).getRelatedBuildingElement().getProvidesBoundaries().isEmpty()) {
+						// TODO warning no space boundaries
+					}
+					if(hasFillings.size()>1){
+						// TODO warning, considering just first filling or check all have the same boundaries
+					}
+					EList<IfcRelSpaceBoundary> fillingBoundaries = hasFillings.get(0).getRelatedBuildingElement().getProvidesBoundaries();
+					if(populateConnectedRooms(roomsMap, door, fillingBoundaries)) continue;
+
+					// fallback - only works for 2nd level space boundaries
+					List<IfcRelSpaceBoundary> processed = new ArrayList<>();
+					for (IfcRelSpaceBoundary spaceBoundary : opening.getVoidsElements().getRelatingBuildingElement().getProvidesBoundaries()) {
+						// TODO these could be more than 2 and affect wall pieces that do not host the particular door
+						if(spaceBoundary instanceof IfcRelSpaceBoundary2ndLevel && !processed.contains(spaceBoundary)) {
+							processed.add(spaceBoundary);
+							IfcRelSpaceBoundary otherSpaceBoundary = ((IfcRelSpaceBoundary2ndLevel)spaceBoundary).getCorrespondingBoundary();
+							if(otherSpaceBoundary!= null) {
+								processed.add(otherSpaceBoundary);
+								populateConnectedRooms(roomsMap, door, List.of(spaceBoundary, otherSpaceBoundary));
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
 		GeodeticOriginCRS geoCRS = getGeodeticCRS(ifcModelInterface);  // TODO check for map conversion (first, before geo)
 		crs = geoCRS != null ? geoCRS : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
+	}
+
+	private static boolean populateConnectedRooms(Map<IfcSpace, Room> roomsMap, Door door, List<IfcRelSpaceBoundary> openingBoundaries) {
+		List<Room> connectedSpaces = new ArrayList<>();
+		boolean external = false;
+		for (IfcRelSpaceBoundary openingBoundary : openingBoundaries) {
+			if (openingBoundary.getRelatingSpace() instanceof IfcSpace) {
+				connectedSpaces.add(roomsMap.get((IfcSpace) openingBoundary.getRelatingSpace()));
+			} else if (openingBoundary.getRelatingSpace() instanceof IfcExternalSpatialElement) {
+				external = true;
+			}
+		}
+		if(connectedSpaces.size() == 1){
+			if(!external){
+				// TODO warning, just 1 space no external
+			}
+			door.setExternal(connectedSpaces.get(0));
+			return true;
+		}
+		if(connectedSpaces.size() >= 2){
+			if(connectedSpaces.size()>2){
+				// TODO warning more than 2 connected spaces
+			}
+			door.setInternal(connectedSpaces.get(0), connectedSpaces.get(1));
+			return true;
+		}
+		return false;
 	}
 
 	private GeodeticOriginCRS getGeodeticCRS(IfcModelInterface ifcModelInterface) {
