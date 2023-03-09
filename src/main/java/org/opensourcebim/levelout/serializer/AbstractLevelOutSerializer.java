@@ -103,6 +103,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			}
 		}
 		GeodeticOriginCRS geoCRS = getGeodeticCRS(ifcModelInterface);  // TODO check for map conversion (first, before geo)
+		// TODO consider units
+		ifcModelInterface.getAllWithSubTypes(IfcProject.class).get(0).getUnitsInContext().getUnits();
 		crs = geoCRS != null ? geoCRS : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
 	}
 
