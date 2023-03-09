@@ -24,4 +24,10 @@
         <description>LevelOut Checking Service</description>
         <name>LevelOut-Checking2</name>
     </JavaPlugin>
+    <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.checkingservice.MandatoryIfcChecking</implementationClass>
+        <description>Checking for mandatory IFC attributes</description>
+        <name>MandatoryIfcChecking</name>
+    </JavaPlugin>
 </PluginDescriptor>
