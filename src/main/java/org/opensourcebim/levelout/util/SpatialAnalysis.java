@@ -7,10 +7,7 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SpatialAnalysis {
 	static boolean isDoorOnSegment(Door door, Corner corner1, Corner corner2) { // Corner p1, p2, p3
@@ -166,6 +163,24 @@ public class SpatialAnalysis {
 
 			}
 		}
+
+	}
+
+	private List<List> findneighbourrooms(List<Room> roomslist) {
+		// TODO remove if not needed anymore!
+		List<List> cellpairsList = new ArrayList<>();
+		for (int i = 0; i < roomslist.size() - 1; i++) {
+			List a = (roomslist.get(i).getCorners());
+			List b = (roomslist.get(i + 1).getCorners());
+			List c = new ArrayList<>(b);
+			c.retainAll(a);
+
+			if (c.size() >= 2) {
+				List<Long> cellneighbours = Arrays.asList(roomslist.get(i).getId(), roomslist.get(i + 1).getId());
+				cellpairsList.add(cellneighbours);
+			}
+		}
+		return cellpairsList;
 
 	}
 

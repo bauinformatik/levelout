@@ -45,4 +45,16 @@ public class Door {
 		this.room1 = room1;
 		this.room2 = room2;
 	}
+
+	public Room getRoom1() {
+		return room1;
+	}
+
+	public Room getRoom2() {
+		return room2;
+	}
+
+	public boolean isExternal() {
+		return external;
+	}
 }
