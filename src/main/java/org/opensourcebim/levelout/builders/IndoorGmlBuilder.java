@@ -442,45 +442,7 @@ public class IndoorGmlBuilder {
 
 	}
 
-	private List<List> findneighbourrooms(List<Room> roomslist) {
-		// TODO Auto-generated method stub
-		List<List> cellpairsList = new ArrayList<>();
-		for (int i = 0; i < roomslist.size() - 1; i++) {
-			List a = (roomslist.get(i).getCorners());
-			List b = (roomslist.get(i + 1).getCorners());
-			List c = new ArrayList<>(b);
-			c.retainAll(a);
-
-			if (c.size() >= 2) {
-				List<Long> cellneighbours = Arrays.asList(roomslist.get(i).getId(), roomslist.get(i + 1).getId());
-				cellpairsList.add(cellneighbours);
-			}
-		}
-		return cellpairsList;
-
-	}
-
-	private void findneighbours(List<List<CellSpaceType>> cellspacelist) {
-		// TODO Auto-generated method stub
-		int count = 0;
-		List<List> ls = new ArrayList<>();
-		int i = 0;
-		for (i = 0; i < cellspacelist.size(); i++) {
-			// if(cellspacelist.get(i).get(1).getCorners()
-		}
-
-		/*
-		 * for (Entry<CellSpaceType, Room> entry : cellspacelist.entrySet()) {
-		 * Entry<CellSpaceType, Room> prev = cellspacelist.lowerEntry(entry.getKey());
-		 * Entry<CellSpaceType, Room> next = cellspacelist.higherEntry(entry.getKey());
-		 * if(next.getValue().getCorners().stream().anyMatch(prev.getValue().getCorners(
-		 * )::contains)== true) { count+=1; }
-		 * 
-		 * if (count>=2) { ls.add(Arrays.asList(prev.getKey(),next.getKey())); count =0;
-		 * }
-		 */
-
-	}
+	
 
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
 		write(outStream, createIndoorFeatures(building));

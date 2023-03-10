@@ -19,25 +19,22 @@ public class SpatialAnalysis {
 	}
 
 	public static Map<Door, List<Room>> analyzeRooms(List<Room> rooms, List<Door> doors) {
-		Map<Room, Door> result = new HashMap<>();
+
 		Map<Door, List<Room>> assignment = new HashMap<>(); // (list of one or two rooms) or assign rooms to doors in
 															// intermediate model
 		for (Door door : doors) {
-			boolean notexecuted = true;
 			for (Room room : rooms) {
 				if (isDoorInRoom(room, door)) {
-					//result.put(room, door);
-					
-					while(notexecuted)
-					{
-					assignment.put(door, new ArrayList<Room>());
-					notexecuted = false;
+
+					if (!assignment.containsKey(door)) {
+						assignment.put(door, new ArrayList<>());
 					}
+
 					assignment.get(door).add(room);
+				}
 			}
 		}
-		}
-		
+
 		return assignment;
 	}
 
