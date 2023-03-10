@@ -6,11 +6,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class Room {
+	private static long highestId = 0;
 	private final long id;
 	private final List<Corner> corners;
 
-	public Room(long id, List<Corner> corners) {
-		this.id = id; // TODO auto-increment
+	public Room(List<Corner> corners) {
+		this.id = ++highestId;
 		this.corners = corners;
 	}
 

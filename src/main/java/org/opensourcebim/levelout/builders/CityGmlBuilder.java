@@ -118,21 +118,19 @@ public class CityGmlBuilder {
 
 	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
-		for (Storey storeys : building.getStoreys()) {
-			setLodgeom(cityGmlBuilding, storeys);
+		for (Storey storey : building.getStoreys()) {
+			setLodgeom(cityGmlBuilding, storey);
 			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
-			cityGmlStorey.setSortKey((double) storeys.getLevel());
+			cityGmlStorey.setSortKey((double) storey.getLevel());
 			cityGmlBuilding.getBuildingSubdivisions().add(new AbstractBuildingSubdivisionProperty(cityGmlStorey));
-			BuildingRoom cityGmlRoom = new BuildingRoom();
-			for (Room room: storeys.getRooms()){
+			for (Room room: storey.getRooms()){
+				BuildingRoom cityGmlRoom = new BuildingRoom();
 				cityGmlRoom.setDescription(new StringOrRef("Room #" + room.getId()));
 				cityGmlStorey.getBuildingRooms().add(new BuildingRoomProperty(cityGmlRoom));
 			}
-			for (Door door: storeys.getDoors()){
-				cityGmlRoom.setDescription(new StringOrRef("Door #" + door.getId()));
-				cityGmlStorey.getBuildingRooms().add(new BuildingRoomProperty(cityGmlRoom));
+			for (Door door: storey.getDoors()){
+
 			}
-			
 		}
 		return cityGmlBuilding;
 	}

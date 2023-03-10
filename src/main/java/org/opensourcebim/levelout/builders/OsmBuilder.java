@@ -24,17 +24,18 @@ import java.util.List;
 public class OsmBuilder {
 	private OsmOutputStream osmOutput;
 	private CoordinateReference crs;
+	private int wayId;
+	private int nodeId;
 
 	private long createAndWriteOsmNode(Corner pt) throws IOException {
 		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY(), pt.getZ());
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
-		Node node = new Node(pt.getId() * -1, geodetic.latitude, geodetic.longitude);
+		Node node = new Node(--nodeId, geodetic.latitude, geodetic.longitude);
 		osmOutput.write(node);
 		return node.getId();
 	}
 
 	private void createAndWriteRoom(Room room, String level) throws IOException {
-		long id = room.getId() * -1;
 		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all
 		// and write later
 		List<Long> nodes = new ArrayList<>();
@@ -45,7 +46,7 @@ public class OsmBuilder {
 		if (nodes.size() > 0)
 			nodes.add(nodes.get(0));
 		List<OsmTag> tags = Arrays.asList(new Tag("indoor", "room"), new Tag("level", level));
-		OsmWay way = new Way(id, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
+		OsmWay way = new Way(--wayId, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		osmOutput.write(way);
 	}
 
@@ -68,8 +69,7 @@ public class OsmBuilder {
 			throws IOException {
 		this.crs = crs;
 		this.osmOutput = new OsmXmlOutputStream(outputStream, true);
-		int id = -building.getId();
-		OsmWay way = new Way(id, TLongArrayList.wrap(new long[] {}), List.of(new Tag("building", "residential")));
+		OsmWay way = new Way(--wayId, TLongArrayList.wrap(new long[] {}), List.of(new Tag("building", "residential")));
 		// TODO: figure out building polygon
 		this.osmOutput.write(way);
 		for (Storey storey : building.getStoreys()) {

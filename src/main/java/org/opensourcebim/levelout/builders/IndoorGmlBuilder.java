@@ -194,9 +194,9 @@ public class IndoorGmlBuilder {
 	}
 
 	public TransitionType createTransition(String id) {
-		TransitionType name = new TransitionType();
-		name.setId(id);
-		return name;
+		TransitionType transition = new TransitionType();
+		transition.setId(id);
+		return transition;
 	}
 
 	// TODO further methods:

@@ -46,10 +46,9 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 	private void initStructure(IfcModelInterface ifcModelInterface) {
 		List<Storey> loStoreys = new ArrayList<>();
-		building = new Building(1, loStoreys);
+		building = new Building(loStoreys);
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
 		int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
-		int roomId = 1;
 		for (IfcBuildingStorey storey : storeys) {
 			List<Room> rooms = new ArrayList<>();
 			List<Door> doors = new ArrayList<>();
@@ -60,7 +59,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates contained : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : contained.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
-					Room room = new Room(roomId++, getPolygon(space.getGeometry(), elevation));
+					Room room = new Room(getPolygon(space.getGeometry(), elevation));
 					rooms.add(room);
 					roomsMap.put(space, room); // later needed for assignment to doors
 					space.getName(); // TODO: use in intermediate model
@@ -69,7 +68,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			for (IfcRelContainedInSpatialStructure contained : storey.getContainsElements()) {
 				for (IfcOpeningElement opening : contained.getRelatedElements().stream().filter(IfcOpeningElement.class::isInstance).map(IfcOpeningElement.class::cast).toArray(IfcOpeningElement[]::new)) {
 					if(opening.getHasFillings().isEmpty() || ! (opening.getHasFillings().get(0).getRelatedBuildingElement() instanceof IfcDoor)) continue; // TODO windows
-					Door door = new Door(0, getPolygon(opening.getGeometry(), elevation));
+					Door door = new Door(getPolygon(opening.getGeometry(), elevation));
 					doors.add(door);
 					EList<IfcRelSpaceBoundary> openingBoundaries = opening.getProvidesBoundaries();
 					if (populateConnectedRooms(roomsMap, door, openingBoundaries)) continue;
@@ -205,10 +204,10 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		List<Corner> corners = new ArrayList<>();
 		int firstSegment = pathIterator.currentSegment(coords);
 		assert !pathIterator.isDone() && firstSegment == PathIterator.SEG_MOVETO;
-		corners.add(new Corner(0, coords[0], coords[1], elevation));
+		corners.add(new Corner(coords[0], coords[1], elevation));
 		pathIterator.next();
 		while (!pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_LINETO) {
-			corners.add(new Corner(0, coords[0], coords[1], elevation));
+			corners.add(new Corner(coords[0], coords[1], elevation));
 			pathIterator.next();
 		}
 		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // TODO warn multisegment path

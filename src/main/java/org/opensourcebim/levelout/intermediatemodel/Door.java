@@ -6,18 +6,17 @@ import java.util.List;
 
 public class Door {
 
+	private static long highestId = 0;
 	private final List<Corner> corners;
 	private boolean external = false;
 	private Room room1;
 	private Room room2;
 	//private final List<Room> connectedRooms;
 
-	public Door(long id, List<Corner> corners) {
-		super();
-		this.id = id;
+	public Door(List<Corner> corners) {
+		this.id = ++highestId;
 		this.corners = corners;
 	}
-
 
 	private final long id;
 	public long getId() {

@@ -5,13 +5,11 @@ import java.util.List;
 
 public class Corner {
 
-	private final long id;
 	private final double x;
 	private final double y;
 	private final double z;
 
-	public Corner(long id, double x, double y, double z) {
-		this.id = id;
+	public Corner(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -32,10 +30,6 @@ public class Corner {
 
 	public double getZ() {
 		return z;
-	}
-
-	public long getId() {
-		return id;
 	}
 
 	@Override
