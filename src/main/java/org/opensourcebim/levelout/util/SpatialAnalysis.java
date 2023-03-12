@@ -38,56 +38,6 @@ public class SpatialAnalysis {
 		return assignment;
 	}
 
-	public static List<List<Long>> adjacentRooms(List<Room> rooms) {
-
-		List<List<Corner>> cornerpairs = new ArrayList<>();
-
-		List<List<List<Corner>>> cornerpairstotal = new ArrayList<>();
-		List<Long> roomIds = new ArrayList<>();
-
-		List<List<Long>> roomsadjacent = new ArrayList<>();
-
-		for (int i = 0; i < rooms.size(); i++) {
-			for (int j = 0; j < rooms.get(i).getCorners().size() - 1; j++) {
-
-				int k = j % (rooms.get(i).getCorners().size());
-				cornerpairs.add(createPair(rooms.get(i).getCorners().get(j), rooms.get(i).getCorners().get(k)));
-				cornerpairstotal.add(cornerpairs);
-
-			}
-
-			cornerpairs.remove(cornerpairs);
-			roomIds.add(rooms.get(i).getId());
-		}
-
-		int size = cornerpairstotal.size();
-		for (int i = 0; i < cornerpairstotal.size() - 1; i++) {
-
-			for (int j = 0; j < (j % cornerpairstotal.size() - 1); j++) {
-				Corner c1 = cornerpairstotal.get(i).get(i).get(0);
-				Corner c2 = cornerpairstotal.get(i).get(i).get(1);
-				Corner c3 = cornerpairstotal.get(i).get(j).get(0);
-				Corner c4 = cornerpairstotal.get(i).get(j).get(1);
-
-				if ((c1.equals(c3) && c2.equals(c4)) || (c1.equals(c4) && c2.equals(c3))) {
-
-					roomsadjacent.add(List.of(roomIds.get(i), roomIds.get(j)));
-
-				}
-
-			}
-
-		}
-
-		return roomsadjacent;
-
-	}
-
-	public static List<Corner> createPair(Corner corner1, Corner corner2) {
-
-		return List.of(corner1, corner2);
-	}
-
 	public static boolean isDoorInRoom(Room room, Door door) {
 
 		Corner doorcorner1 = door.getCorners().get(0);
@@ -148,25 +98,6 @@ public class SpatialAnalysis {
 		double crossY2 = crossZ * doorcorner2.getX() - crossX * doorcorner2.getZ();
 		double crossX2 = crossY * doorcorner2.getZ() - crossZ * doorcorner2.getY();
 		return crossX2 == 0 && crossY2 == 0 && crossZ2 == 0;
-	}
-
-	private void findconnectedStates(List<CellSpaceType> cellspacelist) { // TODO change to room list
-
-		for (int i = 0; i < cellspacelist.size() - 1; i++) {
-			List<CellSpaceBoundaryPropertyType> boundarieslist1 = cellspacelist.get(i).getPartialboundedBy();
-			List<CellSpaceBoundaryPropertyType> boundarieslist2 = cellspacelist.get(i + 1).getPartialboundedBy();
-			List<CellSpaceBoundaryPropertyType> common = new ArrayList<>(boundarieslist1);
-			if (common.retainAll(boundarieslist2) == true) {
-				StatePropertyType state1 = cellspacelist.get(i).getDuality();
-				StatePropertyType state2 = cellspacelist.get(i + 1).getDuality();
-				List<StatePropertyType> statelist = new ArrayList<>();
-				statelist.add(state1);
-				statelist.add(state2);
-				statelist.remove(statelist);
-
-			}
-		}
-
 	}
 
 }

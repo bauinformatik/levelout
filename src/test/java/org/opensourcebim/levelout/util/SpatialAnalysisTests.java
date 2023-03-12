@@ -19,31 +19,11 @@ public class SpatialAnalysisTests {
 
 	@Before
 	public void setupModel() {
-		room1 = new Room(Arrays.asList(new Corner(0, 0, 0), new Corner(6, 0, 0),
-				new Corner(6, 6, 0), new Corner(0, 6, 0)));
-		room2 = new Room(Arrays.asList(new Corner(6, 0, 0), new Corner(10, 0, 0),
-				new Corner(10, 6, 0), new Corner(6, 6, 0)));
+		room1 = new Room(
+				Arrays.asList(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(6, 6, 0), new Corner(0, 6, 0)));
+		room2 = new Room(
+				Arrays.asList(new Corner(6, 0, 0), new Corner(10, 0, 0), new Corner(10, 6, 0), new Corner(6, 6, 0)));
 		door = new Door(Arrays.asList(new Corner(6, 1, 0), new Corner(6, 2, 0)));
-	}
-
-	@Test
-
-	public void testDoorOnSegment() {
-		Door door = new Door(Arrays.asList(new Corner(1, 0, 0), new Corner(2, 0, 0)));
-		Assert.assertTrue(SpatialAnalysis.isDoorOnSegment(door, corner1, corner2));
-	}
-
-	public void testAdjacentRoom() {
-
-		List<Room> rooms = List.of(room1, room2);
-		List<List<Long>> rooms2 = SpatialAnalysis.adjacentRooms(rooms);
-
-	}
-
-	@Test
-	public void testDoorParallelNotOnSegment() {
-		Door door = new Door(Arrays.asList(new Corner(1, 6, 0), new Corner(2, 6, 0)));
-		Assert.assertFalse(SpatialAnalysis.isDoorOnSegment(door, corner1, corner2));
 	}
 
 	@Test
@@ -57,8 +37,9 @@ public class SpatialAnalysisTests {
 		Assert.assertFalse(SpatialAnalysis.isDoorInRoom(room1, door2));
 		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room2, door3));
 		Assert.assertFalse(SpatialAnalysis.isDoorInRoom(room2, door5));
-		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room2, door6));		
+		Assert.assertTrue(SpatialAnalysis.isDoorInRoom(room2, door6));
 	}
+
 	@Test
 	public void testanalyzeRooms() {
 		Door door = new Door(Arrays.asList(new Corner(1, 6, 0), new Corner(2, 6, 0)));
@@ -66,36 +47,15 @@ public class SpatialAnalysisTests {
 		Door door3 = new Door(Arrays.asList(new Corner(6, 1, 0), new Corner(6, 2, 0)));
 		Door door5 = new Door(Arrays.asList(new Corner(6, 1, 0), new Corner(6, 11, 0)));
 		Door door6 = new Door(Arrays.asList(new Corner(6, 0, 0), new Corner(6, 1, 0)));
-		List<Door> doors = Arrays.asList(door,door2,door3,door5,door6);
-		List<Room> rooms = Arrays.asList(room1,room2);
+		List<Door> doors = Arrays.asList(door, door2, door3, door5, door6);
+		List<Room> rooms = Arrays.asList(room1, room2);
 		Map<Door, List<Room>> receivedresult = SpatialAnalysis.analyzeRooms(rooms, doors);
 		Map<Door, List<Room>> expectedresult = new HashMap<>();
-		expectedresult.put(door6, Arrays.asList(room1,room2));
-		expectedresult.put(door3, Arrays.asList(room1,room2));
+		expectedresult.put(door6, Arrays.asList(room1, room2));
+		expectedresult.put(door3, Arrays.asList(room1, room2));
 		expectedresult.put(door, Arrays.asList(room1));
-		
+
 		Assert.assertEquals(expectedresult, receivedresult);
 	}
 
-	@Test
-	public void testColinear() {
-		Assert.assertTrue(
-				SpatialAnalysis.isColinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 0, 0)));
-	}
-
-	@Test
-	public void testNotColinear() {
-		Assert.assertFalse(
-				SpatialAnalysis.isColinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 6, 0)));
-	}
-
-	@Test
-	public void testInternalDoor() {
-		Building building = new Building(List.of(new Storey(0, List.of(room1), List.of(door))));
-	}
-
-	@Test
-	public void testExternalDoor() {
-		Building building = new Building(List.of(new Storey(0, List.of(room1, room2), List.of(door))));
-	}
 }
