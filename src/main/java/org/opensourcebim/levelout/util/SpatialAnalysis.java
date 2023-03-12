@@ -7,10 +7,7 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SpatialAnalysis {
 	static boolean isDoorOnSegment(Door door, Corner corner1, Corner corner2) { // Corner p1, p2, p3

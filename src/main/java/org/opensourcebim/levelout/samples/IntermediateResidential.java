@@ -13,6 +13,16 @@ import java.util.Collections;
 public class IntermediateResidential {
 
 	public static Building create(){
+		/*
+		  4         3     8
+		  +---------+-----+
+		  |      D2 ┼ R3  |
+		  |  R1   7 +-----+ 6
+		  |         | R2  |
+		  +---++----+-----+
+		  1   D1    2     5
+		*/
+
 		Corner p1 = new Corner(0,0,0);
 		Corner p2 = new Corner(6, 0, 0);
 		Corner p3 = new Corner(6, 6, 0);
@@ -35,14 +45,18 @@ public class IntermediateResidential {
 		Corner p24 = new Corner(6, 6, 0);
 		// TODO SK 7: adjacency transitions only: a) use utility method to infer, b) explicit in model (wall?)
 		// TODO SK 8: doors in basic form (direct creation), only then move on to create from intermediate
+		Room room1 = new Room(Arrays.asList(p1, p2, p3, p4));
+		Room room2 = new Room(Arrays.asList(p2, p5, p6, p7));
+		Room room3 = new Room(Arrays.asList(p6, p5, p8, p3));
+		Door door1 = new Door(Arrays.asList(p21, p22));
+		door1.setExternal(room1);
+		Door door2 = new Door(Arrays.asList(p23, p24));
+		door2.setInternal(room1, room3);
 		return new Building(Arrays.asList(
 			new Storey(1, Arrays.asList(
-				new Room(Arrays.asList( p1,p2,p3,p4 )),
-				new Room(Arrays.asList( p2,p5,p6,p7 )),
-				new Room(Arrays.asList( p6,p5,p8,p3 ))
+				room1, room2, room3
 			), Arrays.asList(
-				new Door(Arrays.asList(p21, p22)),
-				new Door(Arrays.asList(p23, p24))
+				door1, door2
 			)),
 			new Storey(5, Arrays.asList(
 				new Room(Arrays.asList( p11,p12,p13,p14 )),
