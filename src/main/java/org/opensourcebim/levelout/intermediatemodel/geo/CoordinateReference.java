@@ -16,7 +16,7 @@ public abstract class CoordinateReference {
 			
 			if(num<=9)
 			{
-				numstr =  String.format("%01d" , num);
+				numstr =  String.format("%02d" , num);
 			}
 			else
 			{
