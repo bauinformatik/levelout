@@ -67,18 +67,18 @@ public class SpatialAnalysisTests {
 	@Test
 	public void testColinear() {
 		Assert.assertTrue(
-			SpatialAnalysis.isColinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 0, 0)));
+			SpatialAnalysis.isCollinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 0, 0)));
 	}
 
 	@Test
 	public void testNotColinear() {
 		Assert.assertFalse(
-			SpatialAnalysis.isColinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 6, 0)));
+			SpatialAnalysis.isCollinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 6, 0)));
 	}
 
 	@Test
 	public void testColinearSlanted(){
-		Assert.assertTrue(SpatialAnalysis.isColinear( new Corner(10,0,0), new Corner(9,2,0), new Corner(8,4,0)));
+		Assert.assertTrue(SpatialAnalysis.isCollinear( new Corner(10,0,0), new Corner(9,2,0), new Corner(8,4,0)));
 	}
 
 	@Test

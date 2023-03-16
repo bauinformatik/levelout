@@ -8,10 +8,22 @@ import java.util.*;
 
 public class SpatialAnalysis {
 
-	public static Map<Door, List<Room>> analyzeRooms(List<Room> rooms, List<Door> doors) {
+	public static void enrichRooms(List<Room> rooms, List<Door> doors){
+		for (Map.Entry<Door, List<Room>> entry: analyzeRooms(rooms, doors).entrySet()){
+			Door door = entry.getKey();
+			List<Room> connectedRooms = entry.getValue();
+			if(connectedRooms.size()==1){
+				door.setExternal(rooms.get(0));
+			} else if(connectedRooms.size()==2){
+				door.setInternal(rooms.get(0), rooms.get(1));
+			} else {
+				throw new IllegalArgumentException("more or less than 1 or 2 rooms reachable from door");
+			}
+		}
+	}
 
-		Map<Door, List<Room>> assignment = new HashMap<>(); // (list of one or two rooms) or assign rooms to doors in
-															// intermediate model
+	static Map<Door, List<Room>> analyzeRooms(List<Room> rooms, List<Door> doors) {
+		Map<Door, List<Room>> assignment = new HashMap<>();
 		for (Door door : doors) {
 			for (Room room : rooms) {
 				if (isDoorInRoom(room, door)) {
@@ -25,7 +37,7 @@ public class SpatialAnalysis {
 		return assignment;
 	}
 
-	public static boolean isDoorInRoom(Room room, Door door) {
+	static boolean isDoorInRoom(Room room, Door door) {
 		for (int i = 0; i < room.getCorners().size(); i++) {
 			int k = (i + 1) % (room.getCorners().size());
 			Corner corner1 = room.getCorners().get(i);
@@ -37,7 +49,7 @@ public class SpatialAnalysis {
 		return false;
 	}
 
-	private static boolean isDoorBetween(Door door, Corner corner1, Corner corner2) {
+	static boolean isDoorBetween(Door door, Corner corner1, Corner corner2) {
 		Corner doorcorner1 = door.getCorners().get(0);
 		Corner doorcorner2 = door.getCorners().get(1);
 		double x1 = corner1.getX(), x2 = corner2.getX(), y2 = corner2.getY(), y1 = corner1.getY();
@@ -48,10 +60,10 @@ public class SpatialAnalysis {
 	}
 
 	static boolean isDoorOnLine(Door door, Corner corner1, Corner corner2) {
-		return isColinear(door.getCorners().get(0), corner1, corner2) && isColinear(door.getCorners().get(1), corner1, corner2);
+		return isCollinear(door.getCorners().get(0), corner1, corner2) && isCollinear(door.getCorners().get(1), corner1, corner2);
 	}
 
-	static boolean isColinear(Corner corner1, Corner corner2, Corner corner3) {
+	static boolean isCollinear(Corner corner1, Corner corner2, Corner corner3) {
 		double x1 = corner1.getX(), y1= corner1.getY(), x2 = corner2.getX(), y2 = corner2.getY(), x3 = corner3.getX(), y3 = corner3.getY();
 		return x1 * (y3-y2) + x2 * (y1-y3) + x3 * (y2-y1) == 0;
 	}

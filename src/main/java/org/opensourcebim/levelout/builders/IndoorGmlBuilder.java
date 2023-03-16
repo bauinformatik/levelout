@@ -305,7 +305,6 @@ public class IndoorGmlBuilder {
 		PrimalSpaceFeaturesType primalSpace = getPrimalSpace(indoorFeatures);
 		SpaceLayerType dualSpace = getFirstDualSpaceLayer(indoorFeatures);
 		for (Storey storey : building.getStoreys()) {
-			Map<Door, List<Room>> analysisResult = SpatialAnalysis.analyzeRooms(storey.getRooms(), storey.getDoors());
 			for (Room room : storey.getRooms()) {
 				CellSpaceType cs = createCellSpace(room);
 				addCellSpace(primalSpace, cs);
