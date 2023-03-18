@@ -47,25 +47,25 @@ public class IntermediateResidential {
 		// TODO SK 8: doors in basic form (direct creation), only then move on to create from intermediate
 		Room room1 = new Room(Arrays.asList(p1, p2, p3, p4));
 		Room room2 = new Room(Arrays.asList(p2, p5, p6, p7));
-		Room room3 = new Room(Arrays.asList(p6, p5, p8, p3));
+		Room room3 = new Room(Arrays.asList(p7, p6, p8, p3));
 		Door door1 = new Door(Arrays.asList(p21, p22));
 		door1.setExternal(room1);
 		Door door2 = new Door(Arrays.asList(p23, p24));
 		door2.setInternal(room1, room3);
 		return new Building(Arrays.asList(
-			new Storey(1, Arrays.asList(
+			new Storey(0, Arrays.asList(
 				room1, room2, room3
 			), Arrays.asList(
 				door1, door2
 			)),
-			new Storey(5, Arrays.asList(
+			new Storey(1, Arrays.asList(
 				new Room(Arrays.asList( p11,p12,p13,p14 )),
 				new Room(Arrays.asList( p12,p15,p16,p17 )),
-				new Room(Arrays.asList( p16,p15,p18,p13 ))
+				new Room(Arrays.asList( p17,p16,p18,p13 ))
 					), Collections.emptyList()
 			)
-		));
+		), Arrays.asList( p1, p5, p8, p4 )
+		);
 	}
-
 }
 

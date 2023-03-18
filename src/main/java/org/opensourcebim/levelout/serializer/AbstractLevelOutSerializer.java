@@ -46,7 +46,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 	private void initStructure(IfcModelInterface ifcModelInterface) {
 		List<Storey> loStoreys = new ArrayList<>();
-		building = new Building(loStoreys);
+		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
+		building = new Building(loStoreys, outline);
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
 		int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
 		for (IfcBuildingStorey storey : storeys) {

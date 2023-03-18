@@ -30,14 +30,13 @@ public class OsmBuilder {
 	private long createAndWriteOsmNode(Corner pt) throws IOException {
 		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY(), pt.getZ());
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
-		Node node = new Node(--nodeId, geodetic.latitude, geodetic.longitude);
+		Node node = new Node(--nodeId, geodetic.longitude, geodetic.latitude);
 		osmOutput.write(node);
 		return node.getId();
 	}
 
 	private void createAndWriteRoom(Room room, String level) throws IOException {
-		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all
-		// and write later
+		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all and write later
 		List<Long> nodes = new ArrayList<>();
 		for (Corner genericNode : room.getCorners()) {
 			long nodeId = createAndWriteOsmNode(genericNode);
@@ -69,10 +68,22 @@ public class OsmBuilder {
 			throws IOException {
 		this.crs = crs;
 		this.osmOutput = new OsmXmlOutputStream(outputStream, true);
-		OsmWay way = new Way(--wayId, TLongArrayList.wrap(new long[] {}), List.of(new Tag("building", "residential")));
-		// TODO: figure out building polygon
+		List<Long> nodes = new ArrayList<>();
+		for(Corner corner : building.getCorners()){
+			long nodeId = createAndWriteOsmNode(corner);
+			nodes.add(nodeId);
+		}
+		List<Storey> storeys = building.getStoreys();
+		List<Tag> tags = new ArrayList<>();
+		tags.add(new Tag("building", "residential"));
+		if(!storeys.isEmpty()){
+			tags.add(new Tag("levels", Integer.toString(storeys.size())));
+			tags.add(new Tag("min_level", Integer.toString(storeys.get(0).getLevel())));
+			tags.add(new Tag("max_level", Integer.toString(storeys.get(storeys.size() - 1).getLevel())));
+		}
+		OsmWay way = new Way(--wayId, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		this.osmOutput.write(way);
-		for (Storey storey : building.getStoreys()) {
+		for (Storey storey : storeys) {
 			createAndWriteStorey(storey);
 		}
 		this.osmOutput.complete();
