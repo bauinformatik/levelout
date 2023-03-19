@@ -29,15 +29,15 @@ public class SpatialAnalysisTests {
 
 		*/
 		room1 = new Room(
-				Arrays.asList(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(6, 6, 0), new Corner(0, 6, 0)));
+				Arrays.asList(new Corner(0, 0), new Corner(6, 0), new Corner(6, 6), new Corner(0, 6)));
 		room2 = new Room(
-				Arrays.asList(new Corner(6, 0, 0), new Corner(10, 0, 0), new Corner(7, 6, 0), new Corner(6, 6, 0)));
-		door1 = new Door(Arrays.asList(new Corner(1, 6, 0), new Corner(2, 6, 0)));
-		door2 = new Door(Arrays.asList(new Corner(1, 7, 0), new Corner(2, 7, 0)));
-		door3 = new Door(Arrays.asList(new Corner(6, 1, 0), new Corner(6, 2, 0)));
-		door4 = new Door(Arrays.asList(new Corner(6, 5, 0), new Corner(6, 7, 0)));
-		door5 = new Door(Arrays.asList(new Corner(6, 0, 0), new Corner(7, 0, 0)));
-		door6 = new Door(Arrays.asList(new Corner(9, 2, 0), new Corner(8, 4, 0)));
+				Arrays.asList(new Corner(6, 0), new Corner(10, 0), new Corner(7, 6), new Corner(6, 6)));
+		door1 = new Door(Arrays.asList(new Corner(1, 6), new Corner(2, 6)));
+		door2 = new Door(Arrays.asList(new Corner(1, 7), new Corner(2, 7)));
+		door3 = new Door(Arrays.asList(new Corner(6, 1), new Corner(6, 2)));
+		door4 = new Door(Arrays.asList(new Corner(6, 5), new Corner(6, 7)));
+		door5 = new Door(Arrays.asList(new Corner(6, 0), new Corner(7, 0)));
+		door6 = new Door(Arrays.asList(new Corner(9, 2), new Corner(8, 4)));
 	}
 
 	@Test
@@ -67,18 +67,18 @@ public class SpatialAnalysisTests {
 	@Test
 	public void testColinear() {
 		Assert.assertTrue(
-			SpatialAnalysis.isCollinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 0, 0)));
+			SpatialAnalysis.isCollinear(new Corner(0, 0), new Corner(6, 0), new Corner(2, 0)));
 	}
 
 	@Test
 	public void testNotColinear() {
 		Assert.assertFalse(
-			SpatialAnalysis.isCollinear(new Corner(0, 0, 0), new Corner(6, 0, 0), new Corner(2, 6, 0)));
+			SpatialAnalysis.isCollinear(new Corner(0, 0), new Corner(6, 0), new Corner(2, 6)));
 	}
 
 	@Test
 	public void testColinearSlanted(){
-		Assert.assertTrue(SpatialAnalysis.isCollinear( new Corner(10,0,0), new Corner(9,2,0), new Corner(8,4,0)));
+		Assert.assertTrue(SpatialAnalysis.isCollinear( new Corner(10,0), new Corner(9,2), new Corner(8,4)));
 	}
 
 	@Test
@@ -95,16 +95,16 @@ public class SpatialAnalysisTests {
 
 	@Test
 	public void testDoorOnSegment() {
-		Assert.assertTrue(SpatialAnalysis.isDoorOnLine(door1, new Corner(6, 6, 0), new Corner(0, 6, 0)));
+		Assert.assertTrue(SpatialAnalysis.isDoorOnLine(door1, new Corner(6, 6), new Corner(0, 6)));
 	}
 
 	@Test
 	public void testDoorParallelNotOnSegment() {
-		Assert.assertFalse(SpatialAnalysis.isDoorOnLine(door2, new Corner(6, 6, 0), new Corner(0, 6, 0)));
+		Assert.assertFalse(SpatialAnalysis.isDoorOnLine(door2, new Corner(6, 6), new Corner(0, 6)));
 	}
 
 	@Test
 	public void testDoorSlantedSegment(){
-		Assert.assertTrue(SpatialAnalysis.isDoorOnLine(door6, new Corner(10, 0, 0), new Corner(7, 6, 0)));
+		Assert.assertTrue(SpatialAnalysis.isDoorOnLine(door6, new Corner(10, 0), new Corner(7, 6)));
 	}
 }

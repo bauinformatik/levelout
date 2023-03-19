@@ -8,11 +8,19 @@ public class Storey {
 	private final int level;
 	private final List<Room> rooms;
 	private final List<Door> doors;
+	private double elevation;
 
-	public Storey(int level, List<Room> rooms, List<Door> doors) {
+	public Storey(int level, double elevation, List<Room> rooms, List<Door> doors) {
 		this.level = level;
+		this.elevation = elevation;
 		this.rooms = rooms;
 		this.doors = doors;
+		for(Room room: rooms){
+			room.setStorey(this);
+		}
+		for(Door door: doors){
+			door.setStorey(this);
+		}
 	}
 
 	public List<Room> getRooms() {
@@ -24,5 +32,9 @@ public class Storey {
 
 	public int getLevel() {
 		return level;
+	}
+
+	public double getZ() {
+		return elevation;
 	}
 }

@@ -28,7 +28,7 @@ public class OsmBuilder {
 	private int nodeId;
 
 	private long createAndWriteOsmNode(Corner pt) throws IOException {
-		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY(), pt.getZ());
+		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY(), 0);
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node node = new Node(--nodeId, geodetic.longitude, geodetic.latitude);
 		osmOutput.write(node);
@@ -44,7 +44,8 @@ public class OsmBuilder {
 		}
 		if (nodes.size() > 0)
 			nodes.add(nodes.get(0));
-		List<OsmTag> tags = Arrays.asList(new Tag("indoor", "room"), new Tag("level", level));
+		List<OsmTag> tags = Arrays.asList(
+			new Tag("indoor", "room"), new Tag("level", level), new Tag("ref", "Room #" + room.getId()));
 		OsmWay way = new Way(--wayId, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		osmOutput.write(way);
 	}

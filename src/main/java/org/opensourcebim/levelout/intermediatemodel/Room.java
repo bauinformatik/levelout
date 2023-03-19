@@ -9,18 +9,25 @@ public class Room {
 	private static long highestId = 0;
 	private final long id;
 	private final List<Corner> corners;
+	private Storey storey;
 
 	public Room(List<Corner> corners) {
 		this.id = ++highestId;
 		this.corners = corners;
 	}
 
+	void setStorey(Storey storey) {
+		if(this.storey!=null) {
+			throw new IllegalArgumentException("no rooms with multiple storeys allowed"); // TODO allow for elevators etc., but then getZ musst be removed and z value determined in context
+		}
+		// TODO thin-walled model: corner reuse and segment splitting (using other rooms in storey )
+		this.storey = storey;
+	}
 	public List<Double> computeCentroid() {
 		if(corners.isEmpty()) return null;
 		double minX = corners.get(0).getX();
 		double minY = corners.get(0).getY();
-		double minZ = corners.get(0).getZ();
-		double maxX = minX, maxY = minY, maxZ = minZ;
+		double maxX = minX, maxY = minY;
 
 		// TODO: check formula for centroid calculation
 
@@ -35,17 +42,11 @@ public class Room {
 			} else if (node.getY() > maxY) {
 				maxY = node.getY();
 			}
-			if (node.getZ() < minZ) {
-				minZ = node.getZ();
-			} else if (node.getZ() > maxZ) {
-				maxZ = node.getZ();
-			}
 		}
 
 		double centroidX = (minX + maxX) / 2;
 		double centroidY = (minY + maxY) / 2;
-		double centroidZ = (minZ + maxZ) / 2;
-		return List.of(centroidX, centroidY, centroidZ);
+		return List.of(centroidX, centroidY, storey.getZ());
 	}
 
 	public long getId(){
@@ -59,8 +60,11 @@ public class Room {
 	public List<Double> asCoordinateList() {
 		List<Double> coordinates = new ArrayList<>();
 		for (Corner corner: corners){
-			coordinates.addAll(corner.asCoordinateList());
+			coordinates.add(corner.getX());
+			coordinates.add(corner.getY());
+			coordinates.add(storey == null ? 0 : storey.getZ());
 		}
 		return coordinates;
 	}
+
 }

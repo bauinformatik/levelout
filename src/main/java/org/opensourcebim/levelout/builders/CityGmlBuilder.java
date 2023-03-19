@@ -40,11 +40,7 @@ public class CityGmlBuilder {
 	private final GeometryFactory geometryFactory = GeometryFactory.newInstance().withIdCreator(idCreator);
 
 	public LineString createCitygmlLines(Door door) {
-		List<Double> coordinates = new ArrayList<>();
-		for (Corner corner : door.getCorners()) {
-			coordinates.addAll(corner.asCoordinateList());
-		}
-		return geometryFactory.createLineString(coordinates, 3);
+		return geometryFactory.createLineString(door.asCoordinateList(), 3);
 	}
 
 	public AbstractSpaceBoundaryProperty createDoorSurface(LineString line) {
@@ -63,11 +59,7 @@ public class CityGmlBuilder {
 }
 
 	private Polygon createCitygmlPoly(Room room) {
-		List<Double> coordinates = new ArrayList<>();
-		for (Corner corner : room.getCorners()) {
-			coordinates.addAll(corner.asCoordinateList());
-		}
-		return geometryFactory.createPolygon(coordinates, 3);
+		return geometryFactory.createPolygon(room.asCoordinateList(), 3);
 	}
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,

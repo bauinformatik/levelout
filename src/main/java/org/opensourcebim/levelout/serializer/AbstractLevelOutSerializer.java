@@ -53,9 +53,9 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		for (IfcBuildingStorey storey : storeys) {
 			List<Room> rooms = new ArrayList<>();
 			List<Door> doors = new ArrayList<>();
-			Storey loStorey = new Storey(level++, rooms, doors);
-			loStoreys.add(loStorey);
 			double elevation = storey.getElevation(); // TODO: use for sorting and in intermediate model
+			Storey loStorey = new Storey(level++, elevation, rooms, doors);
+			loStoreys.add(loStorey);
 			storey.getName(); /* TODO: use in intermediate model (OSM has "name" tag, but also "level:ref" for short keys) */
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates contained : storey.getIsDecomposedBy()) {
@@ -205,10 +205,10 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		List<Corner> corners = new ArrayList<>();
 		int firstSegment = pathIterator.currentSegment(coords);
 		assert !pathIterator.isDone() && firstSegment == PathIterator.SEG_MOVETO;
-		corners.add(new Corner(coords[0], coords[1], elevation));
+		corners.add(new Corner(coords[0], coords[1]));
 		pathIterator.next();
 		while (!pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_LINETO) {
-			corners.add(new Corner(coords[0], coords[1], elevation));
+			corners.add(new Corner(coords[0], coords[1]));
 			pathIterator.next();
 		}
 		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // TODO warn multisegment path

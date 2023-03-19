@@ -9,16 +9,22 @@ public class Door {
 	private static long highestId = 0;
 	private final List<Corner> corners;
 	private boolean external = false;
+	private final long id;
 	private Room room1;
 	private Room room2;
-	//private final List<Room> connectedRooms;
+	private Storey storey;
 
 	public Door(List<Corner> corners) {
 		this.id = ++highestId;
 		this.corners = corners;
 	}
 
-	private final long id;
+	void setStorey(Storey storey) {
+		if(this.storey!=null) {
+			throw new IllegalArgumentException("no doors with multiple storeys allowed");
+		}
+		this.storey = storey;
+	}
 	public long getId() {
 		return id;
 	}
@@ -30,7 +36,9 @@ public class Door {
 	public List<Double> asCoordinateList() {
 		List<Double> coordinates = new ArrayList<>();
 		for (Corner corner: corners){
-			coordinates.addAll(corner.asCoordinateList());
+			coordinates.add(corner.getX());
+			coordinates.add(corner.getY());
+			coordinates.add(storey == null ? 0 : storey.getZ());
 		}
 		return coordinates;
 	}
