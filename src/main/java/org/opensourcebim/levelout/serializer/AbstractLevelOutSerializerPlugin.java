@@ -34,7 +34,7 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
         type.setType(PrimitiveEnum.BOOLEAN);
         parameter.setType(type);
         BooleanType defaultValue = StoreFactory.eINSTANCE.createBooleanType();
-        defaultValue.setValue(false);
+        defaultValue.setValue(true);
         parameter.setDefaultValue(defaultValue);
         settings.getParameters().add(parameter);
         return settings;

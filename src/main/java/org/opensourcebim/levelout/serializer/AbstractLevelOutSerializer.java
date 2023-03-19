@@ -21,6 +21,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
 	boolean extractionMethod;
@@ -41,7 +42,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 	private void initSample() {
 		building = IntermediateResidential.create();
-		crs = new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
+		crs = new GeodeticOriginCRS(new GeodeticPoint(50.9772, 11.3465, 0), 0.25); // TODO move to intermediate model
 	}
 
 	private void initStructure(IfcModelInterface ifcModelInterface) {
@@ -142,10 +143,15 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		if (!(project.size() == 1)) return null;
 		if (!(site.size() == 1)) return null;
 		if (!(project.get(0).getIsDecomposedBy().size() == 1)) return null;
-		if (!project.get(0).getIsDecomposedBy().get(0).getRelatingObject().getGlobalId().equals(site.get(0).getGlobalId()))
+		if (!(project.get(0).getIsDecomposedBy().get(0).getRelatedObjects().size() == 1)) return null;
+		if (!project.get(0).getIsDecomposedBy().get(0).getRelatedObjects().get(0).getGlobalId().equals(site.get(0).getGlobalId()))
 			return null; // or even identity on entity level?
+		List<IfcRepresentationContext> ifcRepresentationContextStream = project.get(0).getRepresentationContexts().stream().filter(ifcRepresentationContext ->
+			"Model".equals(ifcRepresentationContext.getContextType()) && ifcRepresentationContext instanceof IfcGeometricRepresentationContext
+		).collect(Collectors.toList());
+		if (ifcRepresentationContextStream.isEmpty() || ! ((IfcGeometricRepresentationContext)ifcRepresentationContextStream.get(0)).isSetTrueNorth()) return null;
 		IfcDirection trueNorth = ((IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0)).getTrueNorth();
-		if (!(trueNorth.getDim() == 2 && trueNorth.getDirectionRatios().size() == 2)) return null;
+		if (!(trueNorth.getDirectionRatios()!=null && trueNorth.getDirectionRatios().size() == 2)) return null;
 		EList<Long> refLatitude = site.get(0).getRefLatitude();
 		if (!(refLatitude != null && refLatitude.size() >= 3)) return null;
 		EList<Long> refLongitude = site.get(0).getRefLongitude();
