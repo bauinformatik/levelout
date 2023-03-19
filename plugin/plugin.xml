@@ -30,4 +30,10 @@
         <description>Checking for mandatory IFC attributes</description>
         <name>MandatoryIfcChecking</name>
     </JavaPlugin>
+    <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.checkingservice.TestProgressService</implementationClass>
+        <description>Dummy service running 10 seconds and providing progress information</description>
+        <name>TestProgressService</name>
+    </JavaPlugin>
 </PluginDescriptor>
