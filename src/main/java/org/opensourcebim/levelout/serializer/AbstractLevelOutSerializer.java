@@ -68,34 +68,34 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 				}
 			}
 			for (IfcRelContainedInSpatialStructure contained : storey.getContainsElements()) {
-				for (IfcOpeningElement opening : contained.getRelatedElements().stream().filter(IfcOpeningElement.class::isInstance).map(IfcOpeningElement.class::cast).toArray(IfcOpeningElement[]::new)) {
-					if(opening.getHasFillings().isEmpty() || ! (opening.getHasFillings().get(0).getRelatedBuildingElement() instanceof IfcDoor)) continue; // TODO windows
-					Door door = new Door(getPolygon(opening.getGeometry(), elevation));
+				// TODO windows ?
+				for (IfcDoor ifcDoor : contained.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
+					Door door = new Door(getPolygon(ifcDoor.getGeometry(), elevation));
 					doors.add(door);
-					EList<IfcRelSpaceBoundary> openingBoundaries = opening.getProvidesBoundaries();
-					if (populateConnectedRooms(roomsMap, door, openingBoundaries)) continue;
-
-					// if no space boundary for opening, try fillings
-					EList<IfcRelFillsElement> hasFillings = opening.getHasFillings();
-					if(hasFillings.isEmpty() || hasFillings.get(0).getRelatedBuildingElement().getProvidesBoundaries().isEmpty()) {
-						// TODO warning no space boundaries
+					EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
+					populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
+				}
+				for(IfcWall ifcWall : contained.getRelatedElements().stream().filter(IfcWall.class::isInstance).map(IfcWall.class::cast).collect(Collectors.toList())){
+					for(IfcRelVoidsElement voids: ifcWall.getHasOpenings()){
+						if(voids.getRelatedOpeningElement() instanceof IfcOpeningElement){
+							IfcOpeningElement opening = (IfcOpeningElement) voids.getRelatedOpeningElement();
+							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
+								// TODO track processed doors above and use this as fallback?
+								Door door = new Door(getPolygon(opening.getGeometry(), elevation));
+								doors.add(door);
+								populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
+							}
+						}
 					}
-					if(hasFillings.size()>1){
-						// TODO warning, considering just first filling or check all have the same boundaries
-					}
-					EList<IfcRelSpaceBoundary> fillingBoundaries = hasFillings.get(0).getRelatedBuildingElement().getProvidesBoundaries();
-					if(populateConnectedRooms(roomsMap, door, fillingBoundaries)) continue;
-
-					// fallback - only works for 2nd level space boundaries
 					List<IfcRelSpaceBoundary> processed = new ArrayList<>();
-					for (IfcRelSpaceBoundary spaceBoundary : opening.getVoidsElements().getRelatingBuildingElement().getProvidesBoundaries()) {
-						// TODO these could be more than 2 and affect wall pieces that do not host the particular door
+					for (IfcRelSpaceBoundary spaceBoundary : ifcWall.getProvidesBoundaries()) {
+						// TODO use these for room-wall-room connections possibly without a door
 						if(spaceBoundary instanceof IfcRelSpaceBoundary2ndLevel && !processed.contains(spaceBoundary)) {
 							processed.add(spaceBoundary);
 							IfcRelSpaceBoundary otherSpaceBoundary = ((IfcRelSpaceBoundary2ndLevel)spaceBoundary).getCorrespondingBoundary();
 							if(otherSpaceBoundary!= null) {
 								processed.add(otherSpaceBoundary);
-								populateConnectedRooms(roomsMap, door, List.of(spaceBoundary, otherSpaceBoundary));
+								// populateConnectedRooms(roomsMap, door, List.of(spaceBoundary, otherSpaceBoundary));
 								break;
 							}
 						}
