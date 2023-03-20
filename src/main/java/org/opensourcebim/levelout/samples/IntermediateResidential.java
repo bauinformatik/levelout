@@ -66,6 +66,7 @@ public class IntermediateResidential {
 				Collections.emptyList())
 		), Arrays.asList( p1, p5, p8, p4 )
 		);
+
 	}
 }
 
