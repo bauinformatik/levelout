@@ -4,7 +4,10 @@ import org.locationtech.proj4j.CoordinateReferenceSystem;
 import org.locationtech.proj4j.CoordinateTransform;
 import org.locationtech.proj4j.ProjCoordinate;
 
-public class ProjectedOriginCRS extends CoordinateReference {
+import java.io.Serializable;
+
+public class ProjectedOriginCRS extends CoordinateReference implements Serializable {
+	private static final long serialVersionUID = 4685496957100410339L;
 	private final ProjectedPoint origin;
 	private final double xAxisAbscissa;
 	private final double xAxisOrdinate;

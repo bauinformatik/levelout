@@ -19,6 +19,12 @@
         <name>OSM</name>
     </JavaPlugin>
     <JavaPlugin>
+        <interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
+        <implementationClass>org.opensourcebim.levelout.serializer.ObjectLevelOutSerializerPlugin</implementationClass>
+        <description>Intermediated model object Serializer</description>
+        <name>LevelOutObject</name>
+    </JavaPlugin>
+    <JavaPlugin>
         <interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
         <implementationClass>org.opensourcebim.levelout.checkingservice.LevelOutChecking</implementationClass>
         <description>LevelOut Checking Service</description>

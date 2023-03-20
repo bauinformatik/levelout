@@ -2,7 +2,10 @@ package org.opensourcebim.levelout.intermediatemodel.geo;
 
 import org.locationtech.proj4j.*;
 
-public class GeodeticOriginCRS extends CoordinateReference {
+import java.io.Serializable;
+
+public class GeodeticOriginCRS extends CoordinateReference implements Serializable {
+	private static final long serialVersionUID = 6482545861344232840L;
 	private final GeodeticPoint origin;
 	private final double rotation;
 

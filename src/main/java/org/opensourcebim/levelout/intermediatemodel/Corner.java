@@ -1,7 +1,10 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-public class Corner {
+import java.io.Serializable;
 
+public class Corner implements Serializable {
+
+	private static final long serialVersionUID = 2676517367266810521L;
 	private final double x;
 	private final double y;
 

@@ -1,6 +1,9 @@
 package org.opensourcebim.levelout.intermediatemodel.geo;
 
-public class GeodeticPoint {
+import java.io.Serializable;
+
+public class GeodeticPoint implements Serializable {
+	private static final long serialVersionUID = -5330066318904627149L;
 	public double latitude;
 	public double longitude;
 	public double height;

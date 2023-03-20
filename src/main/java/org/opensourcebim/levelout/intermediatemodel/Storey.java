@@ -1,10 +1,12 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-public class Storey {
+public class Storey implements Serializable {
 
+	private static final long serialVersionUID = 224912596112948321L;
 	private final int level;
 	private final List<Room> rooms;
 	private final List<Door> doors;

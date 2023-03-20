@@ -1,11 +1,13 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Door {
+public class Door implements Serializable {
 
+	private static final long serialVersionUID = 563629940339855368L;
 	private static long highestId = 0;
 	private final List<Corner> corners;
 	private boolean external = false;

@@ -1,6 +1,9 @@
 package org.opensourcebim.levelout.intermediatemodel.geo;
 
-public class ProjectedPoint {
+import java.io.Serializable;
+
+public class ProjectedPoint implements Serializable {
+	private static final long serialVersionUID = -207730394997299999L;
 
 	public double eastings;
 	public double northings;

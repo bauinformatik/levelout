@@ -1,11 +1,13 @@
 
 package org.opensourcebim.levelout.intermediatemodel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Room {
+public class Room implements Serializable {
+	private static final long serialVersionUID = -1615263281736055071L;
 	private static long highestId = 0;
 	private final long id;
 	private final List<Corner> corners;
@@ -46,7 +48,7 @@ public class Room {
 
 		double centroidX = (minX + maxX) / 2;
 		double centroidY = (minY + maxY) / 2;
-		return List.of(centroidX, centroidY, storey.getZ());
+		return List.of(centroidX, centroidY, storey == null ? 0 : storey.getZ());
 	}
 
 	public long getId(){
