@@ -67,4 +67,8 @@ public class Door implements Serializable {
 	public boolean isExternal() {
 		return external;
 	}
+
+	static void resetCounter() {
+		highestId = 0;
+	}
 }

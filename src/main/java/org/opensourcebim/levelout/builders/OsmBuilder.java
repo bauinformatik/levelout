@@ -65,9 +65,9 @@ public class OsmBuilder {
 		return new Node(id, lon, lat);
 	}
 
-	public void createAndWriteBuilding(Building building, CoordinateReference crs, OutputStream outputStream)
+	public void createAndWriteBuilding(Building building, OutputStream outputStream)
 			throws IOException {
-		this.crs = crs;
+		this.crs = building.getCrs();
 		this.osmOutput = new OsmXmlOutputStream(outputStream, true);
 		List<Long> nodes = new ArrayList<>();
 		for(Corner corner : building.getCorners()){

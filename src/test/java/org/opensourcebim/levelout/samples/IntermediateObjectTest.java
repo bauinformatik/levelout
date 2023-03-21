@@ -22,7 +22,6 @@ public class IntermediateObjectTest {
 	private static final List<File> intermediate = new ArrayList<>();
 	private static final Path path = Paths.get("output");
 	private Building building;
-	private CoordinateReference crs;
 
 	@BeforeClass
 	public static void setup(){
@@ -34,7 +33,7 @@ public class IntermediateObjectTest {
 	public void testOsmFromFile() throws IOException, ClassNotFoundException {
 		for(File file: intermediate){
 			setup(file);
-			new OsmBuilder().createAndWriteBuilding(building, crs, getOutputStream(".osm", file));
+			new OsmBuilder().createAndWriteBuilding(building, getOutputStream(".osm", file));
 		}
 	}
 
@@ -57,7 +56,6 @@ public class IntermediateObjectTest {
 	private void setup(File file) throws IOException, ClassNotFoundException {
 		ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
 		building = (Building) objectInputStream.readObject();
-		crs = (CoordinateReference) objectInputStream.readObject();
 	}
 
 	private FileOutputStream getOutputStream(String extension, File file) throws FileNotFoundException {

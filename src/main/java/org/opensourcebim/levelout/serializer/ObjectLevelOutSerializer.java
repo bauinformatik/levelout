@@ -18,7 +18,6 @@ public class ObjectLevelOutSerializer extends AbstractLevelOutSerializer {
 		try {
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 			objectOutputStream.writeObject(building);
-			objectOutputStream.writeObject(crs);
 			objectOutputStream.flush();
 		} catch (IOException e) {
 			throw new SerializerException(e);

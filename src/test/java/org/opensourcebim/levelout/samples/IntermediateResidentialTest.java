@@ -8,7 +8,6 @@ import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 import org.opensourcebim.levelout.builders.OsmBuilder;
 import org.opensourcebim.levelout.intermediatemodel.Building;
-import org.opensourcebim.levelout.intermediatemodel.geo.*;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -17,22 +16,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class IntermediateResidentialTest {
-	private CoordinateReference crs;
 	private Building building;
 
 	@Before
 	public void setup(){
 		building = IntermediateResidential.create();
 		if(!new File("output").exists()){
-			if(!new File("output").mkdir()){
-				return;
-			}
+			new File("output").mkdir();
 		}
-		crs = new GeodeticOriginCRS(new GeodeticPoint(50.9772, 11.3465, 0), 0.25);
-
-		// crs = new GeodeticOriginCRS(new GeodeticPoint(53.320555, -1.729000, 0), -0.13918031137);
-		// crs = new ProjectedOriginCRS(new ProjectedPoint(333780.622, 6246775.891, 0), 0.990330045, -0.138731399, "epsg:28356");
-
 	}
 
 	@Test
@@ -45,6 +36,6 @@ public class IntermediateResidentialTest {
 	}
 	@Test
 	public void testOsm() throws IOException {
-		new OsmBuilder().createAndWriteBuilding(building, crs, new FileOutputStream("output/test.osm"));
+		new OsmBuilder().createAndWriteBuilding(building, new FileOutputStream("output/test.osm"));
 	}
 }

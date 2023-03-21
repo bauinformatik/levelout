@@ -10,7 +10,7 @@ public class Storey implements Serializable {
 	private final int level;
 	private final List<Room> rooms;
 	private final List<Door> doors;
-	private double elevation;
+	private final double elevation;
 
 	public Storey(int level, double elevation, List<Room> rooms, List<Door> doors) {
 		this.level = level;

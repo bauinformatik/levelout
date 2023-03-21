@@ -11,9 +11,7 @@ import org.bimserver.plugins.serializers.SerializerException;
 import org.bimserver.utils.GeometryUtils;
 import org.eclipse.emf.common.util.EList;
 import org.opensourcebim.levelout.intermediatemodel.*;
-import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
-import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticOriginCRS;
-import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticPoint;
+import org.opensourcebim.levelout.intermediatemodel.geo.*;
 import org.opensourcebim.levelout.samples.IntermediateResidential;
 
 import java.awt.geom.Area;
@@ -26,7 +24,6 @@ import java.util.stream.Collectors;
 public abstract class AbstractLevelOutSerializer implements Serializer {
 	boolean extractionMethod;
 	Building building;
-	CoordinateReference crs;
 
 	AbstractLevelOutSerializer(boolean extractionMethod) {
 		this.extractionMethod = extractionMethod;
@@ -42,13 +39,16 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 	private void initSample() {
 		building = IntermediateResidential.create();
-		crs = new GeodeticOriginCRS(new GeodeticPoint(50.9772, 11.3465, 0), 0.25); // TODO move to intermediate model
 	}
 
 	private void initStructure(IfcModelInterface ifcModelInterface) {
+		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);  // TODO check for map conversion (first, before geo)
+		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
+		// TODO consider units
+		ifcModelInterface.getAllWithSubTypes(IfcProject.class).get(0).getUnitsInContext().getUnits();
 		List<Storey> loStoreys = new ArrayList<>();
 		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
-		building = new Building(loStoreys, outline);
+		building = new Building(loStoreys, outline, crs);
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
 		int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
 		for (IfcBuildingStorey storey : storeys) {
@@ -59,23 +59,25 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			loStoreys.add(loStorey);
 			storey.getName(); /* TODO: use in intermediate model (OSM has "name" tag, but also "level:ref" for short keys) */
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
-			for (IfcRelAggregates contained : storey.getIsDecomposedBy()) {
-				for (IfcSpace space : contained.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
+			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
+				for (IfcSpace space : aggregation.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
 					Room room = new Room(getPolygon(space.getGeometry(), elevation));
 					rooms.add(room);
 					roomsMap.put(space, room); // later needed for assignment to doors
 					space.getName(); // TODO: use in intermediate model
 				}
 			}
-			for (IfcRelContainedInSpatialStructure contained : storey.getContainsElements()) {
+			for (IfcRelContainedInSpatialStructure containment : storey.getContainsElements()) {
 				// TODO windows ?
-				for (IfcDoor ifcDoor : contained.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
-					Door door = new Door(getPolygon(ifcDoor.getGeometry(), elevation));
+				for (IfcDoor ifcDoor : containment.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
+					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
+					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
+					Door door = new Door(getPolygon(opening.getGeometry(), elevation));
 					doors.add(door);
 					EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
 					populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
 				}
-				for(IfcWall ifcWall : contained.getRelatedElements().stream().filter(IfcWall.class::isInstance).map(IfcWall.class::cast).collect(Collectors.toList())){
+				for(IfcWall ifcWall : containment.getRelatedElements().stream().filter(IfcWall.class::isInstance).map(IfcWall.class::cast).collect(Collectors.toList())){
 					for(IfcRelVoidsElement voids: ifcWall.getHasOpenings()){
 						if(voids.getRelatedOpeningElement() instanceof IfcOpeningElement){
 							IfcOpeningElement opening = (IfcOpeningElement) voids.getRelatedOpeningElement();
@@ -103,10 +105,6 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 				}
 			}
 		}
-		GeodeticOriginCRS geoCRS = getGeodeticCRS(ifcModelInterface);  // TODO check for map conversion (first, before geo)
-		// TODO consider units
-		ifcModelInterface.getAllWithSubTypes(IfcProject.class).get(0).getUnitsInContext().getUnits();
-		crs = geoCRS != null ? geoCRS : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
 	}
 
 	private static boolean populateConnectedRooms(Map<IfcSpace, Room> roomsMap, Door door, List<IfcRelSpaceBoundary> openingBoundaries) {
@@ -136,7 +134,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		return false;
 	}
 
-	private GeodeticOriginCRS getGeodeticCRS(IfcModelInterface ifcModelInterface) {
+	private CoordinateReference getCrs(IfcModelInterface ifcModelInterface) {
 		// TODO common classes for checking and querying
 		List<IfcSite> site = ifcModelInterface.getAllWithSubTypes(IfcSite.class);
 		List<IfcProject> project = ifcModelInterface.getAllWithSubTypes(IfcProject.class);
@@ -150,7 +148,13 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			"Model".equals(ifcRepresentationContext.getContextType()) && ifcRepresentationContext instanceof IfcGeometricRepresentationContext
 		).collect(Collectors.toList());
 		if (ifcRepresentationContextStream.isEmpty() || ! ((IfcGeometricRepresentationContext)ifcRepresentationContextStream.get(0)).isSetTrueNorth()) return null;
-		IfcDirection trueNorth = ((IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0)).getTrueNorth();
+		IfcGeometricRepresentationContext context = (IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0);
+		CoordinateReference cr = getProjectedOriginCRS(context);
+		return (cr != null) ? cr : getGeodeticOriginCRS(site, context);
+	}
+
+	private static GeodeticOriginCRS getGeodeticOriginCRS(List<IfcSite> site, IfcGeometricRepresentationContext context) {
+		IfcDirection trueNorth = context.getTrueNorth();
 		if (!(trueNorth.getDirectionRatios()!=null && trueNorth.getDirectionRatios().size() == 2)) return null;
 		EList<Long> refLatitude = site.get(0).getRefLatitude();
 		if (!(refLatitude != null && refLatitude.size() >= 3)) return null;
@@ -161,6 +165,16 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		double longitude = degreesFromMinutes(refLongitude);
 		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation);
 	}
+
+	private static CoordinateReference getProjectedOriginCRS(IfcGeometricRepresentationContext context) {
+		Optional<IfcCoordinateOperation> first = context.getHasCoordinateOperation().stream().filter(co ->
+			co instanceof IfcMapConversion && co.getTargetCRS() != null
+		).findFirst();
+		if(first.isEmpty()) return null;
+		IfcMapConversion crs = ((IfcMapConversion) first.get());
+		return  new ProjectedOriginCRS(new ProjectedPoint(crs.getEastings(), crs.getNorthings(), crs.getOrthogonalHeight()), crs.getXAxisAbscissa(), crs.getXAxisOrdinate(), crs.getTargetCRS().getName());
+	}
+
 	private boolean checkGeodeticCRS(IfcModelInterface ifcModelInterface) {
 		// TODO common classes for checking and querying
 		List<IfcSite> site = ifcModelInterface.getAllWithSubTypes(IfcSite.class);
@@ -179,7 +193,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 	}
 
 	private List<Corner> getPolygon(GeometryInfo geometry, double elevation) {
-		if (geometry == null) return null;
+		if (geometry == null) return new ArrayList<>(); // TODO log warning or ignore these rooms/doors?
 		// new IfcTools2D().get2D(space, 1); // only for IFC 2x3
 		int[] indices = GeometryUtils.toIntegerArray(geometry.getData().getIndices().getData());
 		double[] vertices = GeometryUtils.toDoubleArray(geometry.getData().getVertices().getData());
@@ -222,7 +236,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 	}
 
 	private static double degreesFromMinutes(EList<Long> refLatitude) {
-		return refLatitude.get(0) + refLatitude.get(1) / 60. + refLatitude.get(2) / 3600.; // TODO consider optional microseconds
+		double fraction = refLatitude.size()>3 ? refLatitude.get(3) / (3600*1000000.) : 0;
+		return refLatitude.get(0) + refLatitude.get(1) / 60. + refLatitude.get(2) / 3600. + fraction;
 	}
 
     @Override

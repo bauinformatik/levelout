@@ -1,18 +1,24 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
 public class Building implements Serializable {
 
-	private static final long serialVersionUID = 481571932663279905L;
+	private static final long serialVersionUID = 5810896951015191802L;
 	private final List<Storey> storeys;
 	private final List<Corner> corners;
+	private final CoordinateReference crs;
 
-	public Building(List<Storey> storeys, List<Corner> corners) {
+	public Building(List<Storey> storeys, List<Corner> corners, CoordinateReference crs) {
+		Room.resetCounter();
+		Door.resetCounter();
 		this.storeys = storeys;
 		this.corners = corners;
+		this.crs = crs;
 	}
 
 	public List<Storey> getStoreys(){
@@ -21,5 +27,9 @@ public class Building implements Serializable {
 
 	public List<Corner> getCorners() {
 		return Collections.unmodifiableList(corners);
+	}
+
+	public CoordinateReference getCrs() {
+		return crs;
 	}
 }

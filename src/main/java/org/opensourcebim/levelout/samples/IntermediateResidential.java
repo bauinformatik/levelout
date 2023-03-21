@@ -6,6 +6,8 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
+import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticOriginCRS;
+import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticPoint;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,8 +66,8 @@ public class IntermediateResidential {
 				new Room(Arrays.asList( p17,p16,p18,p13 ))
 					),
 				Collections.emptyList())
-		), Arrays.asList( p1, p5, p8, p4 )
-		);
+		), Arrays.asList( p1, p5, p8, p4 ),
+			new GeodeticOriginCRS(new GeodeticPoint(50.9772, 11.3465, 0), 0.25));
 
 	}
 }

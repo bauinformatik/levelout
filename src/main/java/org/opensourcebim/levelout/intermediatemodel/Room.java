@@ -69,4 +69,8 @@ public class Room implements Serializable {
 		return coordinates;
 	}
 
+	static void resetCounter(){
+		highestId = 0;
+	}
+
 }
