@@ -2,7 +2,7 @@ package org.opensourcebim.levelout.samples;
 
 import org.citygml4j.xml.CityGMLContextException;
 import org.citygml4j.xml.writer.CityGMLWriteException;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
@@ -12,40 +12,56 @@ import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IntermediateObjectTest {
 
-	private final Path intermediate = Paths.get("output/residential.obj");
-	Building building;
-	CoordinateReference crs;
+	private static final List<File> intermediate = new ArrayList<>();
+	private static final Path path = Paths.get("output");
+	private Building building;
+	private CoordinateReference crs;
 
-	@Before
-	public void setup() throws IOException, ClassNotFoundException, URISyntaxException {
-		Path test = intermediate.toFile().exists() ? intermediate : Path.of(getClass().getResource("residential.obj").toURI());
-		ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(test.toFile()));
+	@BeforeClass
+	public static void setup(){
+		if(path.toFile().exists()) {
+			intermediate.addAll(List.of(path.toFile().listFiles((dir, name) -> name.endsWith(".obj"))));
+		}
+	}
+	@Test
+	public void testOsmFromFile() throws IOException, ClassNotFoundException {
+		for(File file: intermediate){
+			setup(file);
+			new OsmBuilder().createAndWriteBuilding(building, crs, getOutputStream(".osm", file));
+		}
+	}
+
+	@Test
+	public void testIndoorFromFile() throws IOException, JAXBException, ClassNotFoundException {
+		for(File file: intermediate) {
+			setup(file);
+			new IndoorGmlBuilder().createAndWriteBuilding(building, getOutputStream(".indoor.gml", file));
+		}
+	}
+
+	@Test
+	public void testCityGmlFromFile() throws IOException, CityGMLWriteException, CityGMLContextException, ClassNotFoundException {
+		for(File file: intermediate) {
+			setup(file);
+			new CityGmlBuilder().createAndWriteBuilding(building, getOutputStream(".city.gml", file));
+		}
+	}
+
+	private void setup(File file) throws IOException, ClassNotFoundException {
+		ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
 		building = (Building) objectInputStream.readObject();
 		crs = (CoordinateReference) objectInputStream.readObject();
 	}
 
-	@Test
-	public void testOsmFromFile() throws IOException {
-		new OsmBuilder().createAndWriteBuilding(building, crs, getOutputPath(".osm"));
-	}
-
-	@Test
-	public void testIndoorFromFile() throws FileNotFoundException, JAXBException {
-		new IndoorGmlBuilder().createAndWriteBuilding(building, getOutputPath(".indoor.gml"));
-	}
-
-	@Test
-	public void testCityGmlFromFile() throws FileNotFoundException, CityGMLWriteException, CityGMLContextException {
-		new CityGmlBuilder().createAndWriteBuilding(building, getOutputPath(".city.gml"));
-	}
-	private FileOutputStream getOutputPath(String extension) throws FileNotFoundException {
-		Path outputPath = Paths.get("output").resolve(intermediate.getFileName().toFile().getName() + extension);
+	private FileOutputStream getOutputStream(String extension, File file) throws FileNotFoundException {
+		Path outputPath = path.resolve(file.getName() + extension);
 		return new FileOutputStream(outputPath.toFile());
 	}
 
