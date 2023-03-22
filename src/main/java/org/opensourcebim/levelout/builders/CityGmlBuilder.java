@@ -99,62 +99,39 @@ public class CityGmlBuilder {
 			List<BuildingConstructiveElementProperty> buildingConstructiveElements,
 			List<AbstractBuildingSubdivisionProperty> buildingSubdivisions,
 			org.citygml4j.core.model.building.Storey cityGmlStorey) {
-		List<Polygon> polygonList = new ArrayList<>();
-		List<LineString> LineStringList = new ArrayList<>();
 
 		for (Room room : storey.getRooms()) {
 			if (room.getCorners().size() >= 3) {
 				Polygon poly = createCitygmlPoly(room); // to use for shell
-				polygonList.add(poly);
+
 				BuildingRoom br = new BuildingRoom();
 				List<AbstractSpaceBoundaryProperty> spaceBoundary = new ArrayList<>();
-				BuildingRoomProperty brp = new BuildingRoomProperty();
 				spaceBoundary.add(createFloorSurface(poly));
 				br.setBoundaries(spaceBoundary);
-				brp.setInlineObject(br);
-				buildingRooms.add(brp);
+				buildingRooms.add(new BuildingRoomProperty(br));
+
 			}
 
 		}
-		cityGmlStorey.setBuildingRooms(buildingRooms);
 
 		for (Door door : storey.getDoors()) {
 			if (door.getCorners().size() >= 2) {
 				LineString line = createCitygmlLines(door); // to use for shell
-				LineStringList.add(line);
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
 				doorBoundaries.add(createDoorSurface(line));
 				doors.setBoundaries(doorBoundaries);
-				BuildingConstructiveElementProperty buildingconselementProp = new BuildingConstructiveElementProperty();
 				BuildingConstructiveElement buildingconsElement = new BuildingConstructiveElement();
-				List<AbstractFillingElementProperty> fillings = new ArrayList<>();
-				AbstractFillingElementProperty absfillingElement = new AbstractFillingElementProperty();
-				absfillingElement.setInlineObject(doors);
-				fillings.add(absfillingElement);
-				buildingconsElement.setFillings(fillings);
-				buildingconselementProp.setInlineObject(buildingconsElement);
-				buildingConstructiveElements.add(buildingconselementProp);
+				buildingconsElement.getFillings().add(new AbstractFillingElementProperty(doors));
+				buildingConstructiveElements.add(new BuildingConstructiveElementProperty(buildingconsElement));
+
 			}
 		}
+		cityGmlStorey.setBuildingRooms(buildingRooms);
 		cityGmlStorey.setBuildingConstructiveElements(buildingConstructiveElements);
-		//
 		buildingSubdivisions.add(new AbstractBuildingSubdivisionProperty(cityGmlStorey));
 		cityGmlBuilding.setBuildingSubdivisions(buildingSubdivisions);
 
-		List<SurfaceProperty> surfaceMember = new ArrayList<>();
-		for (Polygon polygon : polygonList) {
-			surfaceMember.add(new SurfaceProperty("#" + polygon.getId()));
-		}
-		// cityGmlBuilding.setLod0MultiSurface(new MultiSurfaceProperty(new
-		// MultiSurface(surfaceMember)));
-
-		List<CurveProperty> curveMember = new ArrayList<>();
-		for (LineString line : LineStringList) {
-			curveMember.add(new CurveProperty("#" + line.getId()));
-		}
-		// cityGmlBuilding.setLod0MultiCurve(new MultiCurveProperty(new
-		// MultiCurve(curveMember)));*/
 	}
 
 	public void createAndWriteBuilding(Building building, OutputStream outStream)
