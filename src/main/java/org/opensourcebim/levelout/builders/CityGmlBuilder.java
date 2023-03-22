@@ -56,6 +56,11 @@ public class CityGmlBuilder {
 		return processBoundarySurface(new WallSurface(), line);
 	}
 
+	public AbstractSpaceBoundaryProperty createInteriorWallsurface(LineString line) {
+		return processBoundarySurface(new InteriorWallSurface(), line);
+
+	}
+
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 			LineString line) {
 		thematicSurface.setId(idCreator.createId());
@@ -84,7 +89,7 @@ public class CityGmlBuilder {
 
 	private org.citygml4j.core.model.building.Building addBuildingboundary(
 			org.citygml4j.core.model.building.Building cityGmlBuilding, List<Double> coordinates) {
-		Polygon poly = geometryFactory.createPolygon(coordinates, 3);
+		Polygon poly = geometryFactory.createPolygon(coordinates, 2);
 		cityGmlBuilding.addBoundary(createGroundSurface(poly));
 		return cityGmlBuilding;
 	}
@@ -111,7 +116,8 @@ public class CityGmlBuilder {
 			}
 
 		}
-		cityGmlBuilding.setBuildingRooms(buildingRooms);
+		cityGmlStorey.setBuildingRooms(buildingRooms);
+
 		for (Door door : storey.getDoors()) {
 			if (door.getCorners().size() >= 2) {
 				LineString line = createCitygmlLines(door); // to use for shell
@@ -158,17 +164,17 @@ public class CityGmlBuilder {
 
 	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
-		List<BuildingRoomProperty> buildingRooms = new ArrayList<>();
 		List<AbstractBuildingSubdivisionProperty> buildingSubdivisions = new ArrayList<>();
-		List<BuildingConstructiveElementProperty> buildingConstructiveElements = new ArrayList<>();
-		addBuildingboundary(cityGmlBuilding,
-				Arrays.asList(0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 10.0, 6.0, 0.0, 0.0, 6.0, 0.0, 0.0, 0.0, 0.0));
+		addBuildingboundary(cityGmlBuilding, Arrays.asList(-0.1, 0.0, 10.0, -0.1, 10.0, 6.0, -0.1, 6.0, -0.1, 0.0));
 		for (Storey storey : building.getStoreys()) {
+			List<BuildingRoomProperty> buildingRooms = new ArrayList<>();
+			List<BuildingConstructiveElementProperty> buildingConstructiveElements = new ArrayList<>();
 			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
 			cityGmlStorey.setSortKey((double) storey.getLevel());
 			setLodgeom(cityGmlBuilding, storey, buildingRooms, buildingConstructiveElements, buildingSubdivisions,
 					cityGmlStorey);
 		}
+
 		return cityGmlBuilding;
 	}
 
