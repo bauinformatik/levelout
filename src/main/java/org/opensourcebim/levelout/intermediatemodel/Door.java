@@ -1,7 +1,8 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import org.opensourcebim.levelout.util.Geometry;
+
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,13 +37,7 @@ public class Door implements Serializable {
 	}
 
 	public List<Double> asCoordinateList() {
-		List<Double> coordinates = new ArrayList<>();
-		for (Corner corner: corners){
-			coordinates.add(corner.getX());
-			coordinates.add(corner.getY());
-			coordinates.add(storey == null ? 0 : storey.getZ());
-		}
-		return coordinates;
+		return Geometry.asCoordinateList(corners, storey == null ? 0 : storey.getZ());
 	}
 
 	public void setExternal(Room room) {

@@ -1,6 +1,7 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+import org.opensourcebim.levelout.util.Geometry;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -29,6 +30,10 @@ public class Building implements Serializable {
 		return Collections.unmodifiableList(corners);
 	}
 
+
+	public List<Double> asCoordinateList() {
+		return Geometry.asCoordinateList(corners, Geometry.minimumLevel(storeys)-0.1); // ground surface
+	}
 	public CoordinateReference getCrs() {
 		return crs;
 	}

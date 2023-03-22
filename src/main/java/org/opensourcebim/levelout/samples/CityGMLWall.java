@@ -1,41 +1,26 @@
 
 package org.opensourcebim.levelout.samples;
 
-import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.AbstractBuildingSubdivisionProperty;
 import org.citygml4j.core.model.building.Building;
 import org.citygml4j.core.model.building.BuildingConstructiveElement;
 import org.citygml4j.core.model.building.BuildingConstructiveElementProperty;
-import org.citygml4j.core.model.building.BuildingRoom;
 import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.building.Storey;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
-import org.citygml4j.core.model.core.AbstractThematicSurface;
 import org.citygml4j.core.util.geometry.GeometryFactory;
-import org.citygml4j.xml.CityGMLContext;
-import org.citygml4j.xml.module.citygml.CoreModule;
-import org.citygml4j.xml.writer.CityGMLChunkWriter;
-import org.citygml4j.xml.writer.CityGMLOutputFactory;
-import org.opensourcebim.levelout.intermediatemodel.Corner;
-import org.opensourcebim.levelout.intermediatemodel.Door;
-import org.xmlobjects.gml.model.feature.BoundingShape;
-import org.xmlobjects.gml.model.geometry.Envelope;
-import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve;
-import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty;
-import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.*;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
+
+import java.io.FileOutputStream;
 import java.nio.file.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
-import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 
 public class CityGMLWall {
 
@@ -48,8 +33,6 @@ public class CityGMLWall {
 
 	public void doMain() throws Exception {
 		String fileName = "output/roomstorey8.gml";
-
-		CityGMLContext context = CityGMLContext.newInstance();
 
 		id = DefaultIdCreator.getInstance();
 		geom = GeometryFactory.newInstance().withIdCreator(id);
@@ -100,21 +83,12 @@ public class CityGMLWall {
 		buildingSubdivisions.add(new AbstractBuildingSubdivisionProperty(storey));
 		building.setBuildingSubdivisions(buildingSubdivisions);
 
-		Envelope envelope = building.computeEnvelope();
-		CityGMLVersion version = CityGMLVersion.v3_0;
-		CityGMLOutputFactory out = context.createCityGMLOutputFactory(version);
 		Path output = Paths.get(fileName);
 		Files.createDirectories(output.getParent());
 		System.out.print(output.getParent());
 		Files.createFile(output);
 
-		try (CityGMLChunkWriter writer = out.createCityGMLChunkWriter(output, StandardCharsets.UTF_8.name())) {
-			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
-					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
-					.withHeaderComment("File created with citygml4j");
-			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
-			writer.writeMember(building);
-		}
+		cityGmlBuilder.write(new FileOutputStream(output.toFile()), building);
 
 	}
 
