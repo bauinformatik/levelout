@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,8 @@ public class IndoorGmlBuilder {
 	}
 
 	private ExternalReferenceType createExternalReference(String externalUri, String externalId) {
-		// resource at external URI represents multiple objects, one of which is identified by externalId
+		// resource at external URI represents multiple objects, one of which is
+		// identified by externalId
 		ExternalObjectReferenceType externalObjectReference = new ExternalObjectReferenceType();
 		externalObjectReference.setName(externalId);
 		ExternalReferenceType externalReference = new ExternalReferenceType();
@@ -155,7 +157,8 @@ public class IndoorGmlBuilder {
 		primalSpaceFeatures.getCellSpaceMember().add(cellSpaceMember);
 	}
 
-	public void addCellSpaceBoundaryMembers(PrimalSpaceFeaturesType primalSpaceFeatures, CellSpaceBoundaryType cellSpaceBoundary) {
+	public void addCellSpaceBoundaryMembers(PrimalSpaceFeaturesType primalSpaceFeatures,
+			CellSpaceBoundaryType cellSpaceBoundary) {
 		CellSpaceBoundaryMemberType cellSpaceBoundaryMember = new CellSpaceBoundaryMemberType();
 		cellSpaceBoundaryMember.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
 		primalSpaceFeatures.getCellSpaceBoundaryMember().add(cellSpaceBoundaryMember);
@@ -199,27 +202,45 @@ public class IndoorGmlBuilder {
 		return transition;
 	}
 
-	public TransitionType createTransition(String id, StateType state1, StateType state2){
+	public TransitionType createTransition(String id, StateType state1, StateType state2) {
 		TransitionType transition = createTransition(id);
 		List<StatePropertyType> stateProplist = new ArrayList<>();
 		StatePropertyType stateProp = new StatePropertyType();
 		stateProplist.add(stateProp);
-		stateProp.setHref("#"+state1.getId());
+		stateProp.setHref("#" + state1.getId());
 		StatePropertyType stateProp2 = new StatePropertyType();
 		stateProplist.add(stateProp2);
-		stateProp2.setHref("#"+state2.getId());
+		stateProp2.setHref("#" + state2.getId());
 		transition.setConnects(stateProplist);
 		return transition;
 	}
 
-	public TransitionType createTransition(Door door){
-		return createTransition("door"+door.getId(), roomStateMap.get(door.getRoom1()), roomStateMap.get(door.getRoom2()));
+	public TransitionType createTransition(Door door) {
+
+		return createTransition("door" + door.getId(), roomStateMap.get(door.getRoom1()),roomStateMap.get(door.getRoom2()));
+		
 	}
+
 	public void setTransitionPos(TransitionType trans, List<Double> coordinates) {
 		LineStringType linestring = createLineString(coordinates);
 		CurvePropertyType curveProp = new CurvePropertyType();
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
 		trans.setGeometry(curveProp);
+	}
+
+	public TransitionType setTransitionPos(TransitionType transition, Door door, double d) {
+		List<Double> coordinates = Arrays.asList(roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2),door.asCoordinateList().get(0),
+				door.asCoordinateList().get(1),d,
+				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
+				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
+				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2));
+		LineStringType linestring = createLineString(coordinates);
+		CurvePropertyType curveProp = new CurvePropertyType();
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		transition.setGeometry(curveProp);
+		return transition;
 	}
 
 	public void addTransition(EdgesType edges, TransitionType transition) {
@@ -228,7 +249,8 @@ public class IndoorGmlBuilder {
 		edges.getTransitionMember().add(transitionMember);
 	}
 
-	public void createAndAddCellSpaceBoundary(CellSpaceType cellspace, List<CellSpaceBoundaryType> cellspaceBoundaries) {
+	public void createAndAddCellSpaceBoundary(CellSpaceType cellspace,
+			List<CellSpaceBoundaryType> cellspaceBoundaries) {
 		List<CellSpaceBoundaryPropertyType> cellspaceboundarieslist = new ArrayList<>();
 
 		for (CellSpaceBoundaryType csb : cellspaceBoundaries) {
@@ -257,7 +279,8 @@ public class IndoorGmlBuilder {
 	}
 
 	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
-		return indoorFeatures.getMultiLayeredGraph().getMultiLayeredGraph().getSpaceLayers().get(0).getSpaceLayerMember().get(0).getSpaceLayer();
+		return indoorFeatures.getMultiLayeredGraph().getMultiLayeredGraph().getSpaceLayers().get(0)
+				.getSpaceLayerMember().get(0).getSpaceLayer();
 
 	}
 
@@ -266,7 +289,8 @@ public class IndoorGmlBuilder {
 	}
 
 	public IndoorFeaturesType createIndoorFeatures() {
-		// TODO: do this in builder constructor and keep it private, to ensure proper creation of primal and dual space
+		// TODO: do this in builder constructor and keep it private, to ensure proper
+		// creation of primal and dual space
 		IndoorFeaturesType indoorFeatures = new IndoorFeaturesType();
 		indoorFeatures.setId("if");
 
@@ -315,12 +339,12 @@ public class IndoorGmlBuilder {
 				add2DGeometry(cs, room);
 			}
 			for (Door door : storey.getDoors()) {
-				if(!storey.getRooms().contains(door.getRoom1()) || !storey.getRooms().contains(door.getRoom2())){
+				if (!storey.getRooms().contains(door.getRoom1()) || !storey.getRooms().contains(door.getRoom2())) {
 					// TODO warning
-				} else if(!door.isExternal()){
+				} else if (!door.isExternal()) {
 					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2());
 					TransitionType transition = createTransition(door);
-					// TODO transition geometry
+					setTransitionPos(transition, door, storey.getZ());
 					addTransition(dualSpace.getEdges().get(0), transition);
 					// TODO duality boundary - transition
 				}
@@ -330,7 +354,8 @@ public class IndoorGmlBuilder {
 		return indoorFeatures;
 	}
 
-	public void createAndAddCellSpaceBoundary(CellSpaceType cell1, CellSpaceType cell2, List<Double> coordinates, CellSpaceBoundaryType cellSpaceBoundary){
+	public void createAndAddCellSpaceBoundary(CellSpaceType cell1, CellSpaceType cell2, List<Double> coordinates,
+			CellSpaceBoundaryType cellSpaceBoundary) {
 		CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
 		LineStringType linestring = createLineString(coordinates);
 		CurvePropertyType curveProp = new CurvePropertyType();
@@ -346,12 +371,8 @@ public class IndoorGmlBuilder {
 	}
 
 	private void createAndAddCellSpaceBoundary(Door door, Room room1, Room room2) {
-		createAndAddCellSpaceBoundary(
-			roomCellMap.get(room1),
-			roomCellMap.get(room2),
-			door.asCoordinateList(),
-			createCellspaceBoundary("csb-" + room1.getId() + "-" + room2.getId())
-		);
+		createAndAddCellSpaceBoundary(roomCellMap.get(room1), roomCellMap.get(room2), door.asCoordinateList(),
+				createCellspaceBoundary("csb-" + room1.getId() + "-" + room2.getId()));
 	}
 
 	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
@@ -370,8 +391,9 @@ public class IndoorGmlBuilder {
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 				IndoorGMLNameSpaceMapper.DEFAULT_URI + " http://schemas.opengis.net/indoorgml/1.0/indoorgmlcore.xsd "
-				+ IndoorGMLNameSpaceMapper.NAVIGATION_URI + " http://schemas.opengis.net/indoorgml/1.0/indoorgmlnavi.xsd"
-				+ IndoorGMLNameSpaceMapper.XLINK_URI + " https://www.w3.org/XML/2008/06/xlink.xsd");
+						+ IndoorGMLNameSpaceMapper.NAVIGATION_URI
+						+ " http://schemas.opengis.net/indoorgml/1.0/indoorgmlnavi.xsd"
+						+ IndoorGMLNameSpaceMapper.XLINK_URI + " https://www.w3.org/XML/2008/06/xlink.xsd");
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new IndoorGMLNameSpaceMapper());
