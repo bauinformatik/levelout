@@ -17,6 +17,8 @@ public class Door implements Serializable {
 	private Room room2;
 	private Storey storey;
 
+	
+
 	public Door(List<Corner> corners) {
 		this.id = ++highestId;
 		this.corners = corners;
@@ -58,7 +60,11 @@ public class Door implements Serializable {
 	public Room getRoom2() {
 		return room2;
 	}
-
+	
+	
+	public Storey getStorey() {
+		return storey;
+	}
 	public boolean isExternal() {
 		return external;
 	}

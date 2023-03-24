@@ -16,6 +16,14 @@ public class Geometry {
 		}
 		return coordinates;
 	}
+	
+	public static List<Double> asCoordinateList(Corner corner, double z){
+		List<Double> coordinates = new ArrayList<>();
+			coordinates.add(corner.getX());
+			coordinates.add(corner.getY());
+			coordinates.add(z);
+		return coordinates;
+	}
 
 	public static double minimumLevel(List<Storey> storeys){
 		double minElevation = Double.MAX_VALUE;

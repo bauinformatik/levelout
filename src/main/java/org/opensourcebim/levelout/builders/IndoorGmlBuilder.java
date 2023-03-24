@@ -217,8 +217,9 @@ public class IndoorGmlBuilder {
 
 	public TransitionType createTransition(Door door) {
 
-		return createTransition("door" + door.getId(), roomStateMap.get(door.getRoom1()),roomStateMap.get(door.getRoom2()));
-		
+		return createTransition("door" + door.getId(), roomStateMap.get(door.getRoom1()),
+				roomStateMap.get(door.getRoom2()));
+
 	}
 
 	public void setTransitionPos(TransitionType trans, List<Double> coordinates) {
@@ -228,11 +229,12 @@ public class IndoorGmlBuilder {
 		trans.setGeometry(curveProp);
 	}
 
-	public TransitionType setTransitionPos(TransitionType transition, Door door, double d) {
-		List<Double> coordinates = Arrays.asList(roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
+	public TransitionType setTransitionPos(TransitionType transition, Door door) {
+		List<Double> coordinates = Arrays.asList(
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
 				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2),door.asCoordinateList().get(0),
-				door.asCoordinateList().get(1),d,
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2),
+				door.asCoordinateList().get(0), door.asCoordinateList().get(1), door.asCoordinateList().get(2),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2));
@@ -344,7 +346,7 @@ public class IndoorGmlBuilder {
 				} else if (!door.isExternal()) {
 					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2());
 					TransitionType transition = createTransition(door);
-					setTransitionPos(transition, door, storey.getZ());
+					setTransitionPos(transition, door);
 					addTransition(dualSpace.getEdges().get(0), transition);
 					// TODO duality boundary - transition
 				}

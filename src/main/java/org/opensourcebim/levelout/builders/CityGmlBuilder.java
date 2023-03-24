@@ -26,11 +26,13 @@ import org.xmlobjects.gml.model.geometry.primitives.LineString;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
+import org.opensourcebim.levelout.util.Geometry;
 
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class CityGmlBuilder {
 	private final IdCreator idCreator = DefaultIdCreator.getInstance();
@@ -42,6 +44,10 @@ public class CityGmlBuilder {
 
 	public AbstractSpaceBoundaryProperty createDoorSurface(LineString line) {
 		return processBoundarySurface(new DoorSurface(), line);
+	}
+
+	private AbstractSpaceBoundaryProperty createDoorSurface(Polygon poly) {
+		return processBoundarySurface(new DoorSurface(), poly);
 	}
 
 	public AbstractSpaceBoundaryProperty createWallSurface(LineString line) {
@@ -64,6 +70,14 @@ public class CityGmlBuilder {
 		return geometryFactory.createPolygon(room.asCoordinateList(), 3);
 	}
 
+	private Polygon createDegeneratedDoors(Door door) {
+		List<Double> doorcorner1 = Geometry.asCoordinateList(door.getCorners().get(0), door.getStorey().getZ());
+		List<Double> doorcorner2 = Geometry.asCoordinateList(door.getCorners().get(1), door.getStorey().getZ());
+		List<Double> degeneratedDoor = new ArrayList<>();
+		Stream.of(doorcorner1, doorcorner2, doorcorner2, doorcorner1, doorcorner1).forEach(degeneratedDoor::addAll);
+		return geometryFactory.createPolygon(degeneratedDoor, 3);
+	}
+
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 			Polygon polygon) {
 		thematicSurface.setId(idCreator.createId());
@@ -79,8 +93,8 @@ public class CityGmlBuilder {
 		return processBoundarySurface(new GroundSurface(), polygon);
 	}
 
-	private void addGroundSurface(
-			org.citygml4j.core.model.building.Building cityGmlBuilding, List<Double> coordinates) {
+	private void addGroundSurface(org.citygml4j.core.model.building.Building cityGmlBuilding,
+			List<Double> coordinates) {
 		Polygon poly = geometryFactory.createPolygon(coordinates, 3);
 		cityGmlBuilding.addBoundary(createGroundSurface(poly));
 	}
@@ -99,14 +113,17 @@ public class CityGmlBuilder {
 		}
 		for (Door door : storey.getDoors()) {
 			if (door.getCorners().size() >= 2) {
-				LineString line = createCitygmlLines(door); // to use for shell
+				// LineString line = createCitygmlLines(door); // to use for shell
+				Polygon poly = createDegeneratedDoors(door);
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
-				doorBoundaries.add(createDoorSurface(line));
+				doorBoundaries.add(createDoorSurface(poly));
+				// doorBoundaries.add(createDoorSurface(line));
 				doors.setBoundaries(doorBoundaries);
 				BuildingConstructiveElement buildingconsElement = new BuildingConstructiveElement();
 				buildingconsElement.getFillings().add(new AbstractFillingElementProperty(doors));
-				BuildingConstructiveElementProperty constructiveElement = new BuildingConstructiveElementProperty(buildingconsElement);
+				BuildingConstructiveElementProperty constructiveElement = new BuildingConstructiveElementProperty(
+						buildingconsElement);
 				cityGmlStorey.getBuildingConstructiveElements().add(constructiveElement);
 			}
 		}
@@ -124,7 +141,8 @@ public class CityGmlBuilder {
 		for (Storey storey : building.getStoreys()) {
 			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
 			cityGmlStorey.setSortKey((double) storey.getLevel());
-			AbstractBuildingSubdivisionProperty buildingSubdivision = new AbstractBuildingSubdivisionProperty(cityGmlStorey);
+			AbstractBuildingSubdivisionProperty buildingSubdivision = new AbstractBuildingSubdivisionProperty(
+					cityGmlStorey);
 			cityGmlBuilding.getBuildingSubdivisions().add(buildingSubdivision);
 			addRoomsAndDoors(storey, cityGmlStorey);
 		}
