@@ -1,5 +1,6 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
+import org.opensourcebim.levelout.util.Centroid;
 import org.opensourcebim.levelout.util.Geometry;
 
 import java.io.Serializable;
@@ -17,25 +18,30 @@ public class Door implements Serializable {
 	private Room room2;
 	private Storey storey;
 
-	
-
 	public Door(List<Corner> corners) {
 		this.id = ++highestId;
 		this.corners = corners;
 	}
 
 	void setStorey(Storey storey) {
-		if(this.storey!=null) {
+		if (this.storey != null) {
 			throw new IllegalArgumentException("no doors with multiple storeys allowed");
 		}
 		this.storey = storey;
 	}
+
 	public long getId() {
 		return id;
 	}
 
 	public List<Corner> getCorners() {
 		return Collections.unmodifiableList(corners);
+	}
+
+	public List<Double> computeCentroid() {
+
+		Corner doorcentroid = Centroid.computeCentroid(corners);
+		return List.of(doorcentroid.getX(), doorcentroid.getY(), storey == null ? 0 : storey.getZ());
 	}
 
 	public List<Double> asCoordinateList() {
@@ -60,11 +66,11 @@ public class Door implements Serializable {
 	public Room getRoom2() {
 		return room2;
 	}
-	
-	
+
 	public Storey getStorey() {
 		return storey;
 	}
+
 	public boolean isExternal() {
 		return external;
 	}

@@ -35,9 +35,9 @@ public class OsmBuilder {
 		return node.getId();
 	}
 
-	private void createAndWriteOsmNode(Corner doormidpoint, List<OsmTag> tags) throws IOException {
+	private void createAndWriteOsmNode(List<Double> doorcentroid, List<OsmTag> tags) throws IOException {
 		// TODO Auto-generated method stub
-		CartesianPoint cartesian = new CartesianPoint(doormidpoint.getX(), doormidpoint.getY(), 0);
+		CartesianPoint cartesian = new CartesianPoint(doorcentroid.get(0), doorcentroid.get(1), 0);
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node door = new Node(--nodeId, geodetic.longitude, geodetic.latitude, tags);
 		osmOutput.write(door);
@@ -59,18 +59,11 @@ public class OsmBuilder {
 		osmOutput.write(way);
 	}
 
-	private void createAndWriteDoor(Door door) throws IOException {
+	private void createAndWriteDoor(Door door, String level) throws IOException {
 
-		Corner doorcorner1 = door.getCorners().get(0);
-		Corner doorCorner2 = door.getCorners().get(1);
-
-		double midx = (doorcorner1.getX() + doorCorner2.getX()) / 2;
-		double midy = (doorcorner1.getY() + doorCorner2.getY()) / 2;
-
-		Corner doormidpoint = new Corner(midx, midy);
-		List<OsmTag> tags = Arrays.asList(new Tag("door", "yes"), new Tag("ref", "Door #" + door.getId()));
-
-		createAndWriteOsmNode(doormidpoint, tags);
+		List<OsmTag> tags = Arrays.asList(new Tag("door", "yes"), new Tag("level", level),
+				new Tag("ref", "Door #" + door.getId()));
+		createAndWriteOsmNode(door.computeCentroid(), tags);
 
 	}
 
@@ -81,7 +74,7 @@ public class OsmBuilder {
 
 		}
 		for (Door door : storey.getDoors()) {
-			createAndWriteDoor(door);
+			createAndWriteDoor(door, lvl);
 
 		}
 

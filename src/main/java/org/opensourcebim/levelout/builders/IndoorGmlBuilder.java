@@ -7,7 +7,6 @@ import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
-import org.opensourcebim.levelout.util.SpatialAnalysis;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -230,11 +229,12 @@ public class IndoorGmlBuilder {
 	}
 
 	public TransitionType setTransitionPos(TransitionType transition, Door door) {
+		List<Double> centroid = door.computeCentroid();
 		List<Double> coordinates = Arrays.asList(
 				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
 				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
 				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2),
-				door.asCoordinateList().get(0), door.asCoordinateList().get(1), door.asCoordinateList().get(2),
+				centroid.get(0), centroid.get(1), centroid.get(2),			
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2));
