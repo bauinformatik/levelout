@@ -18,6 +18,15 @@ public abstract class CoordinateReference {
 		}
 	}
 
+	static double getGridconvergence(GeodeticPoint origin, String epsg) {
+
+		double Gridnum = Double.valueOf(epsg.substring(8));
+		double longitudeDiff = origin.longitude - (6 * Gridnum - 183);
+		double convergenceangle = Math.atan(Math.tan(longitudeDiff) * Math.sin(origin.latitude));
+		return convergenceangle;
+
+	}
+
 	public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart);
 
 }
