@@ -45,14 +45,18 @@ public class IntermediateResidential {
 		Corner p22 = new Corner(2, 0);
 		Corner p23 = new Corner(6, 5);
 		Corner p24 = new Corner(6, 6);
+		Corner p25 = new Corner(1, 0);
+		Corner p26 = new Corner(2, 0);
+		Corner p27 = new Corner(6, 5);
+		Corner p28 = new Corner(6, 6);
 		// TODO SK 7: adjacency transitions only: a) use utility method to infer, b) explicit in model (wall?)
 		// TODO SK 8: doors in basic form (direct creation), only then move on to create from intermediate
 		Room room1 = new Room(Arrays.asList(p1, p2, p3, p4));
 		Room room2 = new Room(Arrays.asList(p2, p5, p6, p7));
 		Room room3 = new Room(Arrays.asList(p7, p6, p8, p3));
-		Door door1 = new Door(Arrays.asList(p21, p22));
+		Door door1 = new Door(Arrays.asList(p21, p22,p26,p25));
 		door1.setExternal(room1);
-		Door door2 = new Door(Arrays.asList(p23, p24));
+		Door door2 = new Door(Arrays.asList(p23, p24,p28,p27));
 		door2.setInternal(room1, room3);
 		return new Building(Arrays.asList(
 			new Storey(0, 0, Arrays.asList(

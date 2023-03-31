@@ -26,13 +26,10 @@ import org.xmlobjects.gml.model.geometry.primitives.LineString;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
-import org.opensourcebim.levelout.util.Geometry;
-
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class CityGmlBuilder {
 	private final IdCreator idCreator = DefaultIdCreator.getInstance();
@@ -71,11 +68,7 @@ public class CityGmlBuilder {
 	}
 
 	private Polygon createDegeneratedDoors(Door door) {
-		List<Double> doorcorner1 = Geometry.asCoordinateList(door.getCorners().get(0), door.getStorey().getZ());
-		List<Double> doorcorner2 = Geometry.asCoordinateList(door.getCorners().get(1), door.getStorey().getZ());
-		List<Double> degeneratedDoor = new ArrayList<>();
-		Stream.of(doorcorner1, doorcorner2, doorcorner2, doorcorner1, doorcorner1).forEach(degeneratedDoor::addAll);
-		return geometryFactory.createPolygon(degeneratedDoor, 3);
+		return geometryFactory.createPolygon(door.asCoordinateList(), 3);
 	}
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
@@ -112,13 +105,12 @@ public class CityGmlBuilder {
 			}
 		}
 		for (Door door : storey.getDoors()) {
-			if (door.getCorners().size() >= 2) {
-				// LineString line = createCitygmlLines(door); // to use for shell
+			if (door.getCorners().size() >= 3) {
+				// TODO Solve Closed Ring issue - degenerated doors
 				Polygon poly = createDegeneratedDoors(door);
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
 				doorBoundaries.add(createDoorSurface(poly));
-				// doorBoundaries.add(createDoorSurface(line));
 				doors.setBoundaries(doorBoundaries);
 				BuildingConstructiveElement buildingconsElement = new BuildingConstructiveElement();
 				buildingconsElement.getFillings().add(new AbstractFillingElementProperty(doors));

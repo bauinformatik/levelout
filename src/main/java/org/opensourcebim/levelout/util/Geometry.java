@@ -7,28 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Geometry {
-	public static List<Double> asCoordinateList(List<Corner> corners, double z){
+	public static List<Double> asCoordinateList(List<Corner> corners, double z) {
 		List<Double> coordinates = new ArrayList<>();
-		for (Corner corner: corners){
+		for (Corner corner : corners) {
 			coordinates.add(corner.getX());
 			coordinates.add(corner.getY());
 			coordinates.add(z);
 		}
 		return coordinates;
 	}
-	
-	public static List<Double> asCoordinateList(Corner corner, double z){
-		List<Double> coordinates = new ArrayList<>();
-			coordinates.add(corner.getX());
-			coordinates.add(corner.getY());
-			coordinates.add(z);
-		return coordinates;
-	}
 
-	public static double minimumLevel(List<Storey> storeys){
+	public static double minimumLevel(List<Storey> storeys) {
 		double minElevation = Double.MAX_VALUE;
-		for(Storey storey : storeys){
-			if(storey.getZ() < minElevation) minElevation = storey.getZ();
+		for (Storey storey : storeys) {
+			if (storey.getZ() < minElevation)
+				minElevation = storey.getZ();
 		}
 		return minElevation;
 	}
