@@ -7,8 +7,8 @@ import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
-
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.OutputStream;
@@ -19,12 +19,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class IndoorGmlBuilder {
 	private static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
 	private static final net.opengis.gml.v_3_2.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2.ObjectFactory();
 	private final Map<Room, StateType> roomStateMap = new HashMap<>();
 	private final Map<Room, CellSpaceType> roomCellMap = new HashMap<>();
+	private final Map<StateType, List<TransitionPropertyType>> stateConnectsMap = new HashMap<>();
 
 	private PointType createPoint(double x, double y, double z) {
 		PointType point = new PointType();
@@ -203,14 +205,9 @@ public class IndoorGmlBuilder {
 
 	public TransitionType createTransition(String id, StateType state1, StateType state2) {
 		TransitionType transition = createTransition(id);
-		List<StatePropertyType> stateProplist = new ArrayList<>();
-		StatePropertyType stateProp = new StatePropertyType();
-		stateProplist.add(stateProp);
-		stateProp.setHref("#" + state1.getId());
-		StatePropertyType stateProp2 = new StatePropertyType();
-		stateProplist.add(stateProp2);
-		stateProp2.setHref("#" + state2.getId());
-		transition.setConnects(stateProplist);
+		setStateConnects(state1, transition);
+		setStateConnects(state2, transition);
+		setConnectsForTransition(state1, state2, transition);
 		return transition;
 	}
 
@@ -233,8 +230,8 @@ public class IndoorGmlBuilder {
 		List<Double> coordinates = Arrays.asList(
 				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
 				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2),
-				centroid.get(0), centroid.get(1), centroid.get(2),			
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2), centroid.get(0),
+				centroid.get(1), centroid.get(2),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
 				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2));
@@ -278,6 +275,53 @@ public class IndoorGmlBuilder {
 	public void setDuality(CellSpaceType cellSpace, StateType state) {
 		setDualCellSpaceForState(state, cellSpace);
 		setDualStateForCellSpace(cellSpace, state);
+	}
+
+	private void setDuality(CellSpaceBoundaryType cellSpaceBoundary, TransitionType transition) {
+		setDualCellSpaceBoundaryForTransition(transition, cellSpaceBoundary);
+		setDualTransitionForCellSpaceBoundary(cellSpaceBoundary, transition);
+	}
+
+	private void setDualTransitionForCellSpaceBoundary(CellSpaceBoundaryType cellSpaceBoundary,
+			TransitionType transition) {
+		TransitionPropertyType transitionProperty = new TransitionPropertyType();
+		transitionProperty.setHref("#" + transition.getId());
+		cellSpaceBoundary.setDuality(transitionProperty);
+	}
+
+	private void setDualCellSpaceBoundaryForTransition(TransitionType transition,
+			CellSpaceBoundaryType cellSpaceBoundary) {
+		CellSpaceBoundaryPropertyType cellSpaceBoundaryProperty = new CellSpaceBoundaryPropertyType();
+		cellSpaceBoundaryProperty.setHref("#" + cellSpaceBoundary.getId());
+		transition.setDuality(cellSpaceBoundaryProperty);
+	}
+
+	private void setStateConnects(StateType state, TransitionType transition) {
+		TransitionPropertyType transitionProp = new TransitionPropertyType();
+		transitionProp.setHref("#" + transition.getId());
+		List<TransitionPropertyType> transProplist = Arrays.asList(transitionProp);
+		if (stateConnectsMap.containsKey(state)) {
+			stateConnectsMap.get(state).add(transitionProp);
+		} else {
+			stateConnectsMap.put(state, transProplist);
+		}
+
+	}
+
+	private void setConnectsForState(Map<StateType, List<TransitionPropertyType>> stateConnectsMap) {
+		for (Entry<StateType, List<TransitionPropertyType>> entry : stateConnectsMap.entrySet()) {
+			entry.getKey().setConnects(entry.getValue());
+		}
+
+	}
+
+	private void setConnectsForTransition(StateType state1, StateType state2, TransitionType transition) {
+		StatePropertyType stateProp = new StatePropertyType();
+		stateProp.setHref("#" + state1.getId());
+		StatePropertyType stateProp2 = new StatePropertyType();
+		stateProp2.setHref("#" + state2.getId());
+		List<StatePropertyType> stateProplist = Arrays.asList(stateProp, stateProp2);
+		transition.setConnects(stateProplist);
 	}
 
 	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
@@ -344,14 +388,18 @@ public class IndoorGmlBuilder {
 				if (!storey.getRooms().contains(door.getRoom1()) || !storey.getRooms().contains(door.getRoom2())) {
 					// TODO warning
 				} else if (!door.isExternal()) {
-					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2());
+					CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(
+							"csb-" + door.getRoom1().getId() + "-" + door.getRoom2().getId());
+					// addCellSpaceBoundaryMembers(primalSpace, cellSpaceBoundary);
+					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2(), cellSpaceBoundary);
 					TransitionType transition = createTransition(door);
 					setTransitionPos(transition, door);
 					addTransition(dualSpace.getEdges().get(0), transition);
-					// TODO duality boundary - transition
+					setDuality(cellSpaceBoundary, transition);// TODO duality boundary - transition
 				}
 				// TODO exterior doors
 			}
+			setConnectsForState(stateConnectsMap);
 		}
 		return indoorFeatures;
 	}
@@ -367,14 +415,17 @@ public class IndoorGmlBuilder {
 		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
 		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
 		cellspaceboundaries.add(cellspaceboundaryProp);
+		// cellspaceboundaryProp.setHref("#" + cellSpaceBoundary.getId());
 		cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
 		cell1.setPartialboundedBy(cellspaceboundaries); // in fact the boundaries are added, which is what we want
 		cell2.setPartialboundedBy(cellspaceboundaries);
+
 	}
 
-	private void createAndAddCellSpaceBoundary(Door door, Room room1, Room room2) {
+	private void createAndAddCellSpaceBoundary(Door door, Room room1, Room room2,
+			CellSpaceBoundaryType cellSpaceBoundary) {
 		createAndAddCellSpaceBoundary(roomCellMap.get(room1), roomCellMap.get(room2), door.asCoordinateList(),
-				createCellspaceBoundary("csb-" + room1.getId() + "-" + room2.getId()));
+				cellSpaceBoundary);
 	}
 
 	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
