@@ -14,6 +14,23 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		this.rotation = rotation;
 	}
 
+	String getEpsg() {
+		// TODO : Account for special cases: Norway and Svalbard
+		if (origin.latitude <= -80 || origin.latitude > 84) {
+			throw new IllegalArgumentException("Latitude outside of valid range -80..84.");
+		} else {
+			int num = (int) ((Math.floor((origin.longitude + 180) / 6) % 60) + 1);
+			String numstr = String.format("%02d", num);
+			return origin.latitude > 0 ? "326" + numstr : "327" + numstr;
+		}
+	}
+
+	double getGridConvergence() {  // at origin, this may still be off if the origin is far away from actual coordinates
+		double Gridnum = Double.valueOf(getEpsg().substring(3));
+		double longitudeDiff = origin.longitude - (6 * Gridnum - 183);
+		return Math.atan(Math.tan(longitudeDiff) * Math.sin(origin.latitude));
+	}
+
 	public GeodeticPoint cartesianToGeodeticViaGeoCentric(CartesianPoint cart) {
 		// https://epsg.io/9837-method
 		// https://proj.org/operations/conversions/topocentric.html
@@ -65,14 +82,14 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
-		String epsg = "epsg:" + getEpsg(origin);
+		String epsg = "epsg:" + getEpsg();
 		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
-		double Gridconvergence = getGridconvergence(origin, epsg);
+		double gridConvergence = getGridConvergence();
 		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
 		ProjCoordinate utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
 				new ProjCoordinate());
-		double a = Math.cos(rotation - Gridconvergence);
-		double b = Math.sin(rotation - Gridconvergence);
+		double a = Math.cos(rotation - gridConvergence);
+		double b = Math.sin(rotation - gridConvergence);
 		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
 		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
 

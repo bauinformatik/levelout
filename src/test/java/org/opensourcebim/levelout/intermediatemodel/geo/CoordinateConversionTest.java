@@ -5,21 +5,48 @@ import org.junit.Test;
 
 public class CoordinateConversionTest {
 
+	public void testGridConvergenceCentralMeridian(){
+		GeodeticPoint centralMeridian = new GeodeticPoint(45, 63, 0);
+		Assert.assertEquals(0, new GeodeticOriginCRS(centralMeridian, 0).getGridConvergence(),0.00000001);
+	}
+	@Test
+	public void testGridConvergenceEquator() {
+		GeodeticPoint equator = new GeodeticPoint(0, 61, 0);
+		Assert.assertEquals(0, new GeodeticOriginCRS(equator, 0).getGridConvergence(),0.00000001);
+	}
+	@Test
+	public void testGridConvergenceBorder() {
+		GeodeticPoint segmentBorder = new GeodeticPoint(45, 60, 0); // belongs to the right segment?
+		Assert.assertEquals(-0.03704094636470207, new GeodeticOriginCRS(segmentBorder, 0).getGridConvergence(), 0.00000001);
+	}
+	@Test
+	public void testGridConvergence() {
+		GeodeticPoint equator = new GeodeticPoint(45, 61, 0); // west of central, north of equator
+		Assert.assertEquals(-0.024687696117208394, new GeodeticOriginCRS(equator, 0).getGridConvergence(), 0.00000001);
+	}
+
+	@Test
+	public void testHorizontal(){
+		CartesianPoint p1 = new CartesianPoint(10, 5, 0);
+		CartesianPoint p2 = new CartesianPoint(20, 5, 0);
+		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 55, 0), 0);
+		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.00001);
+	}
 	@Test
 	public void testEpsgNorth(){
 		GeodeticPoint weimar = new GeodeticPoint(50.9795, 11.3235, 0);
-		Assert.assertEquals("32632", CoordinateReference.getEpsg(weimar));
+		Assert.assertEquals("32632", new GeodeticOriginCRS(weimar, 0).getEpsg());
 	}
 
 	@Test
 	public void testEpsgSouth(){
 		GeodeticPoint sydney= new GeodeticPoint(-33.90632062825244, 151.20215639320887, 0);
-		Assert.assertEquals("32756", CoordinateReference.getEpsg(sydney));
+		Assert.assertEquals("32756", new GeodeticOriginCRS(sydney, 0).getEpsg());
 	}
 	@Test
 	public void testEpsgSingleDigitLongZone(){
 		GeodeticPoint anchorage = new GeodeticPoint(61.2163129, -149.8948520, 0);
-		Assert.assertEquals("32606", CoordinateReference.getEpsg(anchorage));
+		Assert.assertEquals("32606", new GeodeticOriginCRS(anchorage, 0).getEpsg());
 	}
 	@Test
 	public void testOriginWGS84viaUTMconvertOrigin() {
