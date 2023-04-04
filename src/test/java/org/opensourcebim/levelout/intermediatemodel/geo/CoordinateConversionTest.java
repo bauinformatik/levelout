@@ -29,8 +29,16 @@ public class CoordinateConversionTest {
 	public void testHorizontal(){
 		CartesianPoint p1 = new CartesianPoint(10, 5, 0);
 		CartesianPoint p2 = new CartesianPoint(20, 5, 0);
-		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 55, 0), 0);
-		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.00001);
+		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56, 0), 0);
+		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.000001); // ~10 cm
+	}
+
+	@Test
+	public void testVertical(){
+		CartesianPoint p1 = new CartesianPoint(5, 10, 0);
+		CartesianPoint p2 = new CartesianPoint(5, 20, 0);
+		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56, 0), Math.PI/2);
+		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.0000001); // ~10 cm
 	}
 	@Test
 	public void testEpsgNorth(){

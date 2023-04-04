@@ -28,7 +28,7 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 	double getGridConvergence() {  // at origin, this may still be off if the origin is far away from actual coordinates
 		double Gridnum = Double.valueOf(getEpsg().substring(3));
 		double longitudeDiff = origin.longitude - (6 * Gridnum - 183);
-		return Math.atan(Math.tan(longitudeDiff) * Math.sin(origin.latitude));
+		return Math.atan(Math.tan(Math.toRadians(longitudeDiff)) * Math.sin(Math.toRadians(origin.latitude)));
 	}
 
 	public GeodeticPoint cartesianToGeodeticViaGeoCentric(CartesianPoint cart) {
