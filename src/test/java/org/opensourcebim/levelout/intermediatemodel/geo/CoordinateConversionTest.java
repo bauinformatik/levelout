@@ -7,22 +7,22 @@ public class CoordinateConversionTest {
 
 	public void testGridConvergenceCentralMeridian(){
 		GeodeticPoint centralMeridian = new GeodeticPoint(45, 63, 0);
-		Assert.assertEquals(0, new GeodeticOriginCRS(centralMeridian, 0).getGridConvergence(),0.00000001);
+		Assert.assertEquals(0, new GeodeticOriginCRS(centralMeridian, 0).getUtmGridConvergence(),0.00000001);
 	}
 	@Test
 	public void testGridConvergenceEquator() {
 		GeodeticPoint equator = new GeodeticPoint(0, 61, 0);
-		Assert.assertEquals(0, new GeodeticOriginCRS(equator, 0).getGridConvergence(),0.00000001);
+		Assert.assertEquals(0, new GeodeticOriginCRS(equator, 0).getUtmGridConvergence(),0.00000001);
 	}
 	@Test
 	public void testGridConvergenceBorder() {
 		GeodeticPoint segmentBorder = new GeodeticPoint(45, 60, 0); // belongs to the right segment?
-		Assert.assertEquals(-0.03704094636470207, new GeodeticOriginCRS(segmentBorder, 0).getGridConvergence(), 0.00000001);
+		Assert.assertEquals(-0.03704094636470207, new GeodeticOriginCRS(segmentBorder, 0).getUtmGridConvergence(), 0.00000001);
 	}
 	@Test
 	public void testGridConvergence() {
 		GeodeticPoint equator = new GeodeticPoint(45, 61, 0); // west of central, north of equator
-		Assert.assertEquals(-0.024687696117208394, new GeodeticOriginCRS(equator, 0).getGridConvergence(), 0.00000001);
+		Assert.assertEquals(-0.024687696117208394, new GeodeticOriginCRS(equator, 0).getUtmGridConvergence(), 0.00000001);
 	}
 
 	@Test

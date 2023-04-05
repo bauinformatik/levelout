@@ -8,10 +8,22 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 	private static final long serialVersionUID = 6482545861344232840L;
 	private final GeodeticPoint origin;
 	private final double rotation;
+	private final double utmGridConvergence;
+	private final ProjCoordinate utmOrigin;
+	private final CoordinateTransform utmToWgs84;
 
 	public GeodeticOriginCRS(GeodeticPoint origin, double rotation) {
 		this.origin = origin;
 		this.rotation = rotation;
+
+		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
+		String epsg = "epsg:" + getEpsg();
+		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
+		utmGridConvergence = getUtmGridConvergence();
+		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
+		utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
+				new ProjCoordinate());
+		utmToWgs84 = ctFactory.createTransform(utm, wgs84);
 	}
 
 	String getEpsg() {
@@ -25,7 +37,7 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		}
 	}
 
-	double getGridConvergence() {  // at origin, this may still be off if the origin is far away from actual coordinates
+	double getUtmGridConvergence() {  // at origin, this may still be off if the origin is far away from actual coordinates
 		double Gridnum = Double.valueOf(getEpsg().substring(3));
 		double longitudeDiff = origin.longitude - (6 * Gridnum - 183);
 		return Math.atan(Math.tan(Math.toRadians(longitudeDiff)) * Math.sin(Math.toRadians(origin.latitude)));
@@ -81,19 +93,11 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
-		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
-		String epsg = "epsg:" + getEpsg();
-		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
-		double gridConvergence = getGridConvergence();
-		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
-		ProjCoordinate utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
-				new ProjCoordinate());
-		double a = Math.cos(- rotation - gridConvergence);
-		double b = Math.sin(- rotation - gridConvergence);
+		double a = Math.cos(- rotation - utmGridConvergence);
+		double b = Math.sin(- rotation - utmGridConvergence);
 		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
 		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
 
-		CoordinateTransform utmToWgs84 = ctFactory.createTransform(utm, wgs84);
 		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY),
 				new ProjCoordinate());
 
