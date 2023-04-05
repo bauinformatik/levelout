@@ -29,9 +29,9 @@ public class SpatialAnalysisTests {
 
 		*/
 		room1 = new Room(
-				Arrays.asList(new Corner(0, 0), new Corner(6, 0), new Corner(6, 6), new Corner(0, 6)));
+                "R1", Arrays.asList(new Corner(0, 0), new Corner(6, 0), new Corner(6, 6), new Corner(0, 6)));
 		room2 = new Room(
-				Arrays.asList(new Corner(6, 0), new Corner(10, 0), new Corner(7, 6), new Corner(6, 6)));
+                "R2", Arrays.asList(new Corner(6, 0), new Corner(10, 0), new Corner(7, 6), new Corner(6, 6)));
 		door1 = new Door(Arrays.asList(new Corner(1, 6), new Corner(2, 6)));
 		door2 = new Door(Arrays.asList(new Corner(1, 7), new Corner(2, 7)));
 		door3 = new Door(Arrays.asList(new Corner(6, 1), new Corner(6, 2)));

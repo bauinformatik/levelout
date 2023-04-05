@@ -12,9 +12,12 @@ public class Storey implements Serializable {
 	private final List<Door> doors;
 	private final double elevation;
 
-	public Storey(int level, double elevation, List<Room> rooms, List<Door> doors) {
+	private final String name;
+
+	public Storey(int level, double elevation, String name, List<Room> rooms, List<Door> doors) {
 		this.level = level;
 		this.elevation = elevation;
+		this.name = name;
 		this.rooms = rooms;
 		this.doors = doors;
 		for(Room room: rooms){
@@ -38,5 +41,9 @@ public class Storey implements Serializable {
 
 	public double getZ() {
 		return elevation;
+	}
+
+	public String getName() {
+		return  name;
 	}
 }

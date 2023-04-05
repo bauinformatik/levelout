@@ -55,16 +55,14 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			List<Room> rooms = new ArrayList<>();
 			List<Door> doors = new ArrayList<>();
 			double elevation = storey.getElevation(); // TODO: use for sorting and in intermediate model
-			Storey loStorey = new Storey(level++, elevation, rooms, doors);
+			Storey loStorey = new Storey(level++, elevation, storey.getName(), rooms, doors);
 			loStoreys.add(loStorey);
-			storey.getName(); /* TODO: use in intermediate model (OSM has "name" tag, but also "level:ref" for short keys) */
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : aggregation.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
-					Room room = new Room(getPolygon(space.getGeometry(), elevation));
+					Room room = new Room(space.getName(), getPolygon(space.getGeometry(), elevation));
 					rooms.add(room);
 					roomsMap.put(space, room); // later needed for assignment to doors
-					space.getName(); // TODO: use in intermediate model
 				}
 			}
 			for (IfcRelContainedInSpatialStructure containment : storey.getContainsElements()) {
@@ -72,7 +70,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 				for (IfcDoor ifcDoor : containment.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
-					Door door = new Door(getPolygon(opening.getGeometry(), elevation));
+					Door door = new Door( ifcDoor.getName(), getPolygon(opening.getGeometry(), elevation));
 					doors.add(door);
 					EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
 					populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
@@ -83,7 +81,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							IfcOpeningElement opening = (IfcOpeningElement) voids.getRelatedOpeningElement();
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
-								Door door = new Door(getPolygon(opening.getGeometry(), elevation));
+								Door door = new Door( getPolygon(opening.getGeometry(), elevation));
 								doors.add(door);
 								populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
 							}

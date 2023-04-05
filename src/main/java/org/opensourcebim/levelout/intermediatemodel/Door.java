@@ -17,10 +17,24 @@ public class Door implements Serializable {
 	private Room room1;
 	private Room room2;
 	private Storey storey;
+	private final String name;
 
-	public Door(List<Corner> corners) {
+	private final boolean closable;
+
+	public Door(List<Corner> corners){
+		this(null, corners);
+	}
+	public Door(List<Corner> corners, boolean closable){
+		this(null, corners, closable);
+	}
+	public Door(String name, List<Corner> corners) {
+		this(name, corners, true);
+	}
+	public  Door(String name, List<Corner> corners, boolean closable) {
 		this.id = ++highestId;
+		this.name = name;
 		this.corners = corners;
+		this.closable = closable;
 	}
 
 	void setStorey(Storey storey) {
@@ -77,5 +91,13 @@ public class Door implements Serializable {
 
 	static void resetCounter() {
 		highestId = 0;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public boolean isClosable() {
+		return closable;
 	}
 }

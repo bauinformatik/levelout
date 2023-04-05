@@ -43,7 +43,7 @@ public class OsmBuilder {
 		osmOutput.write(door);
 	}
 
-	private void createAndWriteRoom(Room room, String level) throws IOException {
+	private void createAndWriteRoom(Room room, List<Tag> levelTags) throws IOException {
 		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all
 		// and write later
 		List<Long> nodes = new ArrayList<>();
@@ -53,28 +53,36 @@ public class OsmBuilder {
 		}
 		if (nodes.size() > 0)
 			nodes.add(nodes.get(0));
-		List<OsmTag> tags = Arrays.asList(new Tag("indoor", "room"), new Tag("level", level),
-				new Tag("ref", "Room #" + room.getId()));
+
+		List<OsmTag> tags = new ArrayList<>(List.of(
+				new Tag("indoor", "room"),
+				new Tag("ref", room.getName())));
+		tags.addAll(levelTags);
 		OsmWay way = new Way(--wayId, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		osmOutput.write(way);
 	}
 
-	private void createAndWriteDoor(Door door, String level) throws IOException {
-
-		List<OsmTag> tags = Arrays.asList(new Tag("door", "yes"), new Tag("level", level),
-				new Tag("ref", "Door #" + door.getId()));
+	private void createAndWriteDoor(Door door, List<Tag> levelTags) throws IOException {
+		List<OsmTag> tags = new ArrayList<>(List.of(
+				new Tag("indoor", "door"),
+				new Tag("door", door.isClosable() ? "yes" : "no")
+				));
+		if(door.getName()!=null) tags.add(new Tag("ref", door.getName()));;
+		tags.addAll(levelTags);
 		createAndWriteOsmNode(door.computeCentroid(), tags);
-
 	}
 
 	private void createAndWriteStorey(Storey storey) throws IOException {
-		String lvl = Integer.toString(storey.getLevel());
+		List<Tag> levelTags = Arrays.asList(
+				new Tag("level", Integer.toString(storey.getLevel())),
+				new Tag("level:ref", storey.getName())
+		);
 		for (Room room : storey.getRooms()) {
-			createAndWriteRoom(room, lvl);
+			createAndWriteRoom(room, levelTags);
 
 		}
 		for (Door door : storey.getDoors()) {
-			createAndWriteDoor(door, lvl);
+			createAndWriteDoor(door, levelTags);
 
 		}
 

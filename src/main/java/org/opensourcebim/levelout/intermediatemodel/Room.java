@@ -14,8 +14,10 @@ public class Room implements Serializable {
 	private final long id;
 	private final List<Corner> corners;
 	private Storey storey;
+	private final String name;
 
-	public Room(List<Corner> corners) {
+	public Room(String name, List<Corner> corners) {
+		this.name = name;
 		this.id = ++highestId;
 		this.corners = corners;
 	}
@@ -54,4 +56,7 @@ public class Room implements Serializable {
 		highestId = 0;
 	}
 
+	public String getName() {
+		return name;
+	}
 }
