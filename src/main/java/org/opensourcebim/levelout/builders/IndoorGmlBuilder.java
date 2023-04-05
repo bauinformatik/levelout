@@ -217,6 +217,11 @@ public class IndoorGmlBuilder {
 				roomStateMap.get(door.getRoom2()));
 
 	}
+	private TransitionType createTransitionReverse(Door door) {
+		
+		return createTransition("door" + door.getId() + "REVERSE", roomStateMap.get(door.getRoom2()),
+				roomStateMap.get(door.getRoom1()));
+	}
 
 	public void setTransitionPos(TransitionType trans, List<Double> coordinates) {
 		LineStringType linestring = createLineString(coordinates);
@@ -240,6 +245,24 @@ public class IndoorGmlBuilder {
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
 		transition.setGeometry(curveProp);
 		return transition;
+	}
+	
+	private TransitionType setTransitionPosReverse(TransitionType transition, Door door) {
+		List<Double> centroid = door.computeCentroid();
+		List<Double> coordinates = Arrays.asList(
+				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
+				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
+				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2), centroid.get(0),
+				centroid.get(1), centroid.get(2),
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
+				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2));
+		LineStringType linestring = createLineString(coordinates);
+		CurvePropertyType curveProp = new CurvePropertyType();
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		transition.setGeometry(curveProp);
+		return transition;
+		
 	}
 
 	public void addTransition(EdgesType edges, TransitionType transition) {
@@ -299,7 +322,7 @@ public class IndoorGmlBuilder {
 	private void setStateConnects(StateType state, TransitionType transition) {
 		TransitionPropertyType transitionProp = new TransitionPropertyType();
 		transitionProp.setHref("#" + transition.getId());
-		List<TransitionPropertyType> transProplist = Arrays.asList(transitionProp);
+		List<TransitionPropertyType> transProplist =new ArrayList<>(Arrays.asList(transitionProp));
 		if (stateConnectsMap.containsKey(state)) {
 			stateConnectsMap.get(state).add(transitionProp);
 		} else {
@@ -393,9 +416,12 @@ public class IndoorGmlBuilder {
 					// addCellSpaceBoundaryMembers(primalSpace, cellSpaceBoundary);
 					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2(), cellSpaceBoundary);
 					TransitionType transition = createTransition(door);
+					TransitionType transitionReverse = createTransitionReverse(door);
 					setTransitionPos(transition, door);
+					setTransitionPosReverse(transitionReverse, door);
 					addTransition(dualSpace.getEdges().get(0), transition);
-					setDuality(cellSpaceBoundary, transition);// TODO duality boundary - transition
+					addTransition(dualSpace.getEdges().get(0), transitionReverse);
+					setDuality(cellSpaceBoundary, transition);// TODO duality boundary - transition, reverse boundary
 				}
 				// TODO exterior doors
 			}
@@ -404,6 +430,7 @@ public class IndoorGmlBuilder {
 		return indoorFeatures;
 	}
 
+	
 	public void createAndAddCellSpaceBoundary(CellSpaceType cell1, CellSpaceType cell2, List<Double> coordinates,
 			CellSpaceBoundaryType cellSpaceBoundary) {
 		CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
