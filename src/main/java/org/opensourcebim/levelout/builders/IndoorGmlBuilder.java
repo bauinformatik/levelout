@@ -231,15 +231,13 @@ public class IndoorGmlBuilder {
 	}
 
 	public TransitionType setTransitionPos(TransitionType transition, Door door) {
-		List<Double> centroid = door.computeCentroid();
-		List<Double> coordinates = Arrays.asList(
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2), centroid.get(0),
-				centroid.get(1), centroid.get(2),
-				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
-				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
-				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2));
+		List<Double> doorCentroid = door.computeCentroid();
+		List<Double> room1Centroid = roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue();
+		List<Double> room2Centroid = roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue();
+		List<Double> coordinates = new ArrayList<>();
+		coordinates.addAll(room1Centroid);
+		coordinates.addAll(doorCentroid);
+		coordinates.addAll(room2Centroid);
 		LineStringType linestring = createLineString(coordinates);
 		CurvePropertyType curveProp = new CurvePropertyType();
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
@@ -248,15 +246,13 @@ public class IndoorGmlBuilder {
 	}
 	
 	private TransitionType setTransitionPosReverse(TransitionType transition, Door door) {
-		List<Double> centroid = door.computeCentroid();
-		List<Double> coordinates = Arrays.asList(
-				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(0),
-				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(1),
-				roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue().get(2), centroid.get(0),
-				centroid.get(1), centroid.get(2),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(0),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(1),
-				roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue().get(2));
+		List<Double> doorCentroid = door.computeCentroid();
+		List<Double> room2Centroid = roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue();
+		List<Double> room1Centroid = roomStateMap.get(door.getRoom1()).getGeometry().getPoint().getPos().getValue();
+		List<Double> coordinates = new ArrayList<>();
+		coordinates.addAll(room2Centroid);
+		coordinates.addAll(doorCentroid);
+		coordinates.addAll(room1Centroid);
 		LineStringType linestring = createLineString(coordinates);
 		CurvePropertyType curveProp = new CurvePropertyType();
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
