@@ -88,8 +88,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
 		ProjCoordinate utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
 				new ProjCoordinate());
-		double a = Math.cos(rotation - gridConvergence);
-		double b = Math.sin(rotation - gridConvergence);
+		double a = Math.cos(- rotation - gridConvergence);
+		double b = Math.sin(- rotation - gridConvergence);
 		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
 		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
 
