@@ -158,7 +158,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		if (!(refLatitude != null && refLatitude.size() >= 3)) return null;
 		EList<Long> refLongitude = site.get(0).getRefLongitude();
 		if (!(refLongitude != null && refLongitude.size() >= 3)) return null;
-		double rotation = Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0)) - Math.PI/2;
+		double rotation = - (Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0)) - Math.PI/2);
 		double latitude = degreesFromMinutes(refLatitude);
 		double longitude = degreesFromMinutes(refLongitude);
 		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation);

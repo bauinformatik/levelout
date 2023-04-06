@@ -95,8 +95,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
-		double a = Math.cos(- rotation - utmGridConvergence);
-		double b = Math.sin(- rotation - utmGridConvergence);
+		double a = Math.cos(rotation - utmGridConvergence);
+		double b = Math.sin(rotation - utmGridConvergence);
 		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
 		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
 
