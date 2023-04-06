@@ -47,9 +47,9 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	public GeodeticPoint cartesianToGeodeticViaGeoCentric(CartesianPoint cart) {
 		// https://epsg.io/9837-method
+		// https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#Geodetic_to/from_ENU_coordinates
 		// https://proj.org/operations/conversions/topocentric.html
-		// tests:
-		// https://github.com/locationtech/proj4j/tree/67d5e85fdf93f204e3b0d564f79c3195aaedaec0/core/src/test/java/org/locationtech/proj4j
+		// tests: https://github.com/locationtech/proj4j/tree/67d5e85fdf93f204e3b0d564f79c3195aaedaec0/core/src/test/java/org/locationtech/proj4j
 		CRSFactory factory = new CRSFactory();
 		// CoordinateReferenceSystem WGS84 = factory.createFromName("epsg:4326");
 		CoordinateReferenceSystem WGS842 = factory.createFromParameters("WGS84", "+proj=longlat +datum=WGS84 +no_defs");
@@ -95,8 +95,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
-		double a = Math.cos(rotation - utmGridConvergence);
-		double b = Math.sin(rotation - utmGridConvergence);
+		double a = Math.cos(rotation + utmGridConvergence);
+		double b = Math.sin(rotation + utmGridConvergence);
 		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
 		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
 

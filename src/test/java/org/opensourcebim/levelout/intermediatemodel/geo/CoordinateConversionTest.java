@@ -5,6 +5,7 @@ import org.junit.Test;
 
 public class CoordinateConversionTest {
 
+	@Test
 	public void testGridConvergenceCentralMeridian(){
 		GeodeticPoint centralMeridian = new GeodeticPoint(45, 63, 0);
 		Assert.assertEquals(0, new GeodeticOriginCRS(centralMeridian, 0).getUtmGridConvergence(),0.00000001);
@@ -30,7 +31,7 @@ public class CoordinateConversionTest {
 		CartesianPoint p1 = new CartesianPoint(10, 5, 0);
 		CartesianPoint p2 = new CartesianPoint(20, 5, 0);
 		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56, 0), 0);
-		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.000001); // ~10 cm
+		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.00000001); // ~1 mm
 	}
 
 	@Test
@@ -38,7 +39,7 @@ public class CoordinateConversionTest {
 		CartesianPoint p1 = new CartesianPoint(5, 10, 0);
 		CartesianPoint p2 = new CartesianPoint(5, 20, 0);
 		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56, 0), Math.PI/2);
-		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.0000001); // ~10 cm
+		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.000000001); // ~1 mm
 	}
 	@Test
 	public void testEpsgNorth(){
