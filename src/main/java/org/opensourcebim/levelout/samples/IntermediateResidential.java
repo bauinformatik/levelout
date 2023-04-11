@@ -71,8 +71,7 @@ public class IntermediateResidential {
 					),
 				Collections.emptyList())
 		), Arrays.asList( p1, p5, p8, p4 ),
-			new GeodeticOriginCRS(new GeodeticPoint(50.9772, 11.3465, 0), 0.25));
-
+			new GeodeticOriginCRS(new GeodeticPoint(50.9772, 11.3465, 0),0.23886154 ));
 	}
 }
 
