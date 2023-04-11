@@ -25,4 +25,43 @@ public class Geometry {
 		}
 		return minElevation;
 	}
+
+	public static Corner computeCentroid(List<Corner> corners) {
+		double cenX = 0;
+		double cenY = 0;
+		for (Corner node : corners) {
+			cenX += node.getX();
+			cenY += node.getY();
+		}
+		return new Corner(cenX / corners.size(), cenY / corners.size());
+	}
+
+	public static double bearingDegrees(double lat1d, double lon1d, double lat2d, double lon2d){
+		Direction direction = bearingAbsOrd(lat1d, lon1d, lat2d,lon2d);
+		return Math.toDegrees(Math.atan2(direction.y, direction.x));
+	}
+
+	public static Direction bearingAbsOrd(double lat1Deg, double lon1Deg, double lat2Deg, double lon2Deg){
+		double lat1 = Math.toRadians(lat1Deg), lon1 = Math.toRadians(lon1Deg);
+		double lat2 = Math.toRadians(lat2Deg), lon2 = Math.toRadians(lon2Deg);
+		double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2-lon1);
+		double y = Math.sin(lon2-lon1) * Math.cos(lat2);
+		return new Direction(x, y);
+
+	}
+
+	public static class Direction {
+		public final double x;
+		public final double y;
+
+		public Direction(double x, double y) {
+			this.y = y;
+			this.x = x;
+		}
+
+		@Override
+		public String toString() {
+			return "( " + this.x + ", " + this.y + " )";
+		}
+	}
 }

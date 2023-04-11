@@ -1,6 +1,5 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
-import org.opensourcebim.levelout.util.Centroid;
 import org.opensourcebim.levelout.util.Geometry;
 
 import java.io.Serializable;
@@ -54,7 +53,7 @@ public class Door implements Serializable {
 
 	public List<Double> computeCentroid() {
 
-		Corner doorcentroid = Centroid.computeCentroid(corners);
+		Corner doorcentroid = Geometry.computeCentroid(corners);
 		return List.of(doorcentroid.getX(), doorcentroid.getY(), storey == null ? 0 : storey.getZ());
 	}
 
