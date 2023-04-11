@@ -47,7 +47,17 @@ public class Geometry {
 		double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2-lon1);
 		double y = Math.sin(lon2-lon1) * Math.cos(lat2);
 		return new Direction(x, y);
+	}
 
+	public static List<Integer> DegMinSecFromFloat(double degreesF){
+		int degrees = (int) Math.floor(degreesF);
+		double minutesF = (degreesF-degrees) * 60;
+		int minutes = (int) Math.floor(minutesF);
+		double secondsF = (minutesF-minutes) * 60;
+		int seconds = (int) Math.floor(secondsF);
+		double fractionsF = (secondsF-seconds) * 1000000;
+		int fractions = (int) Math.floor(fractionsF);
+		return List.of(degrees, minutes, seconds, fractions);
 	}
 
 	public static class Direction {
