@@ -11,8 +11,10 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 	private final double utmGridConvergence;
 	private final ProjCoordinate utmOrigin;
 	private final CoordinateTransform utmToWgs84;
+	private final double scale;
 
-	public GeodeticOriginCRS(GeodeticPoint origin, double rotation) {
+	public GeodeticOriginCRS(GeodeticPoint origin, double rotation, double scale) {
+		this.scale = scale;
 		this.origin = origin;
 		this.rotation = rotation;
 
@@ -24,6 +26,9 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
 				new ProjCoordinate());
 		utmToWgs84 = ctFactory.createTransform(utm, wgs84);
+	}
+	public GeodeticOriginCRS(GeodeticPoint origin, double rotation) {
+		this(origin, rotation, 1);
 	}
 
 	String getEpsg() {
@@ -95,8 +100,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
-		double a = Math.cos(rotation + utmGridConvergence);
-		double b = Math.sin(rotation + utmGridConvergence);
+		double a = Math.cos(rotation + utmGridConvergence) * scale;
+		double b = Math.sin(rotation + utmGridConvergence) * scale;
 		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
 		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
 
