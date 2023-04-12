@@ -409,7 +409,7 @@ public class IndoorGmlBuilder {
 				} else if (!door.isExternal()) {
 					CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(
 							"csb-" + door.getRoom1().getId() + "-" + door.getRoom2().getId());
-					// addCellSpaceBoundaryMembers(primalSpace, cellSpaceBoundary);
+					//addCellSpaceBoundaryMembers(primalSpace, cellSpaceBoundary);
 					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2(), cellSpaceBoundary);
 					TransitionType transition = createTransition(door);
 					TransitionType transitionReverse = createTransitionReverse(door);
@@ -438,7 +438,7 @@ public class IndoorGmlBuilder {
 		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
 		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
 		cellspaceboundaries.add(cellspaceboundaryProp);
-		// cellspaceboundaryProp.setHref("#" + cellSpaceBoundary.getId());
+		//cellspaceboundaryProp.setHref("#" + cellSpaceBoundary.getId());
 		cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
 		cell1.setPartialboundedBy(cellspaceboundaries); // in fact the boundaries are added, which is what we want
 		cell2.setPartialboundedBy(cellspaceboundaries);
