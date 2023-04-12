@@ -12,12 +12,17 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 	private final double xAxisAbscissa;
 	private final double xAxisOrdinate;
 	private final String epsg;
+	private final double scale;
 
-	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, String epsg) {
+	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, double scale, String epsg) {
+		this.scale = scale;
 		this.origin = origin;
 		this.xAxisAbscissa = xAxisAbscissa;
 		this.xAxisOrdinate = xAxisOrdinate;
 		this.epsg = epsg;
+	}
+	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, String epsg) {
+		this(origin, xAxisAbscissa, xAxisOrdinate, 1, epsg );
 	}
 
 	@Override
@@ -35,7 +40,7 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 		CoordinateReferenceSystem originCRS = crsFactory.createFromName(epsg);
 
 		CoordinateTransform originCrsToWgs84 = ctFactory.createTransform(originCRS, wgs84);
-		ProjCoordinate resultcoord = originCrsToWgs84.transform(new ProjCoordinate(eastingsmap, northingsmap),
+		ProjCoordinate resultcoord = originCrsToWgs84.transform(new ProjCoordinate(eastingsmap*scale, northingsmap*scale),
 			new ProjCoordinate());
 
 		return new GeodeticPoint(resultcoord.y, resultcoord.x, origin.height);

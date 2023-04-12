@@ -8,7 +8,6 @@ import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.OutputStream;

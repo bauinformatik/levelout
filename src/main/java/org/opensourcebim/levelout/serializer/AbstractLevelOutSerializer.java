@@ -9,6 +9,7 @@ import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.Serializer;
 import org.bimserver.plugins.serializers.SerializerException;
 import org.bimserver.utils.GeometryUtils;
+import org.bimserver.utils.IfcUtils;
 import org.eclipse.emf.common.util.EList;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.geo.*;
@@ -45,7 +46,6 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);  // TODO check for map conversion (first, before geo)
 		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
 		// TODO consider units
-		ifcModelInterface.getAllWithSubTypes(IfcProject.class).get(0).getUnitsInContext().getUnits();
 		List<Storey> loStoreys = new ArrayList<>();
 		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
 		building = new Building(loStoreys, outline, crs);
@@ -147,11 +147,12 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		).collect(Collectors.toList());
 		if (ifcRepresentationContextStream.isEmpty() || ! ((IfcGeometricRepresentationContext)ifcRepresentationContextStream.get(0)).isSetTrueNorth()) return null;
 		IfcGeometricRepresentationContext context = (IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0);
-		CoordinateReference cr = getProjectedOriginCRS(context);
-		return (cr != null) ? cr : getGeodeticOriginCRS(site, context);
+		double factor = IfcUtils.getLengthUnitPrefix(ifcModelInterface);
+		CoordinateReference cr = getProjectedOriginCRS(context, factor);
+		return (cr != null) ? cr : getGeodeticOriginCRS(site, context, factor);
 	}
 
-	private static GeodeticOriginCRS getGeodeticOriginCRS(List<IfcSite> site, IfcGeometricRepresentationContext context) {
+	private static GeodeticOriginCRS getGeodeticOriginCRS(List<IfcSite> site, IfcGeometricRepresentationContext context, double scale) {
 		IfcDirection trueNorth = context.getTrueNorth();
 		if (!(trueNorth.getDirectionRatios()!=null && trueNorth.getDirectionRatios().size() == 2)) return null;
 		EList<Long> refLatitude = site.get(0).getRefLatitude();
@@ -161,16 +162,17 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		double rotation = - (Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0)) - Math.PI/2);
 		double latitude = degreesFromMinutes(refLatitude);
 		double longitude = degreesFromMinutes(refLongitude);
-		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation);
+		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation, scale);
 	}
 
-	private static CoordinateReference getProjectedOriginCRS(IfcGeometricRepresentationContext context) {
+	private static CoordinateReference getProjectedOriginCRS(IfcGeometricRepresentationContext context, double scale) {
 		Optional<IfcCoordinateOperation> first = context.getHasCoordinateOperation().stream().filter(co ->
 			co instanceof IfcMapConversion && co.getTargetCRS() != null
 		).findFirst();
 		if(first.isEmpty()) return null;
 		IfcMapConversion crs = ((IfcMapConversion) first.get());
-		return  new ProjectedOriginCRS(new ProjectedPoint(crs.getEastings(), crs.getNorthings(), crs.getOrthogonalHeight()), crs.getXAxisAbscissa(), crs.getXAxisOrdinate(), crs.getTargetCRS().getName());
+		crs.getScale(); // TODO consider this as well
+		return new ProjectedOriginCRS(new ProjectedPoint(crs.getEastings(), crs.getNorthings(), crs.getOrthogonalHeight()), crs.getXAxisAbscissa(), crs.getXAxisOrdinate(), scale, crs.getTargetCRS().getName());
 	}
 
 	private boolean checkGeodeticCRS(IfcModelInterface ifcModelInterface) {
