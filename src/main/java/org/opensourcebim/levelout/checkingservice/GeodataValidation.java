@@ -18,6 +18,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 public class GeodataValidation {
 
 	public void validateGeodata(StringBuilder txt, IfcModelInterface model) {
+		txt.append("Geodata validation\n----------------\n");
 		//Validates the presence of the respective IFC entities and select types for the investigation
 		 IfcProject projects = model.getAll(IfcProject.class).stream().findAny().orElse(null);
          if (projects != null) {
