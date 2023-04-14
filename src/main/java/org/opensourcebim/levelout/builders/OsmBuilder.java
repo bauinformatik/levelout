@@ -112,6 +112,8 @@ public class OsmBuilder {
 			tags.add(new Tag("min_level", Integer.toString(storeys.get(0).getLevel())));
 			tags.add(new Tag("max_level", Integer.toString(storeys.get(storeys.size() - 1).getLevel())));
 		}
+		if (nodes.size() > 0)
+			nodes.add(nodes.get(0));
 		OsmWay way = new Way(--wayId, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		this.osmOutput.write(way);
 		for (Storey storey : storeys) {
