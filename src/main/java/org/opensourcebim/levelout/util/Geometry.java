@@ -36,6 +36,15 @@ public class Geometry {
 		return new Corner(cenX / corners.size(), cenY / corners.size());
 	}
 
+	public static double angleDegrees(double lat1d, double lon1d, double lat2d, double lon2d){
+		Direction direction = angleAbsOrd(lat1d, lon1d, lat2d,lon2d);
+		return Math.toDegrees(Math.atan2(direction.y, direction.x));
+	}
+
+	public static Direction angleAbsOrd(double lat1d, double lon1d, double lat2d, double lon2d){
+		Direction direction = bearingAbsOrd(lat1d, lon1d, lat2d,lon2d);
+		return new Direction(direction.y, direction.x);
+	}
 	public static double bearingDegrees(double lat1d, double lon1d, double lat2d, double lon2d){
 		Direction direction = bearingAbsOrd(lat1d, lon1d, lat2d,lon2d);
 		return Math.toDegrees(Math.atan2(direction.y, direction.x));

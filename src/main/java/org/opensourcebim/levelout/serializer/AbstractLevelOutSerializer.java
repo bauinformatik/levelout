@@ -52,16 +52,14 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
 		int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
 		for (IfcBuildingStorey storey : storeys) {
-			List<Room> rooms = new ArrayList<>();
-			List<Door> doors = new ArrayList<>();
-			double elevation = storey.getElevation(); // TODO: use for sorting and in intermediate model
-			Storey loStorey = new Storey(level++, elevation, storey.getName(), rooms, doors);
+			double elevation = storey.getElevation(); // TODO: use for sorting
+			Storey loStorey = new Storey(level++, elevation, storey.getName());
 			loStoreys.add(loStorey);
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : aggregation.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
 					Room room = new Room(space.getName(), getPolygon(space.getGeometry(), elevation));
-					rooms.add(room);
+					loStorey.addRooms(room);
 					roomsMap.put(space, room); // later needed for assignment to doors
 				}
 			}
@@ -71,7 +69,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
 					Door door = new Door( ifcDoor.getName(), getPolygon(opening.getGeometry(), elevation));
-					doors.add(door);
+					loStorey.addDoors(door);
 					EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
 					populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
 				}
@@ -82,7 +80,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
 								Door door = new Door( getPolygon(opening.getGeometry(), elevation));
-								doors.add(door);
+								loStorey.addDoors(door);
 								populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
 							}
 						}

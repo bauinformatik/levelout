@@ -1,6 +1,7 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,23 +9,34 @@ public class Storey implements Serializable {
 
 	private static final long serialVersionUID = 224912596112948321L;
 	private final int level;
-	private final List<Room> rooms;
-	private final List<Door> doors;
+	private final List<Room> rooms = new ArrayList<>();
+	private final List<Door> doors = new ArrayList<>();
 	private final double elevation;
 
 	private final String name;
 
-	public Storey(int level, double elevation, String name, List<Room> rooms, List<Door> doors) {
+	public Storey(int level, double elevation, String name){
 		this.level = level;
 		this.elevation = elevation;
 		this.name = name;
-		this.rooms = rooms;
-		this.doors = doors;
-		for(Room room: rooms){
+	}
+	public Storey(int level, double elevation, String name, List<Room> rooms, List<Door> doors) {
+		this(level, elevation, name);
+		this.addRooms( rooms.toArray(new Room[0]) );
+		this.addDoors( doors.toArray(new Door[0]) );
+	}
+
+	public void addRooms(Room...  rooms){
+		for (Room room : rooms) {
 			room.setStorey(this);
+			this.rooms.add(room);
 		}
+	}
+
+	public void addDoors(Door... doors){
 		for(Door door: doors){
 			door.setStorey(this);
+			this.doors.add(door);
 		}
 	}
 
