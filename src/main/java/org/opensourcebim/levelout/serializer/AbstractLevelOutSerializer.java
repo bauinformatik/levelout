@@ -43,9 +43,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 	}
 
 	private void initStructure(IfcModelInterface ifcModelInterface) {
-		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);  // TODO check for map conversion (first, before geo)
+		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);
 		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
-		// TODO consider units
 		List<Storey> loStoreys = new ArrayList<>();
 		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
 		building = new Building(loStoreys, outline, crs);
