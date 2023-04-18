@@ -49,9 +49,15 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
 		building = new Building(loStoreys, outline, crs);
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
-		int level = 0; // TODO sort by elevation, 0 is closest elevation to 0, from there increment up and down
+		int level = 0;
+		storeys.sort(Comparator.comparingDouble(IfcBuildingStorey::getElevation));
+		while(storeys.get(-level).getElevation()<0){
+			level--;
+		}
+		// TODO this sets the first storey with positive elevation to 0, though EG might be at -0.25 (Smiley West)
+		// and walkout-basements should be counted as level 0 in OSM
 		for (IfcBuildingStorey storey : storeys) {
-			double elevation = storey.getElevation(); // TODO: use for sorting
+			double elevation = storey.getElevation();
 			Storey loStorey = new Storey(level++, elevation, storey.getName());
 			loStoreys.add(loStorey);
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
