@@ -3,6 +3,9 @@ package org.opensourcebim.levelout.builders;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import net.opengis.gml.v_3_2.*;
 import net.opengis.indoorgml.core.v_1_0.*;
+import net.opengis.indoorgml.navigation.v_1_0.AnchorSpaceType;
+
+import org.eclipse.persistence.internal.oxm.record.deferred.AnyMappingContentHandler;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;
@@ -26,6 +29,7 @@ public class IndoorGmlBuilder {
 	private final Map<Room, StateType> roomStateMap = new HashMap<>();
 	private final Map<Room, CellSpaceType> roomCellMap = new HashMap<>();
 	private final Map<StateType, List<TransitionPropertyType>> stateConnectsMap = new HashMap<>();
+	private final Map<CellSpaceType, List<CellSpaceBoundaryPropertyType>> cellspaceboundariesMap = new HashMap<>();
 
 	private PointType createPoint(double x, double y, double z) {
 		PointType point = new PointType();
@@ -103,6 +107,13 @@ public class IndoorGmlBuilder {
 		return cellSpace;
 	}
 
+	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
+		CellSpaceBoundaryType cellSpaceBoundary = new CellSpaceBoundaryType();
+		cellSpaceBoundary.setId(id);
+		return cellSpaceBoundary;
+
+	}
+
 	public void add2DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
 		PolygonType polygon = createSurface(coordinates);
 		add2DGeometry(cellSpace, polygon);
@@ -164,6 +175,29 @@ public class IndoorGmlBuilder {
 		primalSpaceFeatures.getCellSpaceBoundaryMember().add(cellSpaceBoundaryMember);
 	}
 
+	public void createAndAddCellSpaceBoundary(List<CellSpaceType> cells, List<Double> coordinates,
+			CellSpaceBoundaryType cellSpaceBoundary) {
+		CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
+		LineStringType linestring = createLineString(coordinates);
+		CurvePropertyType curveProp = new CurvePropertyType();
+		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
+		csbgeom.setGeometry2D(curveProp);
+		cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
+		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
+		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
+		cellspaceboundaries.add(cellspaceboundaryProp);
+		// cellspaceboundaryProp.setHref("#" + cellSpaceBoundary.getId());
+		cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
+		for (CellSpaceType cell : cells) {
+			if (!cellspaceboundariesMap.containsKey(cell)) {
+				cellspaceboundariesMap.put(cell, cellspaceboundaries);
+			} else {
+				cellspaceboundariesMap.get(cell).addAll(cellspaceboundaries);
+			} // in fact the boundaries are added, which is what we want
+		}
+
+	}
+
 	public StateType createState(String id) {
 		StateType name = new StateType();
 		name.setId(id);
@@ -216,8 +250,9 @@ public class IndoorGmlBuilder {
 				roomStateMap.get(door.getRoom2()));
 
 	}
+
 	private TransitionType createTransitionReverse(Door door) {
-		
+
 		return createTransition("door" + door.getId() + "REVERSE", roomStateMap.get(door.getRoom2()),
 				roomStateMap.get(door.getRoom1()));
 	}
@@ -243,7 +278,7 @@ public class IndoorGmlBuilder {
 		transition.setGeometry(curveProp);
 		return transition;
 	}
-	
+
 	private TransitionType setTransitionPosReverse(TransitionType transition, Door door) {
 		List<Double> doorCentroid = door.computeCentroid();
 		List<Double> room2Centroid = roomStateMap.get(door.getRoom2()).getGeometry().getPoint().getPos().getValue();
@@ -257,7 +292,7 @@ public class IndoorGmlBuilder {
 		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
 		transition.setGeometry(curveProp);
 		return transition;
-		
+
 	}
 
 	public void addTransition(EdgesType edges, TransitionType transition) {
@@ -317,7 +352,7 @@ public class IndoorGmlBuilder {
 	private void setStateConnects(StateType state, TransitionType transition) {
 		TransitionPropertyType transitionProp = new TransitionPropertyType();
 		transitionProp.setHref("#" + transition.getId());
-		List<TransitionPropertyType> transProplist =new ArrayList<>(Arrays.asList(transitionProp));
+		List<TransitionPropertyType> transProplist = new ArrayList<>(Arrays.asList(transitionProp));
 		if (stateConnectsMap.containsKey(state)) {
 			stateConnectsMap.get(state).add(transitionProp);
 		} else {
@@ -340,6 +375,14 @@ public class IndoorGmlBuilder {
 		stateProp2.setHref("#" + state2.getId());
 		List<StatePropertyType> stateProplist = Arrays.asList(stateProp, stateProp2);
 		transition.setConnects(stateProplist);
+	}
+
+	private void setCellspaceBoundaries(
+			Map<CellSpaceType, List<CellSpaceBoundaryPropertyType>> cellspaceboundariesMap) {
+
+		for (Entry<CellSpaceType, List<CellSpaceBoundaryPropertyType>> entry : cellspaceboundariesMap.entrySet()) {
+			entry.getKey().setPartialboundedBy(entry.getValue());
+		}
 	}
 
 	public SpaceLayerType getFirstDualSpaceLayer(IndoorFeaturesType indoorFeatures) {
@@ -403,13 +446,16 @@ public class IndoorGmlBuilder {
 				add2DGeometry(cs, room);
 			}
 			for (Door door : storey.getDoors()) {
-				if (!storey.getRooms().contains(door.getRoom1()) || !storey.getRooms().contains(door.getRoom2())) {
-					// TODO warning
-				} else if (!door.isExternal()) {
+				// if (!storey.getRooms().contains(door.getRoom1()) ||
+				// !storey.getRooms().contains(door.getRoom2())) {
+				// TODO warning
+				// } else
+				if (!door.isExternal()) {
 					CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(
 							"csb-" + door.getRoom1().getId() + "-" + door.getRoom2().getId());
-					//addCellSpaceBoundaryMembers(primalSpace, cellSpaceBoundary);
-					createAndAddCellSpaceBoundary(door, door.getRoom1(), door.getRoom2(), cellSpaceBoundary);
+					createAndAddCellSpaceBoundary(
+							Arrays.asList(roomCellMap.get(door.getRoom1()), roomCellMap.get(door.getRoom2())),
+							door.asCoordinateList(), cellSpaceBoundary);
 					TransitionType transition = createTransition(door);
 					TransitionType transitionReverse = createTransitionReverse(door);
 					setTransitionPos(transition, door);
@@ -417,44 +463,21 @@ public class IndoorGmlBuilder {
 					addTransition(dualSpace.getEdges().get(0), transition);
 					addTransition(dualSpace.getEdges().get(0), transitionReverse);
 					setDuality(cellSpaceBoundary, transition);// TODO duality boundary - transition, reverse boundary
+				} else if (door.isExternal()) {
+					CellSpaceBoundaryType cellSpaceBoundaryext = createCellspaceBoundary(
+							"csb-" + door.getRoom1().getId());
+					createAndAddCellSpaceBoundary(Arrays.asList(roomCellMap.get(door.getRoom1())),
+							door.asCoordinateList(), cellSpaceBoundaryext);
+
 				}
-				// TODO exterior doors
+				// addCellSpaceBoundaryMembers(primalSpace, cellSpaceBoundary);
+
 			}
+
+			setCellspaceBoundaries(cellspaceboundariesMap);
 			setConnectsForState(stateConnectsMap);
 		}
 		return indoorFeatures;
-	}
-
-	
-	public void createAndAddCellSpaceBoundary(CellSpaceType cell1, CellSpaceType cell2, List<Double> coordinates,
-			CellSpaceBoundaryType cellSpaceBoundary) {
-		CellSpaceBoundaryGeometryType csbgeom = new CellSpaceBoundaryGeometryType();
-		LineStringType linestring = createLineString(coordinates);
-		CurvePropertyType curveProp = new CurvePropertyType();
-		curveProp.setAbstractCurve(gmlObjectFactory.createLineString(linestring));
-		csbgeom.setGeometry2D(curveProp);
-		cellSpaceBoundary.setCellSpaceBoundaryGeometry(csbgeom);
-		List<CellSpaceBoundaryPropertyType> cellspaceboundaries = new ArrayList<>();
-		CellSpaceBoundaryPropertyType cellspaceboundaryProp = new CellSpaceBoundaryPropertyType();
-		cellspaceboundaries.add(cellspaceboundaryProp);
-		//cellspaceboundaryProp.setHref("#" + cellSpaceBoundary.getId());
-		cellspaceboundaryProp.setCellSpaceBoundary(indoorObjectFactory.createCellSpaceBoundary(cellSpaceBoundary));
-		cell1.setPartialboundedBy(cellspaceboundaries); // in fact the boundaries are added, which is what we want
-		cell2.setPartialboundedBy(cellspaceboundaries);
-
-	}
-
-	private void createAndAddCellSpaceBoundary(Door door, Room room1, Room room2,
-			CellSpaceBoundaryType cellSpaceBoundary) {
-		createAndAddCellSpaceBoundary(roomCellMap.get(room1), roomCellMap.get(room2), door.asCoordinateList(),
-				cellSpaceBoundary);
-	}
-
-	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
-		CellSpaceBoundaryType cellSpaceBoundary = new CellSpaceBoundaryType();
-		cellSpaceBoundary.setId(id);
-		return cellSpaceBoundary;
-
 	}
 
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
