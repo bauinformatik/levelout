@@ -2,7 +2,6 @@ package org.opensourcebim.levelout.samples;
 
 import java.util.List;
 
-import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.AbstractBuildingSubdivisionProperty;
 import org.citygml4j.core.model.building.Building;
 import org.citygml4j.core.model.building.Storey;

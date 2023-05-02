@@ -1,23 +1,13 @@
 package org.opensourcebim.levelout.samples;
 
-import org.citygml4j.core.model.CityGMLVersion;
 import org.citygml4j.core.model.building.Building;
-import org.citygml4j.core.model.building.BuildingPart;
 import org.citygml4j.core.model.building.BuildingRoom;
 import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
 import org.citygml4j.core.model.core.AbstractThematicSurface;
-import org.citygml4j.core.model.core.AbstractUnoccupiedSpace;
-import org.citygml4j.core.model.core.AbstractUnoccupiedSpaceProperty;
 import org.citygml4j.core.util.geometry.GeometryFactory;
-import org.citygml4j.xml.CityGMLContext;
-import org.citygml4j.xml.module.citygml.CoreModule;
-import org.citygml4j.xml.writer.CityGMLChunkWriter;
-import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.opensourcebim.levelout.builders.CityGmlBuilder;
-import org.xmlobjects.gml.model.feature.BoundingShape;
-import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty;
 import org.xmlobjects.gml.model.geometry.primitives.*;
@@ -26,7 +16,6 @@ import org.xmlobjects.gml.util.id.IdCreator;
 
 import java.io.FileOutputStream;
 import java.nio.file.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
