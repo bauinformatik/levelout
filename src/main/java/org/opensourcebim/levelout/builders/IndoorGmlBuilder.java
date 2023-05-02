@@ -463,7 +463,7 @@ public class IndoorGmlBuilder {
 					addTransition(dualSpace.getEdges().get(0), transition);
 					addTransition(dualSpace.getEdges().get(0), transitionReverse);
 					setDuality(cellSpaceBoundary, transition);// TODO duality boundary - transition, reverse boundary
-				} else if (door.isExternal()) {
+				} else  {
 					CellSpaceBoundaryType cellSpaceBoundaryext = createCellspaceBoundary(
 							"csb-" + door.getRoom1().getId());
 					createAndAddCellSpaceBoundary(Arrays.asList(roomCellMap.get(door.getRoom1())),

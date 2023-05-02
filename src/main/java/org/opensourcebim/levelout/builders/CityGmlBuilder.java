@@ -9,7 +9,6 @@ import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
 import org.citygml4j.core.model.core.AbstractThematicSurface;
-import org.citygml4j.core.model.core.EngineeringCRSProperty;
 import org.citygml4j.core.util.geometry.GeometryFactory;
 import org.citygml4j.xml.CityGMLContext;
 import org.citygml4j.xml.CityGMLContextException;
@@ -20,8 +19,6 @@ import org.citygml4j.xml.writer.CityGMLWriteException;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
-import org.xmlobjects.gml.model.deprecated.AbstractMetaData;
-import org.xmlobjects.gml.model.deprecated.MetaDataProperty;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty;
@@ -48,6 +45,7 @@ import java.util.List;
 public class CityGmlBuilder {
 	private final IdCreator idCreator = DefaultIdCreator.getInstance();
 	private final GeometryFactory geometryFactory = GeometryFactory.newInstance().withIdCreator(idCreator);
+	private final Envelope envelope = new Envelope();
 
 	public LineString createCitygmlLines(Door door) {
 		return geometryFactory.createLineString(door.asCoordinateList(), 3);
@@ -78,6 +76,9 @@ public class CityGmlBuilder {
 	}
 
 	private Polygon createCitygmlPoly(Room room) {
+		for(Corner corner : room.getCorners()){
+			envelope.include(corner.getX(), corner.getY());
+		}
 		return geometryFactory.createPolygon(room.asCoordinateList(), 3);
 	}
 
@@ -142,7 +143,10 @@ public class CityGmlBuilder {
 
 	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
-		addGroundSurface(cityGmlBuilding, building.asCoordinateList());
+		// TODO only create groundsurface if building outline is present, check if this is the correct way to represent LOD0 building outline
+		if(building.getCorners().size()>=3) {
+			addGroundSurface(cityGmlBuilding, building.asCoordinateList());
+		}
 		setEngineeringCRS(building.getCrs());
 
 		for (Storey storey : building.getStoreys()) {
@@ -201,7 +205,7 @@ public class CityGmlBuilder {
 		CityGMLContext context = CityGMLContext.newInstance(cityGmlBuilding.getClass().getClassLoader());
 		CityGMLVersion version = CityGMLVersion.v3_0;
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
-		Envelope envelope = cityGmlBuilding.computeEnvelope();
+		this.envelope.include(cityGmlBuilding.computeEnvelope());  // will only consider direct building boundaries, not rooms etc.
 		//EngineeringCRSProperty ec = new EngineeringCRSProperty();
 		// ec.setGenericElement(null);te
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream,
@@ -209,8 +213,8 @@ public class CityGmlBuilder {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
 					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 					.withHeaderComment("File created with citygml4j");
-		//	writer.getCityModelInfo().setEngineeringCRS(ec);
-			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
+			//	writer.getCityModelInfo().setEngineeringCRS(ec);
+			writer.getCityModelInfo().setBoundedBy(new BoundingShape(this.envelope));
 			writer.writeMember(cityGmlBuilding);
 		}
 	}
