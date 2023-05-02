@@ -16,8 +16,10 @@ import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.xmlobjects.gml.model.basictypes.Code;
 import org.xmlobjects.gml.model.geometry.DirectPosition;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 public class CityGmlBasic {
-	public static void main(String[] args) throws CityGMLWriteException, CityGMLContextException {
+	public static void main(String[] args) throws CityGMLWriteException, CityGMLContextException, ParserConfigurationException {
 		Building building = new Building();
 		CityModel cityModel = new CityModel();
 		cityModel.getCityObjectMembers().add(new AbstractCityObjectProperty(building));

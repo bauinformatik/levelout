@@ -8,9 +8,9 @@ import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 import org.opensourcebim.levelout.builders.OsmBuilder;
 import org.opensourcebim.levelout.intermediatemodel.Building;
-import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,7 +46,7 @@ public class IntermediateObjectTest {
 	}
 
 	@Test
-	public void testCityGmlFromFile() throws IOException, CityGMLWriteException, CityGMLContextException, ClassNotFoundException {
+	public void testCityGmlFromFile() throws IOException, CityGMLWriteException, CityGMLContextException, ClassNotFoundException, ParserConfigurationException {
 		for(File file: intermediate) {
 			setup(file);
 			new CityGmlBuilder().createAndWriteBuilding(building, getOutputStream(".city.gml", file));

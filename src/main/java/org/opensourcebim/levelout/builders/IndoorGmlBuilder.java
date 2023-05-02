@@ -3,9 +3,7 @@ package org.opensourcebim.levelout.builders;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import net.opengis.gml.v_3_2.*;
 import net.opengis.indoorgml.core.v_1_0.*;
-import net.opengis.indoorgml.navigation.v_1_0.AnchorSpaceType;
 
-import org.eclipse.persistence.internal.oxm.record.deferred.AnyMappingContentHandler;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.Room;

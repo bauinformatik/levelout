@@ -10,6 +10,7 @@ import org.opensourcebim.levelout.builders.OsmBuilder;
 import org.opensourcebim.levelout.intermediatemodel.Building;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,7 +28,7 @@ public class IntermediateResidentialTest {
 	}
 
 	@Test
-	public void testCityGml() throws FileNotFoundException, CityGMLWriteException, CityGMLContextException {
+	public void testCityGml() throws FileNotFoundException, CityGMLWriteException, CityGMLContextException, ParserConfigurationException {
 		new CityGmlBuilder().createAndWriteBuilding(building, new FileOutputStream("output/test-city.gml"));
 	}
 	@Test
