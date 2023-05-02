@@ -9,6 +9,7 @@ import org.citygml4j.core.model.building.BuildingRoomProperty;
 import org.citygml4j.core.model.construction.*;
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty;
 import org.citygml4j.core.model.core.AbstractThematicSurface;
+import org.citygml4j.core.model.core.EngineeringCRSProperty;
 import org.citygml4j.core.util.geometry.GeometryFactory;
 import org.citygml4j.xml.CityGMLContext;
 import org.citygml4j.xml.CityGMLContextException;
@@ -18,6 +19,9 @@ import org.citygml4j.xml.writer.CityGMLOutputFactory;
 import org.citygml4j.xml.writer.CityGMLWriteException;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.Door;
+import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+import org.xmlobjects.gml.model.deprecated.AbstractMetaData;
+import org.xmlobjects.gml.model.deprecated.MetaDataProperty;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty;
@@ -26,9 +30,19 @@ import org.xmlobjects.gml.model.geometry.primitives.LineString;
 import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
+
+import net.opengis.gml.v_3_2.CartesianCSPropertyType;
+import net.opengis.gml.v_3_2.CartesianCSType;
+import net.opengis.gml.v_3_2.CoordinateSystemAxisPropertyType;
+import net.opengis.gml.v_3_2.CoordinateSystemAxisType;
+import net.opengis.gml.v_3_2.EngineeringCRSPropertyType;
+import net.opengis.gml.v_3_2.EngineeringCRSType;
+import net.opengis.gml.v_3_2.EngineeringDatumType;
+
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CityGmlBuilder {
@@ -106,7 +120,6 @@ public class CityGmlBuilder {
 		}
 		for (Door door : storey.getDoors()) {
 			if (door.getCorners().size() >= 3) {
-				// TODO Solve Closed Ring issue - degenerated doors
 				Polygon poly = createDegeneratedDoors(door);
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
@@ -130,6 +143,8 @@ public class CityGmlBuilder {
 	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
 		addGroundSurface(cityGmlBuilding, building.asCoordinateList());
+		setEngineeringCRS(building.getCrs());
+
 		for (Storey storey : building.getStoreys()) {
 			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
 			cityGmlStorey.setSortKey((double) storey.getLevel());
@@ -141,17 +156,60 @@ public class CityGmlBuilder {
 		return cityGmlBuilding;
 	}
 
+	private void setEngineeringCRS(CoordinateReference crs) {
+
+		EngineeringCRSPropertyType engineeringCRSPropertyType = new EngineeringCRSPropertyType();
+		// engineeringCRSPropertyTypet
+
+		EngineeringCRSType ec = new EngineeringCRSType();
+
+		ec.setId("local-CRS-1");
+		ec.withScope("CityGML");
+		CartesianCSPropertyType cartesianCS = new CartesianCSPropertyType();
+		CartesianCSType cs = new CartesianCSType();
+		cs.setId("local-CS-1");
+
+		List<String> axes = Arrays.asList("X", "Y", "Z");
+
+		int i = 0;
+		for (String a : axes) {
+			CoordinateSystemAxisPropertyType csaxisProp = new CoordinateSystemAxisPropertyType();
+			CoordinateSystemAxisType axis = new CoordinateSystemAxisType();
+			axis.setId(a.toUpperCase());
+			axis.getAxisAbbrev().setCodeSpace(a);
+			axis.getAxisDirection().setCodeSpace("XYZ");
+			axis.setUom("urn:ogc:def:uom:EPSG::9001");
+			csaxisProp.setCoordinateSystemAxis(axis);
+			cs.getAxis().get(i).getValue().setCoordinateSystemAxis(axis);
+		}
+
+		cartesianCS.setCartesianCS(cs);
+		ec.getCartesianCS().setValue(cartesianCS);
+		EngineeringDatumType engineeringDatum = new EngineeringDatumType();
+		engineeringDatum.setId("local-datum-1");
+		engineeringDatum.getAnchorDefinition().getValue().setCodeSpace("urn:ogc:def:crs,crs:EPSG::" + crs.toString());
+
+		// TODO : set anchor coordinates
+
+		ec.getEngineeringDatum().getValue().setEngineeringDatum(engineeringDatum);
+		engineeringCRSPropertyType.setEngineeringCRS(ec);
+
+	}
+
 	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding)
 			throws CityGMLContextException, CityGMLWriteException {
 		CityGMLContext context = CityGMLContext.newInstance(cityGmlBuilding.getClass().getClassLoader());
 		CityGMLVersion version = CityGMLVersion.v3_0;
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
 		Envelope envelope = cityGmlBuilding.computeEnvelope();
+		//EngineeringCRSProperty ec = new EngineeringCRSProperty();
+		// ec.setGenericElement(null);te
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream,
 				StandardCharsets.UTF_8.name())) {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
 					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 					.withHeaderComment("File created with citygml4j");
+		//	writer.getCityModelInfo().setEngineeringCRS(ec);
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(envelope));
 			writer.writeMember(cityGmlBuilding);
 		}
