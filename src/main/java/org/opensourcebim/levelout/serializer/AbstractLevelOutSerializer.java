@@ -51,14 +51,16 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
 		int level = 0;
 		storeys.sort(Comparator.comparingDouble(IfcBuildingStorey::getElevation));
-		while(storeys.get(-level).getElevation()<0){
+		double minDistance = Double.MAX_VALUE;
+		while(-level < storeys.size() && Math.abs(storeys.get(-level).getElevation()) < minDistance){
+			// this might be the highest negative or the lowest positive whichever is closer to zero
+			// actually, walkout-basements should be counted as level 0 in OSM, but we cannot know
+			minDistance = Math.abs(storeys.get(-level).getElevation());
 			level--;
 		}
-		// TODO this sets the first storey with positive elevation to 0, though EG might be at -0.25 (Smiley West)
-		// and walkout-basements should be counted as level 0 in OSM
 		for (IfcBuildingStorey storey : storeys) {
 			double elevation = storey.getElevation();
-			Storey loStorey = new Storey(level++, elevation, storey.getName());
+			Storey loStorey = new Storey(++level, elevation, storey.getName());
 			loStoreys.add(loStorey);
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
