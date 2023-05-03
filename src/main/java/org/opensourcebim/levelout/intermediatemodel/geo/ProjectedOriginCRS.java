@@ -14,15 +14,17 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 	private final String epsg;
 	private final double scale;
 
-	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, double scale, String epsg) {
+	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, double scale,
+			String epsg) {
 		this.scale = scale;
 		this.origin = origin;
 		this.xAxisAbscissa = xAxisAbscissa;
 		this.xAxisOrdinate = xAxisOrdinate;
 		this.epsg = epsg;
 	}
+
 	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, String epsg) {
-		this(origin, xAxisAbscissa, xAxisOrdinate, 1, epsg );
+		this(origin, xAxisAbscissa, xAxisOrdinate, 1, epsg);
 	}
 
 	@Override
@@ -31,7 +33,8 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 		double rotation = Math.atan2(xAxisOrdinate, xAxisAbscissa);
 		double a = Math.cos(rotation);
 		double b = Math.sin(rotation);
-		// TODO just normalize to avoid large products later, no need for trigonometric functions
+		// TODO just normalize to avoid large products later, no need for trigonometric
+		// functions
 
 		double eastingsmap = (a * cart.x) - (b * cart.y) + origin.eastings;
 		double northingsmap = (b * cart.x) + (a * cart.y) + origin.northings;
@@ -40,9 +43,33 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 		CoordinateReferenceSystem originCRS = crsFactory.createFromName(epsg);
 
 		CoordinateTransform originCrsToWgs84 = ctFactory.createTransform(originCRS, wgs84);
-		ProjCoordinate resultcoord = originCrsToWgs84.transform(new ProjCoordinate(eastingsmap*scale, northingsmap*scale),
-			new ProjCoordinate());
+		ProjCoordinate resultcoord = originCrsToWgs84
+				.transform(new ProjCoordinate(eastingsmap * scale, northingsmap * scale), new ProjCoordinate());
 
 		return new GeodeticPoint(resultcoord.y, resultcoord.x, origin.height);
+	}
+
+	@Override
+	public double getOriginX() {
+		// TODO Auto-generated method stub
+		return origin.northings;
+	}
+
+	@Override
+	public double getOriginY() {
+		// TODO Auto-generated method stub
+		return origin.eastings;
+	}
+
+	@Override
+	public String getEpsgvalue() {
+		// TODO Auto-generated method stub
+		return epsg;
+	}
+
+	@Override
+	public double getOriginZ() {
+		// TODO Auto-generated method stub
+		return origin.height;
 	}
 }

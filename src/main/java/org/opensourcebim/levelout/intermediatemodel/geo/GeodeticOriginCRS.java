@@ -23,15 +23,15 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
 		utmGridConvergence = getUtmGridConvergence();
 		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
-		utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude),
-				new ProjCoordinate());
+		utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude), new ProjCoordinate());
 		utmToWgs84 = ctFactory.createTransform(utm, wgs84);
 	}
+
 	public GeodeticOriginCRS(GeodeticPoint origin, double rotation) {
 		this(origin, rotation, 1);
 	}
 
-	String getEpsg() {
+	public String getEpsg() {
 		// TODO : Account for special cases: Norway and Svalbard
 		if (origin.latitude <= -80 || origin.latitude > 84) {
 			throw new IllegalArgumentException("Latitude outside of valid range -80..84.");
@@ -45,7 +45,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		return (int) ((Math.floor((origin.longitude + 180) / 6) % 60) + 1);
 	}
 
-	double getUtmGridConvergence() {  // at origin, this may still be off if the origin is far away from actual coordinates
+	double getUtmGridConvergence() { // at origin, this may still be off if the origin is far away from actual
+										// coordinates
 		double longitudeDiff = origin.longitude - (6 * (double) getSegmentNumber() - 183);
 		return Math.atan(Math.tan(Math.toRadians(longitudeDiff)) * Math.sin(Math.toRadians(origin.latitude)));
 	}
@@ -54,7 +55,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		// https://epsg.io/9837-method
 		// https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#Geodetic_to/from_ENU_coordinates
 		// https://proj.org/operations/conversions/topocentric.html
-		// tests: https://github.com/locationtech/proj4j/tree/67d5e85fdf93f204e3b0d564f79c3195aaedaec0/core/src/test/java/org/locationtech/proj4j
+		// tests:
+		// https://github.com/locationtech/proj4j/tree/67d5e85fdf93f204e3b0d564f79c3195aaedaec0/core/src/test/java/org/locationtech/proj4j
 		CRSFactory factory = new CRSFactory();
 		// CoordinateReferenceSystem WGS84 = factory.createFromName("epsg:4326");
 		CoordinateReferenceSystem WGS842 = factory.createFromParameters("WGS84", "+proj=longlat +datum=WGS84 +no_defs");
@@ -110,5 +112,29 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 		return new GeodeticPoint(wgs84Point.y, wgs84Point.x, origin.height);
 
+	}
+
+	@Override
+	public double getOriginX() {
+		// TODO Auto-generated method stub
+		return origin.latitude;
+	}
+
+	@Override
+	public double getOriginY() {
+		// TODO Auto-generated method stub
+		return origin.longitude;
+	}
+
+	@Override
+	public String getEpsgvalue() {
+		// TODO Auto-generated method stub
+		return getEpsg();
+	}
+
+	@Override
+	public double getOriginZ() {
+		// TODO Auto-generated method stub
+		return origin.height;
 	}
 }

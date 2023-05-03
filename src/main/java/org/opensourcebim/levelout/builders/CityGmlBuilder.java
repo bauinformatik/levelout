@@ -30,13 +30,7 @@ import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
 
-import net.opengis.gml.v_3_2.CartesianCSPropertyType;
-import net.opengis.gml.v_3_2.CartesianCSType;
-import net.opengis.gml.v_3_2.CoordinateSystemAxisPropertyType;
-import net.opengis.gml.v_3_2.CoordinateSystemAxisType;
-import net.opengis.gml.v_3_2.EngineeringCRSPropertyType;
-import net.opengis.gml.v_3_2.EngineeringCRSType;
-import net.opengis.gml.v_3_2.EngineeringDatumType;
+
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.OutputStream;
@@ -79,7 +73,7 @@ public class CityGmlBuilder {
 	}
 
 	private Polygon createCitygmlPoly(Room room) {
-		for(Corner corner : room.getCorners()){
+		for (Corner corner : room.getCorners()) {
 			envelope.include(corner.getX(), corner.getY());
 		}
 		return geometryFactory.createPolygon(room.asCoordinateList(), 3);
@@ -145,10 +139,12 @@ public class CityGmlBuilder {
 		write(outStream, createBuilding(building), createEngineeringCrs(building.getCrs()));
 	}
 
-	private org.citygml4j.core.model.building.Building createBuilding(Building building) throws ParserConfigurationException {
+	private org.citygml4j.core.model.building.Building createBuilding(Building building)
+			throws ParserConfigurationException {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
-		// TODO only create groundsurface if building outline is present, check if this is the correct way to represent LOD0 building outline
-		if(building.getCorners().size()>=3) {
+		// TODO only create groundsurface if building outline is present, check if this
+		// is the correct way to represent LOD0 building outline
+		if (building.getCorners().size() >= 3) {
 			addGroundSurface(cityGmlBuilding, building.asCoordinateList());
 		}
 
@@ -163,79 +159,73 @@ public class CityGmlBuilder {
 		return cityGmlBuilding;
 	}
 
-	private void setEngineeringCRS(CoordinateReference crs) {
-
-		EngineeringCRSPropertyType engineeringCRSPropertyType = new EngineeringCRSPropertyType();
-		// engineeringCRSPropertyTypet
-
-		EngineeringCRSType ec = new EngineeringCRSType();
-
-		ec.setId("local-CRS-1");
-		ec.withScope("CityGML");
-		CartesianCSPropertyType cartesianCS = new CartesianCSPropertyType();
-		CartesianCSType cs = new CartesianCSType();
-		cs.setId("local-CS-1");
+	private EngineeringCRSProperty createEngineeringCrs(CoordinateReference crs) throws ParserConfigurationException {
+		GenericXmlBuilder builder = new GenericXmlBuilder();
+		Node engCRS = builder.root("EngineeringCRS").attribute("id", "local-CRS-1");
+		engCRS.node("description").text("engineering");
+		engCRS.node("identifier").attribute("codeSpace", "XYZ").text("urn:ogc:def:crs:local:CRS:1");
+		engCRS.node("scope").text("CityGML");
+		Node cartesianCRS = engCRS.node("cartesianCS").node("CartesianCS").attribute("id", "local-CS-1");
+		cartesianCRS.node("description").text("Cartesian 3D CS. Axes: 3 UoM: m.");
+		cartesianCRS.node("identifier").attribute("codeSpace", "XYZ").text("urn:ogc:def:crs:local:CS:1");
 
 		List<String> axes = Arrays.asList("X", "Y", "Z");
 
-		int i = 0;
+		int i = 1;
 		for (String a : axes) {
-			CoordinateSystemAxisPropertyType csaxisProp = new CoordinateSystemAxisPropertyType();
-			CoordinateSystemAxisType axis = new CoordinateSystemAxisType();
-			axis.setId(a.toUpperCase());
-			axis.getAxisAbbrev().setCodeSpace(a);
-			axis.getAxisDirection().setCodeSpace("XYZ");
-			axis.setUom("urn:ogc:def:uom:EPSG::9001");
-			csaxisProp.setCoordinateSystemAxis(axis);
-			cs.getAxis().get(i).getValue().setCoordinateSystemAxis(axis);
+
+			Node csAxis = cartesianCRS.node("axis").node("CoordinateSystemAxis")
+					.attribute("id", "local-axis-" + Integer.toString(i))
+					.attribute("uom", "urn:ogc:def:uom:EPSG::9001");
+			csAxis.node("identifier").attribute("codeSpace", "XYZ").text(a);
+			csAxis.node("axisAbbrev").text(a.toLowerCase());
+			csAxis.node("axisDirection").attribute("codeSpace", "XYZ").text(a);
+			i++;
 		}
 
-		cartesianCS.setCartesianCS(cs);
-		ec.getCartesianCS().setValue(cartesianCS);
-		EngineeringDatumType engineeringDatum = new EngineeringDatumType();
-		engineeringDatum.setId("local-datum-1");
-		engineeringDatum.getAnchorDefinition().getValue().setCodeSpace("urn:ogc:def:crs,crs:EPSG::" + crs.toString());
+		Node engineeringDatum = engCRS.node("engineeringDatum").node("EngineeringDatum").attribute("id",
+				"local-datum-1");
+		engineeringDatum.node("description").text("Cartesian datum");
+		engineeringDatum.node("identifier").attribute("codeSpace", "XYZ").text("Datum1");
+		engineeringDatum.node("scope").text("CityGML");
+		engineeringDatum.node("anchorDefinition")
+				.attribute("codeSpace", "urn:ogc:def:crs,crs:EPSG::" + crs.getEpsgvalue())
+				.text(Double.toString(crs.getOriginX()) + " " + Double.toString(crs.getOriginY()) + " "
+						+ Double.toString(crs.getOriginZ()) + " ");
 
-		// TODO : set anchor coordinates
-
-		ec.getEngineeringDatum().getValue().setEngineeringDatum(engineeringDatum);
-		engineeringCRSPropertyType.setEngineeringCRS(ec);
-
-	}
-
-	private EngineeringCRSProperty createEngineeringCrs(CoordinateReference crs) throws ParserConfigurationException {
-		GenericXmlBuilder builder = new GenericXmlBuilder();
-		Node engCRS = builder.root("EngineeringCRS").attribute("id", "local-CS-1");
-		engCRS.node("identifier").attribute("codeSpace", "XYZ").text("urn:ogc:def:crs:local:CRS:1");
-		Node cartesianCRS = engCRS.node("cartesianCS").node("CartesianCS").attribute("id", "local-CRS-1");
-		Node csAxis = cartesianCRS.node("axis").node("CoordinateSystemAxis").attribute("id", "local-axis-1").attribute("uom", "urn:ogc:def:uom:EPSG::9001");
-		// sample https://github.com/opengeospatial/CityGML-3.0Encodings/blob/50af15ffc860f57ba29042844af7e8b40e960851/Moved_to_CITYGML-3.0Encoding_CityGML/Examples/Core/LocalCRS_CityGML3.gml
+		// sample
+		// https://github.com/opengeospatial/CityGML-3.0Encodings/blob/50af15ffc860f57ba29042844af7e8b40e960851/Moved_to_CITYGML-3.0Encoding_CityGML/Examples/Core/LocalCRS_CityGML3.gml
 
 		EngineeringCRSProperty engineeringCRSProperty = new EngineeringCRSProperty();
 		engineeringCRSProperty.setGenericElement(engCRS.generic());
 		return engineeringCRSProperty;
 	}
 
-	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding) throws CityGMLWriteException, CityGMLContextException, ParserConfigurationException {
+	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding)
+			throws CityGMLWriteException, CityGMLContextException, ParserConfigurationException {
 		write(outStream, cityGmlBuilding, null);
 	}
-	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding, EngineeringCRSProperty engineeringCRS)
+
+	public void write(OutputStream outStream, org.citygml4j.core.model.building.Building cityGmlBuilding,
+			EngineeringCRSProperty engineeringCRS)
 			throws CityGMLContextException, CityGMLWriteException, ParserConfigurationException {
 		CityGMLContext context = CityGMLContext.newInstance(cityGmlBuilding.getClass().getClassLoader());
 		CityGMLVersion version = CityGMLVersion.v3_0;
 		CityGMLOutputFactory outputFactory = context.createCityGMLOutputFactory(version);
-		this.envelope.include(cityGmlBuilding.computeEnvelope());  // will only consider direct building boundaries, not rooms etc.
+		this.envelope.include(cityGmlBuilding.computeEnvelope()); // will only consider direct building boundaries, not
+																	// rooms etc.
 		try (CityGMLChunkWriter writer = outputFactory.createCityGMLChunkWriter(outStream,
 				StandardCharsets.UTF_8.name())) {
 			writer.withIndent("  ").withDefaultSchemaLocations().withDefaultPrefixes()
 					.withDefaultNamespace(CoreModule.of(version).getNamespaceURI())
 					.withHeaderComment("File created with citygml4j");
-			//	writer.getCityModelInfo().setEngineeringCRS(ec);
+
+			// writer.getCityModelInfo().setEngineeringCRS(ec);
+			if (engineeringCRS != null)
+				writer.getCityModelInfo().setEngineeringCRS(engineeringCRS);
 			writer.getCityModelInfo().setBoundedBy(new BoundingShape(this.envelope));
-			if(engineeringCRS!=null) writer.getCityModelInfo().setEngineeringCRS(engineeringCRS);
 			writer.writeMember(cityGmlBuilding);
 		}
 	}
-
 
 }
