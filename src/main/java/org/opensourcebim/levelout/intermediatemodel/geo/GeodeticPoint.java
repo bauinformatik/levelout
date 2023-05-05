@@ -23,4 +23,14 @@ public class GeodeticPoint implements Serializable {
 		double longitudeDiff = longitude - (6 * (double) getUtmSegmentNumber() - 183);
 		return Math.atan(Math.tan(Math.toRadians(longitudeDiff)) * Math.sin(Math.toRadians(latitude)));
 	}
+
+    public String getUtmEpsg() {
+        // TODO : Account for special cases: Norway and Svalbard
+        if (latitude <= -80 || latitude > 84) {
+            throw new IllegalArgumentException("Latitude outside of valid range -80..84.");
+        } else {
+            String segment = String.format("%02d", getUtmSegmentNumber());
+            return (latitude > 0 ? "326" : "327") + segment;
+        }
+    }
 }

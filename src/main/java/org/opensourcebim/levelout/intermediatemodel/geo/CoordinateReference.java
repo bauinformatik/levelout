@@ -22,7 +22,7 @@ public abstract class CoordinateReference {
 
 	public abstract double getOriginX();
 	public abstract double getOriginY();
-	public abstract String getEpsgvalue();
+	public abstract String getEpsg();
 	public abstract double getOriginZ();
 	
 }

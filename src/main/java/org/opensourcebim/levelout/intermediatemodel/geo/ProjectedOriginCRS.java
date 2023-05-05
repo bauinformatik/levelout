@@ -43,7 +43,6 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 
 	@Override
 	public double getOriginX() {
-		// TODO Auto-generated method stub
 		return origin.northings;
 	}
 
@@ -53,7 +52,7 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 	}
 
 	@Override
-	public String getEpsgvalue() {
+	public String getEpsg() {
 		return epsg;
 	}
 

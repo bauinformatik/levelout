@@ -14,7 +14,7 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		super(rotation + origin.getUtmGridConvergence(), scale);
 		this.origin = origin;
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
-		String epsg = "epsg:" + getEpsg();
+		String epsg = "epsg:" + origin.getUtmEpsg();
 		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
 		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
 		utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude), new ProjCoordinate());
@@ -23,16 +23,6 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	public GeodeticOriginCRS(GeodeticPoint origin, double rotation) {
 		this(origin, rotation, 1);
-	}
-
-	public String getEpsg() {
-		// TODO : Account for special cases: Norway and Svalbard
-		if (origin.latitude <= -80 || origin.latitude > 84) {
-			throw new IllegalArgumentException("Latitude outside of valid range -80..84.");
-		} else {
-			String segment = String.format("%02d", origin.getUtmSegmentNumber());
-			return (origin.latitude > 0 ? "326" : "327") + segment;
-		}
 	}
 
 	public GeodeticPoint cartesianToGeodeticViaGeoCentric(CartesianPoint cart) {
@@ -110,14 +100,12 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 	}
 
 	@Override
-	public String getEpsgvalue() {
-		// TODO Auto-generated method stub
-		return getEpsg();
+	public String getEpsg() {
+		return "4326";
 	}
 
 	@Override
 	public double getOriginZ() {
-		// TODO Auto-generated method stub
 		return origin.height;
 	}
 }

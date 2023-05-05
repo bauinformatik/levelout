@@ -44,18 +44,18 @@ public class CoordinateConversionTest {
 	@Test
 	public void testEpsgNorth(){
 		GeodeticPoint weimar = new GeodeticPoint(50.9795, 11.3235, 0);
-		Assert.assertEquals("32632", new GeodeticOriginCRS(weimar, 0).getEpsg());
+		Assert.assertEquals("32632", new GeodeticOriginCRS(weimar, 0).origin.getUtmEpsg());
 	}
 
 	@Test
 	public void testEpsgSouth(){
 		GeodeticPoint sydney= new GeodeticPoint(-33.90632062825244, 151.20215639320887, 0);
-		Assert.assertEquals("32756", new GeodeticOriginCRS(sydney, 0).getEpsg());
+		Assert.assertEquals("32756", new GeodeticOriginCRS(sydney, 0).origin.getUtmEpsg());
 	}
 	@Test
 	public void testEpsgSingleDigitLongZone(){
 		GeodeticPoint anchorage = new GeodeticPoint(61.2163129, -149.8948520, 0);
-		Assert.assertEquals("32606", new GeodeticOriginCRS(anchorage, 0).getEpsg());
+		Assert.assertEquals("32606", new GeodeticOriginCRS(anchorage, 0).origin.getUtmEpsg());
 	}
 	@Test
 	public void testOriginWGS84viaUTMconvertOrigin() {
