@@ -7,12 +7,10 @@ public class ProjectedPoint implements Serializable {
 
 	public double eastings;
 	public double northings;
-	public double height;
 
-	public ProjectedPoint(double eastings, double northings, double height) {
+	public ProjectedPoint(double eastings, double northings) {
 		this.eastings = eastings;
 		this.northings = northings;
-		this.height = height;
 	}
 
 }

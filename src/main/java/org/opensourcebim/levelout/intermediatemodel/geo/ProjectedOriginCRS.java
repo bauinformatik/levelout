@@ -38,7 +38,7 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 		ProjCoordinate resultcoord = originCrsToWgs84
 				.transform(new ProjCoordinate(eastingsmap, northingsmap ), new ProjCoordinate());
 
-		return new GeodeticPoint(resultcoord.y, resultcoord.x, origin.height);
+		return new GeodeticPoint(resultcoord.y, resultcoord.x);
 	}
 
 	@Override
@@ -56,8 +56,4 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 		return epsg;
 	}
 
-	@Override
-	public double getOriginZ() {
-		return origin.height;
-	}
 }

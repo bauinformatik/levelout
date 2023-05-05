@@ -49,7 +49,7 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		new CoordinateTransformFactory().createTransform(source, intermediate);
 		new CoordinateTransformFactory().createTransform(intermediate, target);
 		new CoordinateTransformFactory().createTransform(step1, step2);
-		return new GeodeticPoint(0, 0, 0);
+		return new GeodeticPoint(0, 0);
 	}
 
 	public GeodeticPoint cartesianToGeodeticViaGeoCentric2(CartesianPoint cart) {
@@ -83,7 +83,7 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY),
 				new ProjCoordinate());
 
-		return new GeodeticPoint(wgs84Point.y, wgs84Point.x, origin.height);
+		return new GeodeticPoint(wgs84Point.y, wgs84Point.x);
 
 	}
 
@@ -104,8 +104,4 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		return "4326";
 	}
 
-	@Override
-	public double getOriginZ() {
-		return origin.height;
-	}
 }

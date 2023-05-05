@@ -190,7 +190,7 @@ public class CityGmlBuilder {
 		engineeringDatum.node("scope").text("CityGML");
 		engineeringDatum.node("anchorDefinition")
 				.attribute("codeSpace", "urn:ogc:def:crs,crs:EPSG::" + crs.getEpsg())
-				.text(crs.getOriginX() + " " + crs.getOriginY() + " " + crs.getOriginZ() + " ");
+				.text(crs.getOriginX() + " " + crs.getOriginY()  + " ");
 
 		// sample
 		// https://github.com/opengeospatial/CityGML-3.0Encodings/blob/50af15ffc860f57ba29042844af7e8b40e960851/Moved_to_CITYGML-3.0Encoding_CityGML/Examples/Core/LocalCRS_CityGML3.gml

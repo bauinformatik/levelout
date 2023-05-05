@@ -8,10 +8,9 @@ public class GeodeticPoint implements Serializable {
 	public double longitude;
 	public double height;
 
-	public GeodeticPoint(double latitude, double longitude, double height) {
+	public GeodeticPoint(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.height = height;
 	}
 
 	int getUtmSegmentNumber() {

@@ -44,7 +44,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 	private void initStructure(IfcModelInterface ifcModelInterface) {
 		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);
-		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0, 0), 0); // TODO use some default location in Weimar, Dresden ..
+		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0), 0); // TODO use some default location in Weimar, Dresden ..
 		List<Storey> loStoreys = new ArrayList<>();
 		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
 		building = new Building(loStoreys, outline, crs);
@@ -167,7 +167,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		double rotation = - (Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0)) - Math.PI/2);
 		double latitude = degreesFromMinutes(refLatitude);
 		double longitude = degreesFromMinutes(refLongitude);
-		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude, 0), rotation, scale);
+		return new GeodeticOriginCRS(new GeodeticPoint(latitude, longitude), rotation, scale);
 	}
 
 	private static CoordinateReference getProjectedOriginCRS(IfcGeometricRepresentationContext context, double scale) {
@@ -177,7 +177,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		if(first.isEmpty()) return null;
 		IfcMapConversion crs = ((IfcMapConversion) first.get());
 		crs.getScale(); // TODO consider this as well
-		return new ProjectedOriginCRS(new ProjectedPoint(crs.getEastings(), crs.getNorthings(), crs.getOrthogonalHeight()), crs.getXAxisAbscissa(), crs.getXAxisOrdinate(), scale, crs.getTargetCRS().getName());
+		return new ProjectedOriginCRS(new ProjectedPoint(crs.getEastings(), crs.getNorthings()), crs.getXAxisAbscissa(), crs.getXAxisOrdinate(), scale, crs.getTargetCRS().getName());
 	}
 
 	private boolean checkGeodeticCRS(IfcModelInterface ifcModelInterface) {
