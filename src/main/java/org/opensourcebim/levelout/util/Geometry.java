@@ -2,6 +2,8 @@ package org.opensourcebim.levelout.util;
 
 import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
+import org.opensourcebim.levelout.intermediatemodel.geo.CartesianPoint;
+import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,15 @@ public class Geometry {
 			coordinates.add(z);
 		}
 		return coordinates;
+	}
+
+	public static List<Double> asCoordinateList(List<Corner> corners, double z, CoordinateReference crs){
+		List<Corner> rotated = new ArrayList<>();
+		for(Corner corner: corners)	{
+			CartesianPoint rotatedPt = crs.rotateAndScale(new CartesianPoint(corner.getX(), corner.getY(), z));
+			rotated.add(new Corner(rotatedPt.x, rotatedPt.y));
+		}
+		return asCoordinateList(rotated, z);
 	}
 
 	public static double minimumLevel(List<Storey> storeys) {

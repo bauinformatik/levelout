@@ -6,22 +6,16 @@ import java.io.Serializable;
 
 public class GeodeticOriginCRS extends CoordinateReference implements Serializable {
 	private static final long serialVersionUID = 6482545861344232840L;
-	private final GeodeticPoint origin;
-	private final double rotation;
-	private final double utmGridConvergence;
+	final GeodeticPoint origin;
 	private final ProjCoordinate utmOrigin;
 	private final CoordinateTransform utmToWgs84;
-	private final double scale;
 
 	public GeodeticOriginCRS(GeodeticPoint origin, double rotation, double scale) {
-		this.scale = scale;
+		super(rotation + origin.getUtmGridConvergence(), scale);
 		this.origin = origin;
-		this.rotation = rotation;
-
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
 		String epsg = "epsg:" + getEpsg();
 		CoordinateReferenceSystem utm = crsFactory.createFromName(epsg);
-		utmGridConvergence = getUtmGridConvergence();
 		CoordinateTransform wgs84ToUTM = ctFactory.createTransform(wgs84, utm);
 		utmOrigin = wgs84ToUTM.transform(new ProjCoordinate(origin.longitude, origin.latitude), new ProjCoordinate());
 		utmToWgs84 = ctFactory.createTransform(utm, wgs84);
@@ -36,19 +30,9 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		if (origin.latitude <= -80 || origin.latitude > 84) {
 			throw new IllegalArgumentException("Latitude outside of valid range -80..84.");
 		} else {
-			String segment = String.format("%02d", getSegmentNumber());
+			String segment = String.format("%02d", origin.getUtmSegmentNumber());
 			return (origin.latitude > 0 ? "326" : "327") + segment;
 		}
-	}
-
-	private int getSegmentNumber() {
-		return (int) ((Math.floor((origin.longitude + 180) / 6) % 60) + 1);
-	}
-
-	double getUtmGridConvergence() { // at origin, this may still be off if the origin is far away from actual
-										// coordinates
-		double longitudeDiff = origin.longitude - (6 * (double) getSegmentNumber() - 183);
-		return Math.atan(Math.tan(Math.toRadians(longitudeDiff)) * Math.sin(Math.toRadians(origin.latitude)));
 	}
 
 	public GeodeticPoint cartesianToGeodeticViaGeoCentric(CartesianPoint cart) {
@@ -102,10 +86,9 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
-		double a = Math.cos(rotation + utmGridConvergence) * scale;
-		double b = Math.sin(rotation + utmGridConvergence) * scale;
-		double utmPointX = (a * cart.x) - (b * cart.y) + utmOrigin.x;
-		double utmPointY = (b * cart.x) + (a * cart.y) + utmOrigin.y;
+		CartesianPoint rotatedAndScaled = rotateAndScale(cart);
+		double utmPointX = rotatedAndScaled.x + utmOrigin.x;
+		double utmPointY = rotatedAndScaled.y + utmOrigin.y;
 
 		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY),
 				new ProjCoordinate());
