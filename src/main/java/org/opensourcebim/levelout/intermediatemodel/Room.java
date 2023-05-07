@@ -3,7 +3,6 @@ package org.opensourcebim.levelout.intermediatemodel;
 
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 import org.opensourcebim.levelout.util.Geometry;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;

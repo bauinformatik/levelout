@@ -37,7 +37,9 @@ public class Building implements Serializable {
 	public List<Double> asCoordinateList(CoordinateReference crs) {
 		return Geometry.asCoordinateList(corners, Geometry.minimumLevel(storeys)-0.1, crs);
 	}
+	
 	public CoordinateReference getCrs() {
 		return crs;
+		
 	}
 }

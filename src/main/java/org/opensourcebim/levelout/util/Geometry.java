@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Geometry {
+	
 	public static List<Double> asCoordinateList(List<Corner> corners, double z) {
 		List<Double> coordinates = new ArrayList<>();
 		for (Corner corner : corners) {
@@ -18,6 +19,7 @@ public class Geometry {
 		}
 		return coordinates;
 	}
+	
 
 	public static List<Double> asCoordinateList(List<Corner> corners, double z, CoordinateReference crs){
 		List<Corner> rotated = new ArrayList<>();

@@ -444,10 +444,10 @@ public class IndoorGmlBuilder {
 				add2DGeometry(cs, room);
 			}
 			for (Door door : storey.getDoors()) {
-				// if (!storey.getRooms().contains(door.getRoom1()) ||
-				// !storey.getRooms().contains(door.getRoom2())) {
+				 if (!storey.getRooms().contains(door.getRoom1()) ||
+				 !storey.getRooms().contains(door.getRoom2())) {
 				// TODO warning
-				// } else
+				 } else
 				if (!door.isExternal()) {
 					CellSpaceBoundaryType cellSpaceBoundary = createCellspaceBoundary(
 							"csb-" + door.getRoom1().getId() + "-" + door.getRoom2().getId());

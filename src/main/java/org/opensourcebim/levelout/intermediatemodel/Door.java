@@ -2,7 +2,6 @@ package org.opensourcebim.levelout.intermediatemodel;
 
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 import org.opensourcebim.levelout.util.Geometry;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +60,7 @@ public class Door implements Serializable {
 	public List<Double> asCoordinateList() {
 		return Geometry.asCoordinateList(corners, storey == null ? 0 : storey.getZ());
 	}
+	
 
 	public List<Double> asCoordinateList(CoordinateReference crs) {
 		return Geometry.asCoordinateList(corners, storey == null ? 0 : storey.getZ(), crs);
