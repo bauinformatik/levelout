@@ -3,7 +3,10 @@ package org.opensourcebim.levelout.intermediatemodel.geo;
 import org.locationtech.proj4j.CRSFactory;
 import org.locationtech.proj4j.CoordinateTransformFactory;
 
-public abstract class CoordinateReference {
+import java.io.Serializable;
+
+public abstract class CoordinateReference implements Serializable {
+	private static final long serialVersionUID = -6697679041586377603L;
 	static final CRSFactory crsFactory = new CRSFactory();
 	static final CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
 	private final double a;
