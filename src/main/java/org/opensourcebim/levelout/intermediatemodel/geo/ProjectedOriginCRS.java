@@ -53,7 +53,7 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 
 	@Override
 	public String getEpsg() {
-		return epsg;
+		return epsg.substring(5);
 	}
 
 }

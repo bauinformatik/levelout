@@ -43,9 +43,10 @@ public class CityGmlBuilder {
 	private final IdCreator idCreator = DefaultIdCreator.getInstance();
 	private final GeometryFactory geometryFactory = GeometryFactory.newInstance().withIdCreator(idCreator);
 	private final Envelope envelope = new Envelope();
+	private CoordinateReference crs;
 
 	public LineString createCitygmlLines(Door door) {
-		return geometryFactory.createLineString(door.asCoordinateList(), 3);
+		return geometryFactory.createLineString(door.asCoordinateList(crs), 3);
 	}
 
 	public AbstractSpaceBoundaryProperty createDoorSurface(LineString line) {
@@ -76,11 +77,11 @@ public class CityGmlBuilder {
 		for (Corner corner : room.getCorners()) {
 			envelope.include(corner.getX(), corner.getY());
 		}
-		return geometryFactory.createPolygon(room.asCoordinateList(), 3);
+		return geometryFactory.createPolygon(room.asCoordinateList(crs), 3);
 	}
 
 	private Polygon createDegeneratedDoors(Door door) {
-		return geometryFactory.createPolygon(door.asCoordinateList(), 3);
+		return geometryFactory.createPolygon(door.asCoordinateList(crs), 3);
 	}
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
@@ -142,10 +143,11 @@ public class CityGmlBuilder {
 	private org.citygml4j.core.model.building.Building createBuilding(Building building)
 			throws ParserConfigurationException {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
+		this.crs = building.getCrs();
 		// TODO only create groundsurface if building outline is present, check if this
 		// is the correct way to represent LOD0 building outline
 		if (building.getCorners().size() >= 3) {
-			addGroundSurface(cityGmlBuilding, building.asCoordinateList());
+			addGroundSurface(cityGmlBuilding, building.asCoordinateList(crs));
 		}
 
 		for (Storey storey : building.getStoreys()) {
