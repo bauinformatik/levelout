@@ -20,10 +20,9 @@ public abstract class CoordinateReference implements Serializable {
 	public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart);
 
 	public CartesianPoint rotateAndScale(CartesianPoint cart) {
-		double x = a * cart.x - b * cart.y;
-		double y = b * cart.x + a * cart.y;
-		return new CartesianPoint (x, y, 0);
+		return new CartesianPoint (a * cart.x - b * cart.y, b * cart.x + a * cart.y, 0);
 	}
+
 
 	public abstract double getOriginX();
 	public abstract double getOriginY();
