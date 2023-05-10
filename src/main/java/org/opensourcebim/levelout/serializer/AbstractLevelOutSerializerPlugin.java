@@ -39,4 +39,9 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
         settings.getParameters().add(parameter);
         return settings;
     }
+
+    @Override
+    public Set<String> getRequiredGeometryFields() {
+        return Set.of("vertices", "indices");
+    }
 }
