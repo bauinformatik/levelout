@@ -26,15 +26,13 @@ public class Storey implements Serializable {
 
 	public void addRooms(Room...  rooms){
 		for (Room room : rooms) {
-			room.setStorey(this);
-			this.rooms.add(room);
+			if( this.rooms.add(room) ) room.setStorey(this);
 		}
 	}
 
 	public void addDoors(Door... doors){
 		for(Door door: doors){
-			door.setStorey(this);
-			this.doors.add(door);
+			if( this.doors.add(door) ) door.setStorey(this);
 		}
 	}
 

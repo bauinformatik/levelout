@@ -23,15 +23,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
-	private final boolean abstractElements;
+	private final boolean ignoreAbstractElements;
 	private final boolean extractionMethod;
-	private final boolean deadRooms;
+	private final boolean ignoreDeadRooms;
 	Building building;
 
 	AbstractLevelOutSerializer(AbstractLevelOutSerializerPlugin.Options options) {
 		this.extractionMethod = options.extractionMethod;
-		this.abstractElements = options.abstractElements;
-		this.deadRooms = options.deadRooms;
+		this.ignoreAbstractElements = options.ignoreAbstractElements;
+		this.ignoreDeadRooms = options.ignoreDeadRooms;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
 					Door door = new Door( ifcDoor.getName(), getPolygon(opening.getGeometry(), elevation));
-					if(!door.getCorners().isEmpty() || abstractElements) {
+					if(!(ignoreAbstractElements && door.getCorners().isEmpty())) {
 						loStorey.addDoors(door);
 						EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
 						populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
@@ -92,7 +92,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
 								Door door = new Door( getPolygon(opening.getGeometry(), elevation));
-								if(!door.getCorners().isEmpty() || abstractElements){
+								if(!(ignoreAbstractElements && door.getCorners().isEmpty())){
 									loStorey.addDoors(door);
 									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
 								}
@@ -114,11 +114,14 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 					}
 				}
 			}
-			if(deadRooms) for (Room room: roomsMap.values())
-				loStorey.addRooms(room);
-			else for(Door door: loStorey.getDoors()){
-				if(door.getRoom1()!=null) loStorey.addRooms(door.getRoom1());
-				if(door.getRoom2()!=null) loStorey.addRooms(door.getRoom2());
+			if (ignoreDeadRooms) {
+				for(Door door: loStorey.getDoors()){
+					if(door.getRoom1()!=null) loStorey.addRooms(door.getRoom1());
+					if(door.getRoom2()!=null) loStorey.addRooms(door.getRoom2());
+				}
+			} else {
+				for (Room room: roomsMap.values())
+					loStorey.addRooms(room);
 			}
 
 		}

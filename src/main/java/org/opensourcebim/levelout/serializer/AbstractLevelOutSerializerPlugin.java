@@ -19,11 +19,11 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
 	public void init(PluginContext pluginContext, PluginConfiguration pluginConfiguration) throws PluginException {
 	}
 
-	protected Options getIfcExtractionMethod(PluginConfiguration pluginConfiguration) {
+	protected Options getOptions(PluginConfiguration pluginConfiguration) {
 		Options options = new Options();
 		options.extractionMethod = pluginConfiguration.getBoolean("IfcExtractionMethod");
-		options.deadRooms= pluginConfiguration.getBoolean("DeadRoomCreation");
-		options.abstractElements= pluginConfiguration.getBoolean("AbstractElementCreation");
+		options.ignoreDeadRooms = pluginConfiguration.getBoolean("IgnoreDeadRooms");
+		options.ignoreAbstractElements = pluginConfiguration.getBoolean("IgnoreAbstractElements");
 		return options;
 	}
 
@@ -38,17 +38,17 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
         );
 		settings.getParameters().add(ifcExtractionMethod);
         ParameterDefinition emptySpaces = createBooleanParameter(
-            "AbstractElementCreation",
-            "Abstract Element Creation",
-            "Choose whether elements, e.g. doors and rooms, without geometry are considered for conversion or not.",
-            true
+            "IgnoreAbstractElements",
+            "Ignore Abstract Elements",
+            "Choose whether elements, e.g. doors and rooms, without geometry are ignored for conversion or not.",
+            false
         );
         settings.getParameters().add(emptySpaces);
         ParameterDefinition deadRooms = createBooleanParameter(
-            "DeadRoomCreation",
-            "Dead Room Creation",
+            "IgnoreDeadRooms",
+            "Ignore Dead Rooms",
             "Choose whether apparently inaccessible spaces/rooms - those without detected connection to doors are created or not. Note that in some models the connection via doors is not detected with the current space-boundary based method.",
-            true
+            false
         );
 		settings.getParameters().add(deadRooms);
 		return settings;
@@ -73,10 +73,10 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
 		return Set.of("vertices", "indices");
 	}
 
-    public class Options {
+    public static class Options {
         public boolean extractionMethod;
-        public boolean abstractElements;
-        public boolean deadRooms;
+        public boolean ignoreAbstractElements;
+        public boolean ignoreDeadRooms;
 
     }
 }

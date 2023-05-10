@@ -17,7 +17,7 @@ public class ObjectLevelOutSerializerPlugin extends AbstractLevelOutSerializerPl
 
 	@Override
 	public Serializer createSerializer(PluginConfiguration plugin) {
-		return new ObjectLevelOutSerializer(getIfcExtractionMethod(plugin));
+		return new ObjectLevelOutSerializer(getOptions(plugin));
 	}
 
 	@Override
