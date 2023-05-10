@@ -7,8 +7,8 @@ import org.opensourcebim.levelout.builders.CityGmlBuilder;
 import java.io.OutputStream;
 
 public class CityGmlSerializer extends AbstractLevelOutSerializer {
-    CityGmlSerializer(boolean extractionMethod) {
-        super(extractionMethod);
+    CityGmlSerializer(AbstractLevelOutSerializerPlugin.Options options) {
+        super(options);
     }
 
     @Override

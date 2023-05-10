@@ -9,8 +9,8 @@ import java.io.OutputStream;
 
 public class ObjectLevelOutSerializer extends AbstractLevelOutSerializer {
 
-	ObjectLevelOutSerializer(boolean extractionMethod) {
-		super(extractionMethod);
+	ObjectLevelOutSerializer(AbstractLevelOutSerializerPlugin.Options options) {
+		super(options);
 	}
 
 	@Override

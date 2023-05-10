@@ -1,16 +1,14 @@
 package org.opensourcebim.levelout.intermediatemodel;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Storey implements Serializable {
 
 	private static final long serialVersionUID = 224912596112948321L;
 	private final int level;
-	private final List<Room> rooms = new ArrayList<>();
-	private final List<Door> doors = new ArrayList<>();
+	private final Set<Room> rooms = new HashSet<>();
+	private final Set<Door> doors = new HashSet<>();
 	private final double elevation;
 
 	private final String name;
@@ -40,11 +38,11 @@ public class Storey implements Serializable {
 		}
 	}
 
-	public List<Room> getRooms() {
-		return Collections.unmodifiableList(rooms);
+	public Set<Room> getRooms() {
+		return Collections.unmodifiableSet(rooms);
 	}
-	public List<Door> getDoors() {
-		return Collections.unmodifiableList(doors);
+	public Set<Door> getDoors() {
+		return Collections.unmodifiableSet(doors);
 	}
 
 	public int getLevel() {

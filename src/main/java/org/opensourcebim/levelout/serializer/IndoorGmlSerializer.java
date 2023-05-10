@@ -7,8 +7,8 @@ import org.opensourcebim.levelout.builders.IndoorGmlBuilder;
 import java.io.OutputStream;
 
 public class IndoorGmlSerializer extends AbstractLevelOutSerializer {
-    IndoorGmlSerializer(boolean extractionMethod) {
-        super(extractionMethod);
+    IndoorGmlSerializer(AbstractLevelOutSerializerPlugin.Options options) {
+        super(options);
     }
 
     @Override

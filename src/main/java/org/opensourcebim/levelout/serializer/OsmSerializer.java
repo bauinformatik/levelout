@@ -7,8 +7,8 @@ import org.opensourcebim.levelout.builders.OsmBuilder;
 import java.io.OutputStream;
 
 public class OsmSerializer extends AbstractLevelOutSerializer {
-    OsmSerializer(boolean extractionMethod) {
-        super(extractionMethod);
+    OsmSerializer(AbstractLevelOutSerializerPlugin.Options options) {
+        super(options);
     }
 
     @Override

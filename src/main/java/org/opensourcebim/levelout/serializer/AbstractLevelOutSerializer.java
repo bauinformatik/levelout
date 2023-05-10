@@ -23,11 +23,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
-	boolean extractionMethod;
+	private final boolean abstractElements;
+	private final boolean extractionMethod;
+	private final boolean deadRooms;
 	Building building;
 
-	AbstractLevelOutSerializer(boolean extractionMethod) {
-		this.extractionMethod = extractionMethod;
+	AbstractLevelOutSerializer(AbstractLevelOutSerializerPlugin.Options options) {
+		this.extractionMethod = options.extractionMethod;
+		this.abstractElements = options.abstractElements;
+		this.deadRooms = options.deadRooms;
 	}
 
 	@Override
@@ -66,7 +70,6 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : aggregation.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
 					Room room = new Room(space.getName(), getPolygon(space.getGeometry(), elevation));
-					loStorey.addRooms(room);
 					roomsMap.put(space, room); // later needed for assignment to doors
 				}
 			}
@@ -76,9 +79,11 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
 					Door door = new Door( ifcDoor.getName(), getPolygon(opening.getGeometry(), elevation));
-					loStorey.addDoors(door);
-					EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
-					populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
+					if(!door.getCorners().isEmpty() || abstractElements) {
+						loStorey.addDoors(door);
+						EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
+						populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
+					}
 				}
 				for(IfcWall ifcWall : containment.getRelatedElements().stream().filter(IfcWall.class::isInstance).map(IfcWall.class::cast).collect(Collectors.toList())){
 					for(IfcRelVoidsElement voids: ifcWall.getHasOpenings()){
@@ -87,8 +92,10 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
 								Door door = new Door( getPolygon(opening.getGeometry(), elevation));
-								loStorey.addDoors(door);
-								populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
+								if(!door.getCorners().isEmpty() || abstractElements){
+									loStorey.addDoors(door);
+									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
+								}
 							}
 						}
 					}
@@ -107,6 +114,13 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 					}
 				}
 			}
+			if(deadRooms) for (Room room: roomsMap.values())
+				loStorey.addRooms(room);
+			else for(Door door: loStorey.getDoors()){
+				if(door.getRoom1()!=null) loStorey.addRooms(door.getRoom1());
+				if(door.getRoom2()!=null) loStorey.addRooms(door.getRoom2());
+			}
+
 		}
 	}
 
