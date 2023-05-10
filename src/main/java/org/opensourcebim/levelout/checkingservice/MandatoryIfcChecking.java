@@ -28,6 +28,7 @@ public class MandatoryIfcChecking extends AbstractAddExtendedDataService {
 			// TODO: defined types
 			if(!value.eClass().getEPackage().equals(model.getPackageMetaData().getEPackage())) continue;
 		}
+		int i = 0;
 		for(IdEObject entity : model.getValues()){
 			if(!entity.eClass().getEPackage().equals(model.getPackageMetaData().getEPackage())) continue;
 			for(EStructuralFeature feature: entity.eClass().getEAllStructuralFeatures()){
@@ -42,6 +43,8 @@ public class MandatoryIfcChecking extends AbstractAddExtendedDataService {
 					}
 				}
 			}
+			i++;
+			runningService.updateProgress( i / model.getValues().size());
 		}
 		addExtendedData(txt.toString().getBytes(StandardCharsets.UTF_8), "stats.txt", "Statistics", "text/plain", bimServerClientInterface, roid);
 	}
