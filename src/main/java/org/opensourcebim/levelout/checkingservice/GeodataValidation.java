@@ -1,168 +1,86 @@
 package org.opensourcebim.levelout.checkingservice;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.models.ifc4.IfcCoordinateReferenceSystem;
-import org.bimserver.models.ifc4.IfcCoordinateReferenceSystemSelect;
+import org.bimserver.models.ifc4.IfcAxis2Placement;
+import org.bimserver.models.ifc4.IfcAxis2Placement3D;
+import org.bimserver.models.ifc4.IfcBuilding;
+import org.bimserver.models.ifc4.IfcCartesianPoint;
+import org.bimserver.models.ifc4.IfcDirection;
+import org.bimserver.models.ifc4.IfcGeometricRepresentationContext;
+import org.bimserver.models.ifc4.IfcLocalPlacement;
 import org.bimserver.models.ifc4.IfcMapConversion;
+import org.bimserver.models.ifc4.IfcObjectPlacement;
+import org.bimserver.models.ifc4.IfcPlacement;
 import org.bimserver.models.ifc4.IfcProject;
+import org.bimserver.models.ifc4.IfcProjectedCRS;
 import org.bimserver.models.ifc4.IfcRepresentationContext;
+import org.bimserver.models.ifc4.IfcSite;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
-
 
 public class GeodataValidation {
 
+	// Declaration and initialization of an instance variable named geoLoGeoRef50 of type GeodataLoGeoRef50
+	private GeodataLoGeoRef50 geoLoGeoRef50 = new GeodataLoGeoRef50();
+	
 	public void validateGeodata(StringBuilder txt, IfcModelInterface model) {
-		//Validates the presence of the respective IFC entities and select types for the investigation
-		 IfcProject projects = model.getAll(IfcProject.class).stream().findAny().orElse(null);
-         if (projects != null) {
-            IfcMapConversion mapConversions = model.getAll(IfcMapConversion.class).stream().findAny().orElse(null);
-	        if (mapConversions != null) {
-	            validateIfcMapConversion(txt, mapConversions);
-	            IfcCoordinateReferenceSystemSelect coordinateReferenceSystemSelects = mapConversions.getSourceCRS();
-	            if (coordinateReferenceSystemSelects != null) {
-	                validateIfcCoordinateReferenceSystemSelect(txt, coordinateReferenceSystemSelects);
-	            } else {
-	                txt.append("The IFC entity IfcGeometricRepresentationContext is missing from the IFC model.\n");
-	            }
-	            IfcCoordinateReferenceSystem coordinateReferenceSystems = mapConversions.getTargetCRS();
-	            if (coordinateReferenceSystems != null) {
-	                validateIfcCoordinateReferenceSystem(txt, coordinateReferenceSystems);
-	            } else {
-	                txt.append("The IFC entity IfcProjectedCRS is missing from the IFC model.\n");
-	            }
-            validateIfcContext(txt, model, projects, mapConversions, coordinateReferenceSystemSelects);
-	        } else {
-	            txt.append("The IfcMapConversion entity is missing from the IFC model.\n");
-	        }
-         } else {
-             txt.append("The IFC entity IfcProject is missing from the IFC model.\n");
-         }
-    }
-	
-	//Validates the IFC attribute values of a given IFC entity
-	private void validateAttributes(StringBuilder txt, EClass eClass, EList<EStructuralFeature> eFeatures, List<String> validValues, EObject targetObject) {
-		//Check1 for IFC attribute values of value != null
-		//Iteration process with stream over the list eFeatures
-		boolean hasValue = eFeatures.stream()
-				//Filters the validValues list for all IFC attributes with a name in this list
-				.filter(feature -> validValues.contains(feature.getName()))
-	            //Extracts the value of each IFC attribute from targetObject
-				.map(feature -> targetObject.eGet(feature))
-	            //Checks that value of all IFC attributes is not null
-	            .allMatch(value -> value != null);
-		//Check2 for validity of geodata saved in IFC attributes
-		if (hasValue) {
-			//Valid statement
-	        txt.append("The required geodata from ").append(eClass.getName()).append(" are valid in the IFC model.\n");
-	    } else {
-	    	//Invalid statement
-	    	txt.append("The required geodata from ").append(eClass.getName()).append(" are invalid in the IFC model.\n");
-	    	txt.append("\n").append("The following geodata must be added:\n");
-	    	//Check3 for the necessity of adding IFC attribute values
-	    	//Iteration process with stream over the list eFeatures
-	    	eFeatures.stream()
-	    		//Filters the targetObjekt list for all IFC attribute values that are null
-                .filter(feature -> targetObject.eGet(feature) == null)
-                //Calls the method missingAttributeMessage for all IFC attribute values that are null
-                .forEach(feature -> missingAttributeMessage(txt, eClass.getName(), feature.getName()));
-	    }
-	}
-	
-	//Writes a message for the user in case of missing IFC attribute values in the considered submodel
-	private void missingAttributeMessage(StringBuilder txt, String className, String attributeName) {
-		txt.append("\t").append(attributeName).append(" is missing in ").append(className).append("\n");
-	}
-	
-	//Checks the relationship between IfcContext and IfcGeometricRepresentationContext
-	private void validateIfcContext(StringBuilder txt, IfcModelInterface model, IfcProject projects, IfcMapConversion mapConversions, IfcCoordinateReferenceSystemSelect coordinateReferenceSystemSelects) {
-	    //Creates the list representationContexts with all values of the attribute RepresentationContexts from IfcProject
-		List<IfcRepresentationContext> representationContexts = projects.getRepresentationContexts();
-	    //Iteration process with stream over the list representationContexts
-	    boolean hasValue = representationContexts.stream()
-	    		//Checks the matching case with the variable coordinateReferencSystemSelect
-	    		.anyMatch(coordinateReferenceSystemSelects::equals);
-	    if (hasValue) {
-	        //Valid statement
-	    	txt.append("\n").append("IfcContext has a relationship to IfcGeometricRepresentationContext\n");
-	    } else {
-	    	//Invalid statement
-	        txt.append("\n").append("The relationship between IfcContext and IfcGeometricRepresentationContext is missing\n");
-	    }
-	}
-	
-	//Checks a respective set of attributes of IfcMapConversion for their presence
-	private void validateIfcMapConversion(StringBuilder txt, IfcMapConversion mapConversions) {
-		//Executes the eClass() method on mapconversions, the result is assigned to the variable eClass
-		EClass eClass = mapConversions.eClass();
-		//Creates the list eFeatures with all  attribute information from IfcMapConversion
-        EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
-        //Text output of the respective IFC entity name
-        txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
-        for (EStructuralFeature eFeature : eFeatures) {
-            //Storing of all attribute names from IfcMapConversion
-        	String featureName = eFeature.getName();
-        	//Storing of all attribute values from IfcMapConversion
-            Object featureValue = mapConversions.eGet(eFeature);
-            //Text output of all attribute names and assignment of their attribute values
-            txt.append("\t").append(featureName).append(": ").append(featureValue).append("\n");
+		
+		//Validates the presence of the respective IFC entities and select types for LoGeoRef50
+		IfcProject projects = model.getAll(IfcProject.class).stream().findAny().orElse(null);
+		IfcMapConversion mapConversions = model.getAll(IfcMapConversion.class).stream().findAny().orElse(null);
+		IfcProjectedCRS projectedCRSs = model.getAll(IfcProjectedCRS.class).stream().findAny().orElse(null);
+		if (projects != null && (mapConversions != null || projectedCRSs != null)) {
+        	txt.append("A geodata analysis for LoGeoRef50 is conducted.");
+        	//The validateGeodataLoGeoRef50 method is called on the geoLoGeoRef50 object with the given txt and model parameters.
+        	geoLoGeoRef50.validateGeodataLoGeoRef50(txt, model);
+    	} else {
+    		//Validates the presence of the respective IFC entities and select types for LoGeoRef40
+    		//Problem, die zugehörigen IFC-Entitäten für LoGeoRef40 werden wahrscheinlich vorhanden sein, es muss eher geprüft werden, ob diese brauchbar sind. Deshalb kann es sinnvoll sein ab LoGeoRef40 die anderen Prüfungen der LoGeoRefs mit durchlaufen zu lassen
+    		EList<IfcRepresentationContext> representationContexts = projects.getRepresentationContexts();
+    		IfcGeometricRepresentationContext geometricRepresentationContexts = representationContexts.stream()
+    				.filter(feature -> feature instanceof IfcGeometricRepresentationContext && "Model".equals(feature.getContextType()))
+    				.map(feature -> (IfcGeometricRepresentationContext) feature)
+    				.findFirst()
+    				.orElse(null);
+    		//IfcAxis2Placement axis2Placements = geometricRepresentationContexts.getWorldCoordinateSystem();
+    		//IfcCartesianPoint cartesianPoints = ((IfcPlacement) axis2Placements).getLocation();
+    		//IfcDirection directions = geometricRepresentationContexts.getTrueNorth();
+    		//txt.append("List all:" + directions).append("\n");
+            if (projects != null && geometricRepresentationContexts != null) {
+            	txt.append("A geodata analysis for LoGeoRef40 is conducted.");
+            	//The validateGeodataLoGeoRef40 method is called on the geoLoGeoRef40 object with the given txt and model parameters.
+                //geoLoGeoRef40.validateGeodataLoGeoRef40(txt, model);
+            } else {
+            	//Validates the presence of the respective IFC entities and select types for LoGeoRef30
+            	IfcSite sites = model.getAll(IfcSite.class).stream().findAny().orElse(null);
+                IfcObjectPlacement objectPlacements = sites.getObjectPlacement();
+                EList<IfcLocalPlacement> localPlacements = objectPlacements.getReferencedByPlacements();
+                txt.append("List all:" + localPlacements).append("\n");
+                //IfcAxis2Placement ifcAxis2Placements = localPlacements.getRelativePlacement();
+                if (sites != null && localPlacements != null) {
+                	txt.append("A geodata analysis for LoGeoRef30 is conducted.");
+                	//The validateGeodataLoGeoRef40 method is called on the geoLoGeoRef30 object with the given txt and model parameters.
+                    //geoLoGeoRef30.validateGeodataLoGeoRef30(txt, model);
+                } else {
+                	//Validates the presence of the respective IFC entities and select types for LoGeoRef20
+                	if (sites != null) {
+                		txt.append("A geodata analysis for LoGeoRef20 is conducted.");
+                    	//The validateGeodataLoGeoRef20 method is called on the geoLoGeoRef20 object with the given txt and model parameters.
+                        //geoLoGeoRef20.validateGeodataLoGeoRef20(txt, model);
+                	} else {
+                		//Validates the presence of the respective IFC entities and select types for LoGeoRef10
+                		IfcBuilding buildings = model.getAll(IfcBuilding.class).stream().findAny().orElse(null);
+                		if (buildings != null) {
+                			txt.append("A geodata analysis for LoGeoRef10 is conducted.");
+                        	//The validateGeodataLoGeoRef10 method is called on the geoLoGeoRef10 object with the given txt and model parameters.
+                            //geoLoGeoRef10.validateGeodataLoGeoRef10(txt, model);
+                		}
+                	}
+                }
+            }
         }
-        txt.append("\n");
-        //Saves the attributes to be checked in list validValues with attributes necessary for geolocation.
-        List<String> validValues = Arrays.asList("SourceCRS", "TargetCRS", "Eastings","Northings", "OrthogonalHeight", "XAxisAbscissa", "XAxisOrdinate", "Scale");
-        //Executes the method validateAttributes explained above
-        validateAttributes(txt, eClass, eFeatures, validValues, mapConversions);
-    }
-	
-	//Checks a respective set of attributes of IfcCoordinateReferenceSystemSelect for their presence
-	private void validateIfcCoordinateReferenceSystemSelect(StringBuilder txt, IfcCoordinateReferenceSystemSelect coordinateReferenceSystemSelects) {
-		//Executes the eClass() method on coordinateReferenceSystemSelects, the result is assigned to the variable eClass
-		EClass eClass = coordinateReferenceSystemSelects.eClass();
-		//Creates the list eFeatures with all attribute information from IfcCoordinateReferenceSystemSelect
-		EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
-		//Text output of the respective IFC entity name
-        txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
-        for (EStructuralFeature eFeature : eFeatures) {
-        	//Storing of all attribute names from IfcCoordinateReferenceSystemSelect
-        	String featureName = eFeature.getName();
-        	//Storing of all attribute values from IfcCoordinateReferenceSystemSelect
-        	Object featureValue = coordinateReferenceSystemSelects.eGet(eFeature);
-        	//Text output of all attribute names and assignment of their attribute values
-        	txt.append("\t").append(featureName).append(": ").append(featureValue).append("\n");
-		}
-		txt.append("\n");
-		//Saves the attributes to be checked in list validValues with attributes necessary for geolocation.
-		List<String> validValues = Arrays.asList("WorldCoordinateSystem", "TrueNorth", "HasCoordinateOperation");
-		//Executes the method validateAttributes explained above
-        validateAttributes(txt, eClass, eFeatures, validValues, coordinateReferenceSystemSelects);
-	}   
-	    
-	//Checks a respective set of attributes of IfcCoordinateReferenceSystem for their presence
-	private void validateIfcCoordinateReferenceSystem(StringBuilder txt, IfcCoordinateReferenceSystem coordinateReferenceSystems) {
-		//Executes the eClass() method on coordinateReferenceSystems, the result is assigned to the variable eClass
-		EClass eClass = coordinateReferenceSystems.eClass();
-		//Creates the list eFeatures with all attribute information from IfcCoordinateReferenceSystem
-		EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
-		//Text output of the respective IFC entity name
-		txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
-        for (EStructuralFeature eFeature : eFeatures) {
-        	//Storing of all attribute names from IfcCoordinateReferenceSystem
-        	String featureName = eFeature.getName();
-        	//Storing of all attribute values from IfcCoordinateReferenceSystem
-        	Object featureValue = coordinateReferenceSystems.eGet(eFeature);
-        	//Text output of all attribute names and assignment of their attribute values
-        	txt.append("\t").append(featureName).append(": ").append(featureValue).append("\n");
-        }
-        txt.append("\n");
-        //Saves the attributes to be checked in list validValues with attributes necessary for geolocation.
-        List<String> validValues = Arrays.asList("GeodeticDatum", "VerticalDatum", "HasCoordinateOperation", "MapProjection", "MapZone", "MapUnit");
-        //Executes the method validateAttributes explained above
-        validateAttributes(txt, eClass, eFeatures, validValues, coordinateReferenceSystems);
 	}
+	
+	//Prüfen, ob die SI-Einheiten gesetzt sind
+	
 }
 
