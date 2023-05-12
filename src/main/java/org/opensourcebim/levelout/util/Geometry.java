@@ -6,6 +6,7 @@ import org.opensourcebim.levelout.intermediatemodel.geo.CartesianPoint;
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Geometry {
@@ -17,6 +18,9 @@ public class Geometry {
 			coordinates.add(corner.getY());
 			coordinates.add(z);
 		}
+		if (coordinates.size() > 0)
+			coordinates.addAll(Arrays.asList(coordinates.get(0),coordinates.get(1), coordinates.get(2)));
+		
 		return coordinates;
 	}
 	
