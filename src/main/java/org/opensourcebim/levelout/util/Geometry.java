@@ -4,6 +4,7 @@ import org.opensourcebim.levelout.intermediatemodel.Corner;
 import org.opensourcebim.levelout.intermediatemodel.Storey;
 import org.opensourcebim.levelout.intermediatemodel.geo.CartesianPoint;
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+import org.opensourcebim.levelout.intermediatemodel.geo.GeodeticPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,20 @@ public class Geometry {
 		return Math.toDegrees(Math.atan2(direction.y, direction.x));
 	}
 
+	public static GeodeticPoint midPoint(GeodeticPoint p1, GeodeticPoint p2){
+		double lat1 = Math.toRadians(p1.latitude);
+		double lat2 = Math.toRadians(p2.latitude);
+		double lon1 = Math.toRadians(p1.longitude);
+		double lon2 = Math.toRadians(p2.longitude);
+		var Bx = Math.cos(lat2) * Math.cos(lon2-lon1);
+		var By = Math.cos(lat2) * Math.sin(lon2-lon1);
+		var lat = Math.atan2(
+			Math.sin(lat1)+Math.sin(lat2),
+			Math.sqrt( (Math.cos(lat1)+Bx)*(Math.cos(lat1)+Bx) + By*By )
+		);
+		var lon = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
+		return new GeodeticPoint(Math.toDegrees(lat), Math.toDegrees(lon));
+	}
 	public static Direction angleAbsOrd(double lat1d, double lon1d, double lat2d, double lon2d){
 		Direction direction = bearingAbsOrd(lat1d, lon1d, lat2d,lon2d);
 		return new Direction(direction.y, direction.x);
