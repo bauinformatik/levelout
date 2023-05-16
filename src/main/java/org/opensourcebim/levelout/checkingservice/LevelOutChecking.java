@@ -12,8 +12,12 @@ import org.bimserver.plugins.services.BimServerClientInterface;
 //Class LevelOutChecking inherit from the class AbstractAddExtendedDataService
 public class LevelOutChecking extends AbstractAddExtendedDataService {
 	
-	// Declaration and initialization of an instance variable named geoVal of type GeodataValidation
-	private GeodataValidation geoVal = new GeodataValidation();
+  //Declaration and initialization of an instance variable with their types
+	private GeodataValidation geodataValidation = new GeodataValidation();
+	
+	private SpaceBoundaryValidation spaceBoundaryValidation = new SpaceBoundaryValidation();
+	
+	private SpaceValidation spaceValidation = new SpaceValidation();	
 	
 	//Constructor LevelOutChecking initialize the parent class AbstractAddExtendedDataService with the schema name
 	public LevelOutChecking() {
@@ -42,7 +46,7 @@ public class LevelOutChecking extends AbstractAddExtendedDataService {
         //Added the previously extracted information to the StringBuilder txt
         //Title
         txt.append("Checking Report\n");
-        txt.append("-------------------\n");
+        txt.append("--------------------------------------\n");
         //Project information
         txt.append("Current project: ").append(project.getName()).append("\n");
         txt.append("No of IFC entities: ").append(entities_No).append("\n");
@@ -55,16 +59,20 @@ public class LevelOutChecking extends AbstractAddExtendedDataService {
                 mnBnds.getX() + ", " + mnBnds.getY() + ", " + mnBnds.getZ() + " --- " +
                 mxBnds.getX() + ", " + mxBnds.getY() + ", " + mxBnds.getZ() + "\n");
         else txt.append("Bounds: no bounds set\n");
-        txt.append("-------------------\n");
- 
-        //Title: Output and validation of the geodata
-        txt.append("Output and validation of geodata\n\n");
+        txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-        //Text: Check for the presence of IfcMapConversion, IfcProjectedCRS and IfcGeometricRepresentationContext and their attribute values
-        txt.append("Check for the presence of the following IFC enitities and their attributes:\n" + "\tIfcProject,\n" + "\tIfcMapConversion,\n" + "\tIfcProjectedCRS,\n" + "\tIfcGeometricRepresentationContext\n\n"); 
+      //The validateGeodata method is called
+        geodataValidation.validateGeodata(txt, model);
+        txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-        //The validateGeodata method is called on the geoVal object with the given txt and model parameters.
-        geoVal.validateGeodata(txt, model);
+      //The validateSpaceBoundary method is called
+        spaceBoundaryValidation.validateSpaceBoundary(txt, model);
+        txt.append("--------------------------------------\n" + "--------------------------------------\n");
+        
+      //The validateSpace method is called
+        spaceValidation.validateSpace(txt, model);
+        txt.append("--------------------------------------\n" + "--------------------------------------\n");
+        
         
         //The method addExtendedData() is called to add the created test report as extended data to the BIMserver project. The check report is stored in stats.txt.
         addExtendedData(txt.toString().getBytes(), "stats.txt", "Statistics", "text/plain", bimServerClientInterface, roid);
