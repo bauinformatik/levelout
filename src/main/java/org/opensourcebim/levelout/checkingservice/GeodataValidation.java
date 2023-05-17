@@ -34,7 +34,7 @@ public class GeodataValidation {
     		IfcSite sites = model.getAll(IfcSite.class).stream().findAny().orElse(null);
     		if (sites != null) {
         		txt.append("A geodata analysis for LoGeoRef20 is conducted." + "\n");
-        		txt.append("Check for the presence of the following IFC enitities and their attributes:\n" + "\tIfcSite,\n" + "\n\n");
+        		txt.append("Check for the presence of the following IFC enitities and their attributes:\n" + "\tIfcSite\n" + "\n\n");
             	//The validateGeodataLoGeoRef20 method is called on the geoLoGeoRef20 object with the given txt and model parameters.
                 geoLoGeoRef20.validateGeodataLoGeoRef20(txt, model);
     		} else {
