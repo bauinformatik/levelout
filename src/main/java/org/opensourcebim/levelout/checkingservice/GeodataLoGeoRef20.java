@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
-public class GeodataLoGeoRef20 {
+public class GeodataLoGeoRef20 extends GeodataLoGeoRef {
 	
 	public void validateGeodataLoGeoRef20(StringBuilder txt, IfcModelInterface model) {
 		

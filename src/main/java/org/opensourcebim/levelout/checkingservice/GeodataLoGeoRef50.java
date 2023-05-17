@@ -17,7 +17,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
-public class GeodataLoGeoRef50 {
+public class GeodataLoGeoRef50 extends GeodataLoGeoRef {
 
 	public void validateGeodataLoGeoRef50(StringBuilder txt, IfcModelInterface model) {
 		 //Validates the presence of the respective IFC entities and IFC select types for the investigation
