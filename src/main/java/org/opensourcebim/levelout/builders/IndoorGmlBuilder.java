@@ -107,6 +107,12 @@ public class IndoorGmlBuilder {
 		return cellSpace;
 	}
 
+	private CellSpaceType createCellSpace(Door door) {
+		CellSpaceType cellSpace = createCellSpace("cs-door" + door.getId());
+		doorCellMap.put(door, cellSpace);
+		return cellSpace;
+	}
+
 	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
 		CellSpaceBoundaryType cellSpaceBoundary = new CellSpaceBoundaryType();
 		cellSpaceBoundary.setId(id);
@@ -142,6 +148,11 @@ public class IndoorGmlBuilder {
 
 	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
 		add2DGeometry(cellSpace, room.asCoordinateList());
+	}
+
+	private void add2DGeometry(CellSpaceType cellSpace, Door door) {
+		add2DGeometry(cellSpace, door.asCoordinateList());
+
 	}
 
 	public void add3DGeometry(CellSpaceType cellSpace, List<Double> coordinates) {
@@ -204,6 +215,12 @@ public class IndoorGmlBuilder {
 		return name;
 	}
 
+	private StateType createState(Door door) {
+		StateType state = createState("st-door" + door.getId());
+		doorStateMap.put(door, state);
+		return state;
+	}
+
 	private StateType createState(Room room) {
 		StateType state = createState("st" + room.getId());
 		roomStateMap.put(room, state);
@@ -219,6 +236,14 @@ public class IndoorGmlBuilder {
 
 	private void setStatePos(StateType state, Room room) {
 		List<Double> centroid = room.computeCentroid();
+		if (centroid != null) {
+			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
+		}
+	}
+
+	private void setStatePos(StateType state, Door door) {
+
+		List<Double> centroid = door.computeCentroid();
 		if (centroid != null) {
 			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
 		}
@@ -477,31 +502,6 @@ public class IndoorGmlBuilder {
 			setConnectsForState(stateConnectsMap);
 		}
 		return indoorFeatures;
-	}
-
-	private void add2DGeometry(CellSpaceType cellSpace, Door door) {
-		add2DGeometry(cellSpace, door.asCoordinateList());
-
-	}
-
-	private void setStatePos(StateType state, Door door) {
-
-		List<Double> centroid = door.computeCentroid();
-		if (centroid != null) {
-			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
-		}
-	}
-
-	private StateType createState(Door door) {
-		StateType state = createState("st-door" + door.getId());
-		doorStateMap.put(door, state);
-		return state;
-	}
-
-	private CellSpaceType createCellSpace(Door door) {
-		CellSpaceType cellSpace = createCellSpace("cs-door" + door.getId());
-		doorCellMap.put(door, cellSpace);
-		return cellSpace;
 	}
 
 	public void createAndWriteBuilding(Building building, OutputStream outStream) throws JAXBException {
