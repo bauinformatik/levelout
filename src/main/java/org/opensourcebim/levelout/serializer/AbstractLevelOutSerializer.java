@@ -20,6 +20,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractLevelOutSerializer implements Serializer {
@@ -242,7 +243,31 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		}
 		PathIterator pathIterator = area.getPathIterator(null);
 		float[] coords = new float[6];
+		Area outerArea = new Area();
+		Path2D.Float currentPath = new Path2D.Float();
+		while (!pathIterator.isDone()){
+			int segmentType = pathIterator.currentSegment(coords);
+			if(segmentType == PathIterator.SEG_MOVETO){
+				currentPath.reset();
+				currentPath.moveTo(coords[0], coords[1]);
+			} else if(segmentType == PathIterator.SEG_LINETO){
+				currentPath.lineTo(coords[0], coords[1]);
+			} else if(segmentType == PathIterator.SEG_CLOSE){
+				currentPath.closePath();
+				outerArea.add(new Area(currentPath));
+			} else {
+				// TODO unhandled segment type (cubic etc.), should not be the case
+			}
+			pathIterator.next();
+		}
+		if(! outerArea.isSingular()){
+			// TODO warn multiple disconnected areas?
+		}
 		List<Corner> corners = new ArrayList<>();
+		if( outerArea.isEmpty()) {
+			return corners;
+		}
+		pathIterator = outerArea.getPathIterator(null);
 		int firstSegment = pathIterator.currentSegment(coords);
 		assert !pathIterator.isDone() && firstSegment == PathIterator.SEG_MOVETO;
 		corners.add(new Corner(coords[0], coords[1]));
@@ -251,7 +276,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			corners.add(new Corner(coords[0], coords[1]));
 			pathIterator.next();
 		}
-		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // TODO warn multisegment path
+		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // eqaul to outerArea.isSingular() check above
 		return corners;
 	}
 
