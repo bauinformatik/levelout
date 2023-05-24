@@ -57,33 +57,6 @@ public class GeodataLoGeoRef50 extends GeodataLoGeoRef {
          }
     }
 	
-	//Validates the IFC attribute values of a given IFC entity
-	private void validateAttributes(StringBuilder txt, EClass eClass, EList<EStructuralFeature> eFeatures, List<String> validValues, EObject targetObject) {
-		//Check1 for IFC attribute values of value != null
-		boolean hasValue = eFeatures.stream()
-				.filter(feature -> validValues.contains(feature.getName()))
-				.map(feature -> targetObject.eGet(feature))
-	            .allMatch(value -> value != null);
-		//Check2 for validity of geodata saved in IFC attributes
-		if (hasValue) {
-			//Valid statement
-	        txt.append("The required geodata from ").append(eClass.getName()).append(" are valid in the IFC model.\n");
-	    } else {
-	    	//Invalid statement
-	    	txt.append("The required geodata from ").append(eClass.getName()).append(" are invalid in the IFC model.\n");
-	    	txt.append("\n").append("The following geodata must be added:\n");
-	    	//Check3 for the necessity of adding IFC attribute values
-	    	eFeatures.stream()
-                .filter(feature -> targetObject.eGet(feature) == null)
-                .forEach(feature -> missingAttributeMessage(txt, eClass.getName(), feature.getName()));
-	    }
-	}
-	
-	//Writes a message for the user in case of missing IFC attribute values in the considered submodel
-	private void missingAttributeMessage(StringBuilder txt, String className, String attributeName) {
-		txt.append("\t").append(attributeName).append(" is missing in ").append(className).append("\n");
-	}
-	
 	//Checks the relationship between IfcContext and IfcGeometricRepresentationContext
 	private void validateIfcContext(StringBuilder txt, IfcModelInterface model, IfcProject projects, IfcMapConversion mapConversions, IfcCoordinateReferenceSystemSelect coordinateReferenceSystemSelects) {
 	    List<IfcRepresentationContext> representationContexts = projects.getRepresentationContexts();
