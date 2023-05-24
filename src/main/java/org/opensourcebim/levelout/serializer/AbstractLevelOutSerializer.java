@@ -156,14 +156,12 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 	private CoordinateReference getCrs(IfcModelInterface ifcModelInterface) {
 		// TODO common classes for checking and querying
-		List<IfcSite> site = ifcModelInterface.getAllWithSubTypes(IfcSite.class);
 		List<IfcProject> project = ifcModelInterface.getAllWithSubTypes(IfcProject.class);
 		if (!(project.size() == 1)) return null;
-		if (!(site.size() == 1)) return null;
 		if (!(project.get(0).getIsDecomposedBy().size() == 1)) return null;
 		if (!(project.get(0).getIsDecomposedBy().get(0).getRelatedObjects().size() == 1)) return null;
-		if (!project.get(0).getIsDecomposedBy().get(0).getRelatedObjects().get(0).getGlobalId().equals(site.get(0).getGlobalId()))
-			return null; // or even identity on entity level?
+		if (!(project.get(0).getIsDecomposedBy().get(0).getRelatedObjects().get(0) instanceof IfcSite)) return null;
+		IfcSite site = (IfcSite) project.get(0).getIsDecomposedBy().get(0).getRelatedObjects().get(0);
 		List<IfcRepresentationContext> ifcRepresentationContextStream = project.get(0).getRepresentationContexts().stream().filter(ifcRepresentationContext ->
 			"Model".equals(ifcRepresentationContext.getContextType()) && ifcRepresentationContext instanceof IfcGeometricRepresentationContext
 		).collect(Collectors.toList());
@@ -174,12 +172,12 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		return (cr != null) ? cr : getGeodeticOriginCRS(site, context, factor);
 	}
 
-	private static GeodeticOriginCRS getGeodeticOriginCRS(List<IfcSite> site, IfcGeometricRepresentationContext context, double scale) {
+	private static GeodeticOriginCRS getGeodeticOriginCRS(IfcSite site, IfcGeometricRepresentationContext context, double scale) {
 		IfcDirection trueNorth = context.getTrueNorth();
 		if (!(trueNorth.getDirectionRatios()!=null && trueNorth.getDirectionRatios().size() == 2)) return null;
-		EList<Long> refLatitude = site.get(0).getRefLatitude();
+		EList<Long> refLatitude = site.getRefLatitude();
 		if (!(refLatitude != null && refLatitude.size() >= 3)) return null;
-		EList<Long> refLongitude = site.get(0).getRefLongitude();
+		EList<Long> refLongitude = site.getRefLongitude();
 		if (!(refLongitude != null && refLongitude.size() >= 3)) return null;
 		double rotation = - (Math.atan2(trueNorth.getDirectionRatios().get(1), trueNorth.getDirectionRatios().get(0)) - Math.PI/2);
 		double latitude = degreesFromMinutes(refLatitude);
