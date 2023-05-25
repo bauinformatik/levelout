@@ -16,6 +16,7 @@ import org.opensourcebim.levelout.intermediatemodel.geo.*;
 import org.opensourcebim.levelout.samples.IntermediateResidential;
 
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.io.OutputStream;
@@ -50,9 +51,6 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 	private void initStructure(IfcModelInterface ifcModelInterface) {
 		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);
 		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0), 0); // TODO use some default location in Weimar, Dresden ..
-		List<Storey> loStoreys = new ArrayList<>();
-		List<Corner> outline = new ArrayList<>(); // TODO populate, move area union to spatial analysis util class
-		building = new Building(loStoreys, outline, crs);
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
 		int level = 0;
 		storeys.sort(Comparator.comparingDouble(IfcBuildingStorey::getElevation));
@@ -63,14 +61,26 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			minDistance = Math.abs(storeys.get(-level).getElevation());
 			level--;
 		}
+		level++;
+		Area storeyFootprint = new Area();
+		double groundFloorElevation = storeys.get(-level).getElevation();
+		for(IfcProduct element : storeys.get(-level).getContainsElements().get(0).getRelatedElements()){
+			if(element.getGeometry()!=null) {
+				Area footprint = getFootprint(element.getGeometry(), groundFloorElevation);
+				storeyFootprint.add(footprint);
+			}
+		}
+		List<Storey> loStoreys = new ArrayList<>();
+		Area storeyOutline = getOutline(storeyFootprint);
+		building = new Building(loStoreys, getCorners(storeyOutline), crs);
 		for (IfcBuildingStorey storey : storeys) {
 			double elevation = storey.getElevation();
-			Storey loStorey = new Storey(++level, elevation, storey.getName());
+			Storey loStorey = new Storey(level++, elevation, storey.getName());
 			loStoreys.add(loStorey);
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : aggregation.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
-					Room room = new Room(space.getName(), getPolygon(space.getGeometry(), elevation));
+					Room room = new Room(space.getName(), getOuterPolygon(space.getGeometry(), elevation));
 					roomsMap.put(space, room); // later needed for assignment to doors
 				}
 			}
@@ -79,7 +89,11 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 				for (IfcDoor ifcDoor : containment.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
-					Door door = new Door( ifcDoor.getName(), getPolygon(opening.getGeometry(), elevation));
+					Area openingFootprint = (opening.getVoidsElements()!=null && opening.getVoidsElements().getRelatingBuildingElement()!=null)
+						? getIntersectionArea(elevation, opening, opening.getVoidsElements().getRelatingBuildingElement())
+						: getFootprint(opening.getGeometry(), elevation);
+                    // TODO warn if no host for opening! This is invalid as per IFC4
+					Door door = new Door( ifcDoor.getName(), getCorners(openingFootprint));
 					if(!(ignoreAbstractElements && door.getCorners().isEmpty())) {
 						loStorey.addDoors(door);
 						EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
@@ -92,7 +106,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							IfcOpeningElement opening = (IfcOpeningElement) voids.getRelatedOpeningElement();
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
-								Door door = new Door( getPolygon(opening.getGeometry(), elevation));
+								Area openingFootprint = getIntersectionArea(elevation, opening, ifcWall);
+								Door door = new Door( getCorners(openingFootprint));
 								if(!(ignoreAbstractElements && door.getCorners().isEmpty())){
 									loStorey.addDoors(door);
 									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
@@ -126,6 +141,13 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			}
 
 		}
+	}
+
+	private Area getIntersectionArea(double elevation, IfcOpeningElement opening, IfcElement voidedElement) {
+		Area voidedElementFootprint = getFootprint(voidedElement.getGeometry(), elevation); // TODO outline needed?
+		Area openingFootprint = getFootprint(opening.getGeometry(), elevation);
+		openingFootprint.intersect(voidedElementFootprint); // destructive method
+		return openingFootprint;
 	}
 
 	private static boolean populateConnectedRooms(Map<IfcSpace, Room> roomsMap, Door door, List<IfcRelSpaceBoundary> openingBoundaries) {
@@ -213,9 +235,59 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		return true;
 	}
 
-	private List<Corner> getPolygon(GeometryInfo geometry, double elevation) {
+	private List<Corner> getOuterPolygon(GeometryInfo geometry, double elevation) {
 		if (geometry == null) return new ArrayList<>(); // TODO log warning or ignore these rooms/doors?
 		// new IfcTools2D().get2D(space, 1); // only for IFC 2x3
+		Area area = getOutline(getFootprint(geometry, elevation));
+		return getCorners(area);
+	}
+
+	private List<Corner> getCorners(Area area) {
+		if(! area.isSingular()){
+			// TODO warn multiple disconnected areas?
+		}
+		List<Corner> corners = new ArrayList<>();
+		if( area.isEmpty()) {
+			return corners;
+		}
+		PathIterator pathIterator = area.getPathIterator(null);
+		float[] coords = new float[6];
+		int firstSegment = pathIterator.currentSegment(coords);
+		assert !pathIterator.isDone() && firstSegment == PathIterator.SEG_MOVETO;
+		corners.add(new Corner(coords[0], coords[1]));
+		pathIterator.next();
+		while (!pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_LINETO) {
+			corners.add(new Corner(coords[0], coords[1]));
+			pathIterator.next();
+		}
+		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // eqaul to outerArea.isSingular() check above
+		return corners;
+	}
+
+	private Area getOutline(Area area) {
+		// TODO move area union to spatial analysis util class
+		Area outline = new Area();
+		double[] coords = new double[6];
+		GeneralPath path = new GeneralPath();
+		for ( PathIterator pathIterator = area.getPathIterator(null); !pathIterator.isDone(); pathIterator.next() ) {
+			int type = pathIterator.currentSegment(coords);
+			if(type == PathIterator.SEG_MOVETO){
+				path.reset();
+				path.moveTo(coords[0], coords[1]);
+			} else if (type== PathIterator.SEG_LINETO) {
+				path.lineTo(coords[0], coords[1]);
+			} else if (type== PathIterator.SEG_CLOSE){
+				path.closePath();
+				outline.add(new Area(path));
+			} else {
+				// TODO unhandled segment type (cubic etc.), should not be the case
+			}
+
+		}
+		return outline;
+	}
+
+	private Area getFootprint(GeometryInfo geometry, double elevation) {
 		int[] indices = GeometryUtils.toIntegerArray(geometry.getData().getIndices().getData());
 		double[] vertices = GeometryUtils.toDoubleArray(geometry.getData().getVertices().getData());
 		double[] matrix = GeometryUtils.toDoubleArray(geometry.getTransformation());
@@ -241,43 +313,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			path.closePath();
 			area.add(new Area(path));
 		}
-		PathIterator pathIterator = area.getPathIterator(null);
-		float[] coords = new float[6];
-		Area outerArea = new Area();
-		Path2D.Float currentPath = new Path2D.Float();
-		while (!pathIterator.isDone()){
-			int segmentType = pathIterator.currentSegment(coords);
-			if(segmentType == PathIterator.SEG_MOVETO){
-				currentPath.reset();
-				currentPath.moveTo(coords[0], coords[1]);
-			} else if(segmentType == PathIterator.SEG_LINETO){
-				currentPath.lineTo(coords[0], coords[1]);
-			} else if(segmentType == PathIterator.SEG_CLOSE){
-				currentPath.closePath();
-				outerArea.add(new Area(currentPath));
-			} else {
-				// TODO unhandled segment type (cubic etc.), should not be the case
-			}
-			pathIterator.next();
-		}
-		if(! outerArea.isSingular()){
-			// TODO warn multiple disconnected areas?
-		}
-		List<Corner> corners = new ArrayList<>();
-		if( outerArea.isEmpty()) {
-			return corners;
-		}
-		pathIterator = outerArea.getPathIterator(null);
-		int firstSegment = pathIterator.currentSegment(coords);
-		assert !pathIterator.isDone() && firstSegment == PathIterator.SEG_MOVETO;
-		corners.add(new Corner(coords[0], coords[1]));
-		pathIterator.next();
-		while (!pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_LINETO) {
-			corners.add(new Corner(coords[0], coords[1]));
-			pathIterator.next();
-		}
-		assert pathIterator.isDone() && pathIterator.currentSegment(coords) == PathIterator.SEG_CLOSE; // eqaul to outerArea.isSingular() check above
-		return corners;
+		return area;
 	}
 
 	private static double degreesFromMinutes(EList<Long> refLatitude) {
