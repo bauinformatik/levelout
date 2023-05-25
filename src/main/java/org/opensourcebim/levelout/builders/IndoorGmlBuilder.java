@@ -14,11 +14,7 @@ import javax.xml.bind.Marshaller;
 import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class IndoorGmlBuilder {
@@ -98,7 +94,7 @@ public class IndoorGmlBuilder {
 	public CellSpaceType createCellSpace(String id, String name) {
 		CellSpaceType cellSpace = new CellSpaceType();
 		cellSpace.setId(id);
-		cellSpace.setName(Arrays.asList(new CodeType().withValue(name)));
+		cellSpace.setName(List.of(new CodeType().withValue(name)));
 		return cellSpace;
 	}
 	public CellSpaceType createCellSpace(String id) {
@@ -223,6 +219,7 @@ public class IndoorGmlBuilder {
 
 	private StateType createState(Door door) {
 		StateType state = createState("st-door" + door.getId());
+		state.setName(List.of(new CodeType().withValue(door.getName())));
 		doorStateMap.put(door, state);
 		return state;
 	}
@@ -475,8 +472,7 @@ public class IndoorGmlBuilder {
 			for (Door door : storey.getDoors()) {
 				if (!storey.getRooms().contains(door.getRoom1()) && !storey.getRooms().contains(door.getRoom2())) {
 					// TODO warning
-
-				} else if (door.isExternal() || !door.isExternal()) {
+				} else {
 					CellSpaceType cs = createCellSpace(door);
 					addCellSpace(primalSpace, cs);
 					StateType state = createState(door);
@@ -485,23 +481,21 @@ public class IndoorGmlBuilder {
 					setDuality(cs, state);
 					add2DGeometry(cs, door);
 
-					if (!door.isExternal()) {
+					TransitionType transitionroom1 = createTransitionRoom1(door);
+					TransitionType transitionroom1Reverse = createTransitionRoom1Reverse(door);
+					setTransitionPosRoom1(transitionroom1, door);
+					setTransitionPosRoom1(transitionroom1Reverse, door);
+					addTransition(dualSpace.getEdges().get(0), transitionroom1);
+					addTransition(dualSpace.getEdges().get(0), transitionroom1Reverse);
 
-						TransitionType transitionroom1 = createTransitionRoom1(door);
-						TransitionType transitionroom1Reverse = createTransitionRoom1Reverse(door);
+					if (!door.isExternal()) {
 						TransitionType transitionroom2 = createTransitionRoom2(door);
 						TransitionType transitionroom2Reverse = createTransitionRoom2Reverse(door);
-						setTransitionPosRoom1(transitionroom1, door);
-						setTransitionPosRoom1(transitionroom1Reverse, door);
 						setTransitionPosRoom2(transitionroom2, door);
 						setTransitionPosRoom2(transitionroom2Reverse, door);
-						addTransition(dualSpace.getEdges().get(0), transitionroom1);
 						addTransition(dualSpace.getEdges().get(0), transitionroom2);
-						addTransition(dualSpace.getEdges().get(0), transitionroom1Reverse);
 						addTransition(dualSpace.getEdges().get(0), transitionroom2Reverse);
-
 					}
-
 				}
 			}
 

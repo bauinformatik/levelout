@@ -20,12 +20,6 @@ public class Door implements Serializable {
 
 	private final boolean closable;
 
-	public Door(List<Corner> corners){
-		this(null, corners);
-	}
-	public Door(List<Corner> corners, boolean closable){
-		this(null, corners, closable);
-	}
 	public Door(String name, List<Corner> corners) {
 		this(name, corners, true);
 	}

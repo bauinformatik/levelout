@@ -69,8 +69,8 @@ public class OsmBuilder {
 				new Tag("indoor", "door"),
 				new Tag("door", door.isClosable() ? "yes" : "no")
 				));
-		if(door.getName()!=null) tags.add(new Tag("ref", door.getName()));;
-		if(door.getName()!=null) tags.add(new Tag("id", Long.toString(door.getId())));;
+		if(door.getName()!=null) tags.add(new Tag("ref", door.getName()));
+		tags.add(new Tag("id", Long.toString(door.getId())));
 		tags.addAll(levelTags);
 		createAndWriteOsmNode(door.computeCentroid(), tags);
 	}

@@ -54,9 +54,9 @@ public class IntermediateResidential {
 		Room room1 = new Room("0.1", Arrays.asList(p1, p2, p3, p4));
 		Room room2 = new Room("0.2", Arrays.asList(p2, p5, p6, p7));
 		Room room3 = new Room("0.3", Arrays.asList(p7, p6, p8, p3));
-		Door door1 = new Door(Arrays.asList(p21, p22,p26,p25));
+		Door door1 = new Door("0.1-external", Arrays.asList(p21, p22,p26,p25));
 		door1.setExternal(room1);
-		Door door2 = new Door(Arrays.asList(p23, p24,p28,p27));
+		Door door2 = new Door("0.1-0.3", Arrays.asList(p23, p24,p28,p27));
 		door2.setInternal(room1, room3);
 		return new Building(Arrays.asList(
 			new Storey(0, 0, "EG", Arrays.asList(

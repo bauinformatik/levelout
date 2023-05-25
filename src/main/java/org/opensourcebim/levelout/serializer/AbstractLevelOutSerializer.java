@@ -107,7 +107,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
 								Area openingFootprint = getIntersectionArea(elevation, opening, ifcWall);
-								Door door = new Door( getCorners(openingFootprint));
+								Door door = new Door( opening.getName(), getCorners(openingFootprint));
 								if(!(ignoreAbstractElements && door.getCorners().isEmpty())){
 									loStorey.addDoors(door);
 									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());

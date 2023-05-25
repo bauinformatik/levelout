@@ -32,12 +32,12 @@ public class SpatialAnalysisTests {
                 "R1", Arrays.asList(new Corner(0, 0), new Corner(6, 0), new Corner(6, 6), new Corner(0, 6)));
 		room2 = new Room(
                 "R2", Arrays.asList(new Corner(6, 0), new Corner(10, 0), new Corner(7, 6), new Corner(6, 6)));
-		door1 = new Door(Arrays.asList(new Corner(1, 6), new Corner(2, 6)));
-		door2 = new Door(Arrays.asList(new Corner(1, 7), new Corner(2, 7)));
-		door3 = new Door(Arrays.asList(new Corner(6, 1), new Corner(6, 2)));
-		door4 = new Door(Arrays.asList(new Corner(6, 5), new Corner(6, 7)));
-		door5 = new Door(Arrays.asList(new Corner(6, 0), new Corner(7, 0)));
-		door6 = new Door(Arrays.asList(new Corner(9, 2), new Corner(8, 4)));
+		door1 = new Door("D1", Arrays.asList(new Corner(1, 6), new Corner(2, 6)));
+		door2 = new Door("D2", Arrays.asList(new Corner(1, 7), new Corner(2, 7)));
+		door3 = new Door("D3", Arrays.asList(new Corner(6, 1), new Corner(6, 2)));
+		door4 = new Door("D4", Arrays.asList(new Corner(6, 5), new Corner(6, 7)));
+		door5 = new Door("D5", Arrays.asList(new Corner(6, 0), new Corner(7, 0)));
+		door6 = new Door("D6", Arrays.asList(new Corner(9, 2), new Corner(8, 4)));
 	}
 
 	@Test

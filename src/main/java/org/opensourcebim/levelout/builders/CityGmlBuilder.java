@@ -31,8 +31,6 @@ import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
 
-import net.opengis.gml.v_3_2.CodeType;
-
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -115,7 +113,7 @@ public class CityGmlBuilder {
 				List<AbstractSpaceBoundaryProperty> spaceBoundary = new ArrayList<>();
 				spaceBoundary.add(createFloorSurface(poly));
 				cityGmlRoom.setBoundaries(spaceBoundary);
-				cityGmlRoom.setNames(Arrays.asList(new Code(room.getName())));
+				cityGmlRoom.setNames(List.of(new Code(room.getName())));
 				BuildingRoomProperty roomProperty = new BuildingRoomProperty(cityGmlRoom);
 				cityGmlStorey.getBuildingRooms().add(roomProperty);
 			}
@@ -127,7 +125,7 @@ public class CityGmlBuilder {
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
 				doorBoundaries.add(createDoorSurface(poly));
 				doors.setBoundaries(doorBoundaries);
-				doors.setNames(Arrays.asList(new Code(door.getName())));
+				doors.setNames(List.of(new Code(door.getName())));
 				BuildingConstructiveElement buildingconsElement = new BuildingConstructiveElement();
 				buildingconsElement.getFillings().add(new AbstractFillingElementProperty(doors));
 				BuildingConstructiveElementProperty constructiveElement = new BuildingConstructiveElementProperty(
