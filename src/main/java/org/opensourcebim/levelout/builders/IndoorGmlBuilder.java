@@ -95,6 +95,12 @@ public class IndoorGmlBuilder {
 		cellspace.getExternalReference().add(externalReference);
 	}
 
+	public CellSpaceType createCellSpace(String id, String name) {
+		CellSpaceType cellSpace = new CellSpaceType();
+		cellSpace.setId(id);
+		cellSpace.setName(Arrays.asList(new CodeType().withValue(name)));
+		return cellSpace;
+	}
 	public CellSpaceType createCellSpace(String id) {
 		CellSpaceType cellSpace = new CellSpaceType();
 		cellSpace.setId(id);
@@ -102,13 +108,13 @@ public class IndoorGmlBuilder {
 	}
 
 	private CellSpaceType createCellSpace(Room room) {
-		CellSpaceType cellSpace = createCellSpace("cs" + room.getId());
+		CellSpaceType cellSpace = createCellSpace("cs" + room.getId(), room.getName());
 		roomCellMap.put(room, cellSpace);
 		return cellSpace;
 	}
 
 	private CellSpaceType createCellSpace(Door door) {
-		CellSpaceType cellSpace = createCellSpace("cs-door" + door.getId());
+		CellSpaceType cellSpace = createCellSpace("cs-door" + door.getId(), door.getName());
 		doorCellMap.put(door, cellSpace);
 		return cellSpace;
 	}

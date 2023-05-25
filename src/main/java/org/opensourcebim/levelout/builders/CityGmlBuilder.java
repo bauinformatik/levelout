@@ -21,6 +21,7 @@ import org.opensourcebim.levelout.builders.GenericXmlBuilder.Node;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.Door;
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
+import org.xmlobjects.gml.model.basictypes.Code;
 import org.xmlobjects.gml.model.feature.BoundingShape;
 import org.xmlobjects.gml.model.geometry.Envelope;
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty;
@@ -30,7 +31,7 @@ import org.xmlobjects.gml.model.geometry.primitives.Polygon;
 import org.xmlobjects.gml.util.id.DefaultIdCreator;
 import org.xmlobjects.gml.util.id.IdCreator;
 
-
+import net.opengis.gml.v_3_2.CodeType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.OutputStream;
@@ -86,9 +87,8 @@ public class CityGmlBuilder {
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 			Polygon polygon) {
-	//	thematicSurface.setId(idCreator.createId());
+		thematicSurface.setId(idCreator.createId());
 		thematicSurface.setLod0MultiSurface(new MultiSurfaceProperty(geometryFactory.createMultiSurface(polygon)));
-		thematicSurface.setId(polygon.getId());
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 
@@ -110,12 +110,12 @@ public class CityGmlBuilder {
 		for (Room room : storey.getRooms()) {
 			if (room.getCorners().size() >= 3) {
 				Polygon poly = createCitygmlPoly(room);
-				poly.setId(room.getName());// to use for shell
+				// to use for shell
 				BuildingRoom cityGmlRoom = new BuildingRoom();
 				List<AbstractSpaceBoundaryProperty> spaceBoundary = new ArrayList<>();
 				spaceBoundary.add(createFloorSurface(poly));
 				cityGmlRoom.setBoundaries(spaceBoundary);
-				cityGmlRoom.setId(room.getName());
+				cityGmlRoom.setNames(Arrays.asList(new Code(room.getName())));
 				BuildingRoomProperty roomProperty = new BuildingRoomProperty(cityGmlRoom);
 				cityGmlStorey.getBuildingRooms().add(roomProperty);
 			}
@@ -123,12 +123,11 @@ public class CityGmlBuilder {
 		for (Door door : storey.getDoors()) {
 			if (door.getCorners().size() >= 3) {
 				Polygon poly = createDegeneratedDoors(door);
-				poly.setId(door.getName());
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
 				doorBoundaries.add(createDoorSurface(poly));
 				doors.setBoundaries(doorBoundaries);
-				doors.setId(door.getName());
+				doors.setNames(Arrays.asList(new Code(door.getName())));
 				BuildingConstructiveElement buildingconsElement = new BuildingConstructiveElement();
 				buildingconsElement.getFillings().add(new AbstractFillingElementProperty(doors));
 				BuildingConstructiveElementProperty constructiveElement = new BuildingConstructiveElementProperty(
@@ -158,7 +157,7 @@ public class CityGmlBuilder {
 		for (Storey storey : building.getStoreys()) {
 			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
 			cityGmlStorey.setSortKey((double) storey.getLevel());
-			cityGmlStorey.setId(storey.getName());
+			cityGmlStorey.setNames(Arrays.asList(new Code(storey.getName())));
 			AbstractBuildingSubdivisionProperty buildingSubdivision = new AbstractBuildingSubdivisionProperty(
 					cityGmlStorey);
 			cityGmlBuilding.getBuildingSubdivisions().add(buildingSubdivision);
@@ -196,9 +195,8 @@ public class CityGmlBuilder {
 		engineeringDatum.node("description").text("Cartesian datum");
 		engineeringDatum.node("identifier").attribute("codeSpace", "XYZ").text("Datum1");
 		engineeringDatum.node("scope").text("CityGML");
-		engineeringDatum.node("anchorDefinition")
-				.attribute("codeSpace", "urn:ogc:def:crs,crs:EPSG::" + crs.getEpsg())
-				.text(crs.getOriginX() + " " + crs.getOriginY()  + " ");
+		engineeringDatum.node("anchorDefinition").attribute("codeSpace", "urn:ogc:def:crs,crs:EPSG::" + crs.getEpsg())
+				.text(crs.getOriginX() + " " + crs.getOriginY() + " ");
 
 		// sample
 		// https://github.com/opengeospatial/CityGML-3.0Encodings/blob/50af15ffc860f57ba29042844af7e8b40e960851/Moved_to_CITYGML-3.0Encoding_CityGML/Examples/Core/LocalCRS_CityGML3.gml
