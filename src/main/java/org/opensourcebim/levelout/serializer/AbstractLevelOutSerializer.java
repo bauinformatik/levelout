@@ -89,8 +89,10 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 				for (IfcDoor ifcDoor : containment.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
-					IfcElement voidedElement = opening.getVoidsElements().getRelatingBuildingElement();
-					Area openingFootprint = getIntersectionArea(elevation, opening, voidedElement);
+					Area openingFootprint = (opening.getVoidsElements()!=null && opening.getVoidsElements().getRelatingBuildingElement()!=null)
+						? getIntersectionArea(elevation, opening, opening.getVoidsElements().getRelatingBuildingElement())
+						: getFootprint(opening.getGeometry(), elevation);
+                    // TODO warn if no host for opening! This is invalid as per IFC4
 					Door door = new Door( ifcDoor.getName(), getCorners(openingFootprint));
 					if(!(ignoreAbstractElements && door.getCorners().isEmpty())) {
 						loStorey.addDoors(door);
