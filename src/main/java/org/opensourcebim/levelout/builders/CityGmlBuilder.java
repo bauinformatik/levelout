@@ -86,8 +86,9 @@ public class CityGmlBuilder {
 
 	private AbstractSpaceBoundaryProperty processBoundarySurface(AbstractThematicSurface thematicSurface,
 			Polygon polygon) {
-		thematicSurface.setId(idCreator.createId());
+	//	thematicSurface.setId(idCreator.createId());
 		thematicSurface.setLod0MultiSurface(new MultiSurfaceProperty(geometryFactory.createMultiSurface(polygon)));
+		thematicSurface.setId(polygon.getId());
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 
@@ -108,11 +109,13 @@ public class CityGmlBuilder {
 	private void addRoomsAndDoors(Storey storey, org.citygml4j.core.model.building.Storey cityGmlStorey) {
 		for (Room room : storey.getRooms()) {
 			if (room.getCorners().size() >= 3) {
-				Polygon poly = createCitygmlPoly(room); // to use for shell
+				Polygon poly = createCitygmlPoly(room);
+				poly.setId(room.getName());// to use for shell
 				BuildingRoom cityGmlRoom = new BuildingRoom();
 				List<AbstractSpaceBoundaryProperty> spaceBoundary = new ArrayList<>();
 				spaceBoundary.add(createFloorSurface(poly));
 				cityGmlRoom.setBoundaries(spaceBoundary);
+				cityGmlRoom.setId(room.getName());
 				BuildingRoomProperty roomProperty = new BuildingRoomProperty(cityGmlRoom);
 				cityGmlStorey.getBuildingRooms().add(roomProperty);
 			}
@@ -120,10 +123,12 @@ public class CityGmlBuilder {
 		for (Door door : storey.getDoors()) {
 			if (door.getCorners().size() >= 3) {
 				Polygon poly = createDegeneratedDoors(door);
+				poly.setId(door.getName());
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
 				doorBoundaries.add(createDoorSurface(poly));
 				doors.setBoundaries(doorBoundaries);
+				doors.setId(door.getName());
 				BuildingConstructiveElement buildingconsElement = new BuildingConstructiveElement();
 				buildingconsElement.getFillings().add(new AbstractFillingElementProperty(doors));
 				BuildingConstructiveElementProperty constructiveElement = new BuildingConstructiveElementProperty(
@@ -153,6 +158,7 @@ public class CityGmlBuilder {
 		for (Storey storey : building.getStoreys()) {
 			org.citygml4j.core.model.building.Storey cityGmlStorey = new org.citygml4j.core.model.building.Storey();
 			cityGmlStorey.setSortKey((double) storey.getLevel());
+			cityGmlStorey.setId(storey.getName());
 			AbstractBuildingSubdivisionProperty buildingSubdivision = new AbstractBuildingSubdivisionProperty(
 					cityGmlStorey);
 			cityGmlBuilding.getBuildingSubdivisions().add(buildingSubdivision);
