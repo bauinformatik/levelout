@@ -89,7 +89,9 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 				for (IfcDoor ifcDoor : containment.getRelatedElements().stream().filter(IfcDoor.class::isInstance).map(IfcDoor.class::cast).toArray(IfcDoor[]::new)) {
 					if (ifcDoor.getFillsVoids().size()!=1) continue; // TODO warning if >1, handle standalone
 					IfcOpeningElement opening = ifcDoor.getFillsVoids().get(0).getRelatingOpeningElement();
-					Door door = new Door( ifcDoor.getName(), getOuterPolygon(opening.getGeometry(), elevation));
+					IfcElement voidedElement = opening.getVoidsElements().getRelatingBuildingElement();
+					Area openingFootprint = getIntersectionArea(elevation, opening, voidedElement);
+					Door door = new Door( ifcDoor.getName(), getCorners(openingFootprint));
 					if(!(ignoreAbstractElements && door.getCorners().isEmpty())) {
 						loStorey.addDoors(door);
 						EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
@@ -102,7 +104,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							IfcOpeningElement opening = (IfcOpeningElement) voids.getRelatedOpeningElement();
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
-								Door door = new Door( getOuterPolygon(opening.getGeometry(), elevation));
+								Area openingFootprint = getIntersectionArea(elevation, opening, ifcWall);
+								Door door = new Door( getCorners(openingFootprint));
 								if(!(ignoreAbstractElements && door.getCorners().isEmpty())){
 									loStorey.addDoors(door);
 									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
@@ -136,6 +139,13 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			}
 
 		}
+	}
+
+	private Area getIntersectionArea(double elevation, IfcOpeningElement opening, IfcElement voidedElement) {
+		Area voidedElementFootprint = getFootprint(voidedElement.getGeometry(), elevation); // TODO outline needed?
+		Area openingFootprint = getFootprint(opening.getGeometry(), elevation);
+		openingFootprint.intersect(voidedElementFootprint); // destructive method
+		return openingFootprint;
 	}
 
 	private static boolean populateConnectedRooms(Map<IfcSpace, Room> roomsMap, Door door, List<IfcRelSpaceBoundary> openingBoundaries) {
@@ -274,6 +284,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		}
 		return outline;
 	}
+
 	private Area getFootprint(GeometryInfo geometry, double elevation) {
 		int[] indices = GeometryUtils.toIntegerArray(geometry.getData().getIndices().getData());
 		double[] vertices = GeometryUtils.toDoubleArray(geometry.getData().getVertices().getData());
