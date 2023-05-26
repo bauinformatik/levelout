@@ -4,31 +4,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.models.ifc4.IfcAxis2Placement;
-import org.bimserver.models.ifc4.IfcAxis2Placement2D;
-import org.bimserver.models.ifc4.IfcAxis2Placement3D;
 import org.bimserver.models.ifc4.IfcContext;
 import org.bimserver.models.ifc4.IfcDirection;
 import org.bimserver.models.ifc4.IfcGeometricRepresentationContext;
-import org.bimserver.models.ifc4.IfcLocalPlacement;
-import org.bimserver.models.ifc4.IfcMapConversion;
 import org.bimserver.models.ifc4.IfcObjectDefinition;
-import org.bimserver.models.ifc4.IfcObjectPlacement;
-import org.bimserver.models.ifc4.IfcProject;
-import org.bimserver.models.ifc4.IfcReal;
 import org.bimserver.models.ifc4.IfcRelAggregates;
 import org.bimserver.models.ifc4.IfcRepresentationContext;
 import org.bimserver.models.ifc4.IfcSite;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
 public class GeodataLoGeoRef20_40 extends GeodataLoGeoRef {
 	
 	public void validateGeodataLoGeoRef20_40(StringBuilder txt, IfcModelInterface model) {
-		
-		//Validates the presence of the respective IFC entities and IFC select types for the investigation
+		txt.append("Validate Level of Georeferencing 20/40 (IFC2x3)." + "\n");
 		IfcSite sites = model.getAll(IfcSite.class).stream().findFirst().orElse(null);
 		if (sites != null) {
 			validateIfcSite(txt, sites);
@@ -67,25 +57,6 @@ public class GeodataLoGeoRef20_40 extends GeodataLoGeoRef {
 			txt.append("Test value: " + reals + "\n");
 			validateTrueNorth(txt, directions);
 			
-			/*
-			EClass eClass = ((EObject) directions).eClass();
-			EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
-			txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
-	        for (EStructuralFeature eFeature : eFeatures) {
-	        	String featureName = eFeature.getName();
-	            Object featureValue = sites.eGet(eFeature);
-	            txt.append("\t").append(featureName).append(": ").append(featureValue).append("\n");
-	        }
-	        txt.append("\n");
-	        */
-			
-			/* 
-			EList<IfcRepresentationContext> projects = null;
-				if (objectDefinitions instanceof IfcContext) {
-					projects = ((IfcContext) objectDefinitions).getRepresentationContexts();
-				}
-			*/ 
-			 
 		 } else {
              txt.append("The IFC entity IfcSite is missing from the IFC model.\n");
          }
@@ -93,28 +64,12 @@ public class GeodataLoGeoRef20_40 extends GeodataLoGeoRef {
 	
 	//Checks a respective set of attributes of IfcSite for their presence
 	private void validateIfcSite(StringBuilder txt, IfcSite sites) {
-		EClass eClass = sites.eClass();
-		EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
         List<String> validValues = Arrays.asList("RefLatitude", "RefLongitude", "RefElevation");
-        validateAttributes(txt, eClass, eFeatures, validValues, sites);
+        validateAttributes(txt, validValues, sites);
 	}
 	
 	private void validateTrueNorth(StringBuilder txt, IfcDirection directions) {
-		EClass eClass = directions.eClass();
-		EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
 		List<String> validValues = Arrays.asList("DirectionRatios");
-        validateAttributes(txt, eClass, eFeatures, validValues, directions);
+        validateAttributes(txt, validValues, directions);
 	}
 }
-
-//tools:
-//Text output of the respective IFC entity name
-		/*
-		txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
-      for (EStructuralFeature eFeature : eFeatures) {
-      	String featureName = eFeature.getName();
-          Object featureValue = sites.eGet(eFeature);
-          txt.append("\t").append(featureName).append(": ").append(featureValue).append("\n");
-      }
-      txt.append("\n");
-      */
