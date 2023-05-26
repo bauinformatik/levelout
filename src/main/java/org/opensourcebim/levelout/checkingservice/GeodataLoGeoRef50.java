@@ -43,13 +43,13 @@ public class GeodataLoGeoRef50 extends Validation {
 		validateAttributes(txt, requiredAttributes, geometricRepresentationContexts);
 	}
 
-	private void validateIfcCoordinateReferenceSystem(StringBuilder txt, IfcCoordinateReferenceSystem coordinateReferenceSystems) {
-		// printAttributes(txt, coordinateReferenceSystems);
+	private void validateIfcCoordinateReferenceSystem(StringBuilder txt, IfcCoordinateReferenceSystem coordinateReferenceSystem) {
+		// printAttributes(txt, coordinateReferenceSystem);
         List<String> requiredAttributes = Arrays.asList("GeodeticDatum", "VerticalDatum", "HasCoordinateOperation", "MapProjection", "MapZone", "MapUnit");
-        validateAttributes(txt, requiredAttributes, coordinateReferenceSystems);
+        validateAttributes(txt, requiredAttributes, coordinateReferenceSystem);
         // Prüfen, ob im Attributwert von "Name" der IFC-Entität IfcProjectedCRS der EPSG-Code vorhanden ist
-        boolean hasEPSGWord = coordinateReferenceSystems.getName().startsWith("EPSG:");
-        boolean hasEPSGNumber = Pattern.compile("\\b\\d{4,5}\\b").matcher(coordinateReferenceSystems.getName()).find();
+        boolean hasEPSGWord = coordinateReferenceSystem.getName().startsWith("EPSG:");
+        boolean hasEPSGNumber = Pattern.compile("\\b\\d{4,5}\\b").matcher(coordinateReferenceSystem.getName()).find();
 		if (hasEPSGWord || hasEPSGNumber) {
 			txt.append("\n").append("The IFC model contains an EPSG code.\n");
 		} else {

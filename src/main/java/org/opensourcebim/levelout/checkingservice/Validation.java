@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Validation {
 	
@@ -14,22 +15,19 @@ public class Validation {
 		//Check1 for IFC attribute values of value != null
 		EClass eClass = targetObject.eClass();
 		EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
-		boolean hasValue = eFeatures.stream()
-				.filter(feature -> requiredAttributes.contains(feature.getName()))
-				.map(feature -> targetObject.eGet(feature))
-	            .allMatch(value -> value != null);
+		List<EStructuralFeature> missingRequiredAttributes = eFeatures.stream()
+				.filter(feature -> requiredAttributes.contains(feature.getName()) && targetObject.eGet(feature)==null)
+				.collect(Collectors.toList());
 		//Check2 for validity of geodata saved in IFC attributes
-		if (hasValue) {
+		if (missingRequiredAttributes.isEmpty()) {
 			//Valid statement
-	        txt.append("The required geodata from ").append(eClass.getName()).append(" are valid in the IFC model.\n");
+	        txt.append("The required attributes for ").append(eClass.getName()).append(" are set.\n");
 	    } else {
 	    	//Invalid statement
-	    	txt.append("The required geodata from ").append(eClass.getName()).append(" are invalid in the IFC model.\n");
-	    	txt.append("\n").append("The following geodata must be added:\n");
+	    	txt.append("The required attributes for ").append(eClass.getName()).append(" are not set.\n");
+	    	txt.append("\n").append("The following attributes must be added:\n");
 	    	//Check3 for the necessity of adding IFC attribute values
-	    	eFeatures.stream()
-                .filter(feature -> targetObject.eGet(feature) == null)
-                .forEach(feature -> missingAttributeMessage(txt, eClass.getName(), feature.getName()));
+            missingRequiredAttributes.forEach(feature -> missingAttributeMessage(txt, eClass.getName(), feature.getName()));
 	    }
 	}
 	
@@ -38,7 +36,7 @@ public class Validation {
 		txt.append("\t").append(attributeName).append(" is missing in ").append(className).append("\n");
 	}
 
-	private void printAttributes(StringBuilder txt, EObject object) {
+	protected void printAttributes(StringBuilder txt, EObject object) {
 		EClass eClass = object.eClass();
 		txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
 		for (EStructuralFeature eFeature : eClass.getEAllStructuralFeatures()) {
