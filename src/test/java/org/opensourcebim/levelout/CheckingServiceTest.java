@@ -93,7 +93,7 @@ public class CheckingServiceTest {
 		SLongCheckinActionState checkin = services.getServiceInterface().checkinSync(sProject.getOid(), "checkin", ifcDeserializer.getOid(), fileResource.length(), fileResource.getName(), new DataHandler(resource), false);
 		Assert.assertNotEquals(-1, checkin.getRoid());
 		sProject = services.getServiceInterface().getProjectsByName("test").get(0);
-		Thread.sleep(1500); // service execution might take shorter or longer TODO register and be notified
+		Thread.sleep(2000); // service execution might take shorter or longer TODO register and be notified
 		Assert.assertEquals(3, services.getServiceInterface().getAllExtendedDataOfRevision(sProject.getLastRevisionId()).size());
 		long extendedDataId = services.getServiceInterface().getExtendedDataSchemaByName("UNSTRUCTURED_UTF8_TEXT_1_0").getOid();
 		SExtendedData extendedData = services.getServiceInterface().getLastExtendedDataOfRevisionAndSchema(sProject.getLastRevisionId(), extendedDataId);
