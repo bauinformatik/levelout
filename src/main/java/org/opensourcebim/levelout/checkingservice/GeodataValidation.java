@@ -28,7 +28,9 @@ public class GeodataValidation {
 	
 	public void validateGeodata(StringBuilder txt, IfcModelInterface model) {
 		txt.append("Geodata Validation\n-------------------\n");
-		geodataLoGeoRef.validateUnits(txt, model);
+		geodataLoGeoRef.validateGeodataLoGeoRef(txt, model);
+		//geodataLoGeoRef.validateProjects(projects, txt, model);
+		//geodataLoGeoRef.validateSites(sites, txt, model);
 		//Validates the presence of the respective IFC entities and select types for Variant 1 (LoGeoRef50)
 		IfcProject project = model.getAll(IfcProject.class).stream().findAny().orElse(null);
 		if (project != null) {
@@ -41,49 +43,11 @@ public class GeodataValidation {
 	        	geodataLoGeoRef50.validateGeodataLoGeoRef50(txt, model);
 	    	} else {
 	    		//Validates the presence of the respective IFC entities and select types for Variant 2 (LoGeoRef20+40)
-	    		// TODO Where is the correct placement for the IfcSite check?
+	    		
+	    		//Auxiliary code
 	    		IfcSite sites = model.getAll(IfcSite.class).stream().findAny().orElse(null);
-	    		if (sites != null) {
-	    			IfcElementCompositionEnum elementCompositionTypeEnum = sites.getCompositionType();
-	    			String elementCompositionTypeEnumMsg = "The CompositionType attribute for IfcSite is ";
-	    			if (elementCompositionTypeEnum == null) {
-	    				txt.append(elementCompositionTypeEnumMsg + "undefined." + "\n");
-	    			} else {
-	    				String elementCompositionTypeEnumString = elementCompositionTypeEnum.toString();
-	    				txt.append(elementCompositionTypeEnumMsg + elementCompositionTypeEnumString + "\n");
-	    				switch(elementCompositionTypeEnumString) {
-	    				// TODO How could be dealt with the respective ElementCompositionTypeEnum?
-	    					case "COMPLEX": txt.append("There is more than one IfcSite entity in the IFC model" + "\n"); break;
-	    					case "ELEMENT": txt.append("There is one IfcSite entity in the IFC model" + "\n"); break;
-	    					case "PARTIAL": txt.append("The IfcSite entity is decomposed in parts." + "\n"); break;
-	    				}
-	    			}
-	    			txt.append("Test value: " + elementCompositionTypeEnum +"\n");
-	    		} else {
-	    			txt.append("A geodata analysis for LoGeoRef50 or LoGeoRef20 is impossible.");
-	    		}
-	    		// TODO Where is the correct placement for the IfcGeometricRepresentationContext check?
-	    		IfcGeometricRepresentationContext geometricRepresentationContext = model.getAll(IfcGeometricRepresentationContext.class).stream()
-	    				.filter(feature -> feature instanceof IfcGeometricRepresentationContext && "Model".equals(feature.getContextType()))
-						.map(feature -> (IfcGeometricRepresentationContext) feature)
-						.findFirst()
-						.orElse(null);
-	    		if (sites != null || geometricRepresentationContext != null) {
-	    			long dimensionCount = geometricRepresentationContext.getCoordinateSpaceDimension();
-	        		txt.append("The dimension context in the IFC model is: " + dimensionCount + "\n");
-	        		switch((int)dimensionCount) {
-    				// TODO How could be dealt with the respective CoordinateSpaceDimension?
-    					case 1: txt.append("A 1D context is present. The IFC model is unsuitable for further investigation." + "\n"); break;
-    					case 2: txt.append("A 2D context is present. The IFC model is unsuitable for further investigation." + "\n"); break;
-    					case 3: txt.append("A 3D context is present. The IFC model is suitable for further investigation." + "\n"); break;
-    				}
-	    			txt.append("A geodata analysis for LoGeoRef20 is conducted." + "\n");
-	        		txt.append("Check for the presence of the following IFC enitities and their attributes: "+ "\n"
-	        				 + "\tIfcSite\n" + "IfcGeometricRepresentationContext\n\n");
-	                geodataLoGeoRef20_40.validateGeodataLoGeoRef20_40(txt, model);
-	    		} else {
-	    			txt.append("A geodata analysis for Variant 1 (LoGeoRef50) or Variant 2 (LoGeoRef20/40) is impossible.");
-	    		}
+	    			
+	    		
 	        }
 		} else {
 			txt.append("A geodata analysis is impossible. The IfcProject entity is missing from the IFC model.");
