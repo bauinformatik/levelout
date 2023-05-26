@@ -40,13 +40,13 @@ public class GeodataLoGeoRef20_40 extends Validation {
 	private void validateRotation(IfcGeometricRepresentationContext context) {
 		IfcDirection trueNorth = context.getTrueNorth();
 		if(trueNorth==null) {
-			txt.append("True north not set.\n");
+			txt.append("True north not set. Assuming WCS y-axis is north.\n");
 			return;
 		}
 		if (!(trueNorth.getDim() == 2 && trueNorth.getDirectionRatios().size() == 2)) {
 			txt.append("Wrong true north dimension.\n");
 		}
-		List<String> validValues = List.of("DirectionRatios");
-        validateAttributes(validValues, trueNorth);
+		List<String> requiredAttributes = List.of("DirectionRatios");
+        validateAttributes(requiredAttributes, trueNorth);
 	}
 }
