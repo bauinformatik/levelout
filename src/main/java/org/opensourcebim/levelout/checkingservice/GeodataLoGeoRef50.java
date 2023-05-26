@@ -43,7 +43,7 @@ public class GeodataLoGeoRef50 extends Validation {
     }
 
 	private void validateIfcGeometricRepresentationContext(IfcGeometricRepresentationContext geometricRepresentationContexts) {
-		List<String> requiredAttributes = Arrays.asList("WorldCoordinateSystem", "TrueNorth", "HasCoordinateOperation");
+		List<String> requiredAttributes = Arrays.asList("WorldCoordinateSystem", "HasCoordinateOperation");
 		validateAttributes(requiredAttributes, geometricRepresentationContexts);
 	}
 

@@ -12,7 +12,7 @@ public abstract class Validation {
 
 	StringBuilder txt;
 	
-	//Validates the IFC attribute values of a given IFC entity
+	// Validates the IFC attribute values of a given IFC entity
 	protected void validateAttributes(List<String> requiredAttributes, EObject targetObject) {
 		//Check1 for IFC attribute values of value != null
 		EClass eClass = targetObject.eClass();
@@ -20,15 +20,11 @@ public abstract class Validation {
 		List<EStructuralFeature> missingRequiredAttributes = eFeatures.stream()
 				.filter(feature -> requiredAttributes.contains(feature.getName()) && targetObject.eGet(feature)==null)
 				.collect(Collectors.toList());
-		//Check2 for validity of geodata saved in IFC attributes
 		if (missingRequiredAttributes.isEmpty()) {
-			//Valid statement
-	        txt.append("The required attributes for ").append(eClass.getName()).append(" are set.\n");
+	        txt.append("The required attributes for ").append(eClass.getName()).append(" are all set.\n");
 	    } else {
-	    	//Invalid statement
-	    	txt.append("The required attributes for ").append(eClass.getName()).append(" are not set.\n");
-	    	txt.append("\n").append("The following attributes must be added:\n");
-	    	//Check3 for the necessity of adding IFC attribute values
+	    	txt.append("The required attributes for ").append(eClass.getName()).append(" are not all set.\n");
+	    	txt.append("The following attributes must be added:\n");
             missingRequiredAttributes.forEach(feature -> missingAttributeMessage(eClass.getName(), feature.getName()));
 	    }
 	}
@@ -40,7 +36,7 @@ public abstract class Validation {
 
 	protected void printAttributes(EObject object) {
 		EClass eClass = object.eClass();
-		txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
+		txt.append("\n").append("The attributes of " + eClass.getName() + " are: \n");
 		for (EStructuralFeature eFeature : eClass.getEAllStructuralFeatures()) {
 			String featureName = eFeature.getName();
 			Object featureValue = object.eGet(eFeature);
