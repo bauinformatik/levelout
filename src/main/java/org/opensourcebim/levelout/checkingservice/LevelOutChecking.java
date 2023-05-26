@@ -9,17 +9,9 @@ import org.bimserver.plugins.SchemaName;
 import org.bimserver.plugins.services.AbstractAddExtendedDataService;
 import org.bimserver.plugins.services.BimServerClientInterface;
 
-//Class LevelOutChecking inherit from the class AbstractAddExtendedDataService
 public class LevelOutChecking extends AbstractAddExtendedDataService {
-	
-  //Declaration and initialization of an instance variable with their types
-	private GeodataValidation geodataValidation = new GeodataValidation();
-	
-	private SpaceBoundaryValidation spaceBoundaryValidation = new SpaceBoundaryValidation();
-	
-	private SpaceValidation spaceValidation = new SpaceValidation();	
-	
-	//Constructor LevelOutChecking initialize the parent class AbstractAddExtendedDataService with the schema name
+
+    //Constructor LevelOutChecking initialize the parent class AbstractAddExtendedDataService with the schema name
 	public LevelOutChecking() {
         super(SchemaName.UNSTRUCTURED_UTF8_TEXT_1_0.name());
         
@@ -61,19 +53,15 @@ public class LevelOutChecking extends AbstractAddExtendedDataService {
         else txt.append("Bounds: no bounds set\n");
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-      //The validateGeodata method is called
-        geodataValidation.validateGeodata(txt, model);
+        new GeodataValidation(txt).validateGeodata(model);
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-      //The validateSpaceBoundary method is called
-        spaceBoundaryValidation.validateSpaceBoundary(txt, model);
+        new SpaceBoundaryValidation().validateSpaceBoundary(txt, model);
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-      //The validateSpace method is called
-        spaceValidation.validateSpace(txt, model);
+        new SpaceValidation().validateSpace(txt, model);
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
-        
-        
+
         //The method addExtendedData() is called to add the created test report as extended data to the BIMserver project. The check report is stored in stats.txt.
         addExtendedData(txt.toString().getBytes(), "stats.txt", "Statistics", "text/plain", bimServerClientInterface, roid);
     }

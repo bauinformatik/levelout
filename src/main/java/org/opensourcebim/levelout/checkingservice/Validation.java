@@ -8,10 +8,12 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Validation {
+public abstract class Validation {
+
+	StringBuilder txt;
 	
 	//Validates the IFC attribute values of a given IFC entity
-	protected void validateAttributes(StringBuilder txt, List<String> requiredAttributes, EObject targetObject) {
+	protected void validateAttributes(List<String> requiredAttributes, EObject targetObject) {
 		//Check1 for IFC attribute values of value != null
 		EClass eClass = targetObject.eClass();
 		EList<EStructuralFeature> eFeatures = eClass.getEAllStructuralFeatures();
@@ -27,16 +29,16 @@ public class Validation {
 	    	txt.append("The required attributes for ").append(eClass.getName()).append(" are not set.\n");
 	    	txt.append("\n").append("The following attributes must be added:\n");
 	    	//Check3 for the necessity of adding IFC attribute values
-            missingRequiredAttributes.forEach(feature -> missingAttributeMessage(txt, eClass.getName(), feature.getName()));
+            missingRequiredAttributes.forEach(feature -> missingAttributeMessage(eClass.getName(), feature.getName()));
 	    }
 	}
 	
 	//Writes a message for the user in case of missing IFC attribute values in the considered submodel
-	private void missingAttributeMessage(StringBuilder txt, String className, String attributeName) {
+	private void missingAttributeMessage(String className, String attributeName) {
 		txt.append("\t").append(attributeName).append(" is missing in ").append(className).append("\n");
 	}
 
-	protected void printAttributes(StringBuilder txt, EObject object) {
+	protected void printAttributes(EObject object) {
 		EClass eClass = object.eClass();
 		txt.append("\n").append("The attributes of " + eClass.getName().toString() + " are: \n");
 		for (EStructuralFeature eFeature : eClass.getEAllStructuralFeatures()) {

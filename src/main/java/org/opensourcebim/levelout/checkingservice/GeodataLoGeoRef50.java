@@ -11,9 +11,13 @@ import org.bimserver.models.ifc4.IfcMapConversion;
 
 public class GeodataLoGeoRef50 extends Validation {
 
-	public void validateGeodataLoGeoRef50(StringBuilder txt, IfcGeometricRepresentationContext context) {
+	public GeodataLoGeoRef50(StringBuilder txt) {
+		this.txt = txt;
+	}
+
+	public void validateGeodataLoGeoRef50(IfcGeometricRepresentationContext context) {
 		txt.append("Validate Level of Georeferencing 50 (IFC4)." + "\n");
-		validateIfcGeometricRepresentationContext(txt, context);
+		validateIfcGeometricRepresentationContext(context);
 		List<IfcCoordinateOperation> coordinateoperations = context.getHasCoordinateOperation();
 		IfcMapConversion mapConversions = coordinateoperations.stream()
 				.filter(feature -> feature instanceof IfcMapConversion)
@@ -24,29 +28,29 @@ public class GeodataLoGeoRef50 extends Validation {
 			txt.append("The IfcMapConversion entity is missing from the IFC model.\n");
 			return;
 		}
-		validateIfcMapConversion(txt, mapConversions);
+		validateIfcMapConversion(mapConversions);
 		IfcCoordinateReferenceSystem projectedCRS = mapConversions.getTargetCRS();
 		if(projectedCRS == null){
 			txt.append("The IFC entity IfcProjectedCRS is missing from the IFC model.\n");
 			return;
 		}
-		validateIfcCoordinateReferenceSystem(txt, projectedCRS);
+		validateIfcCoordinateReferenceSystem(projectedCRS);
     }
 
-	private void validateIfcMapConversion(StringBuilder txt, IfcMapConversion mapConversions) {
+	private void validateIfcMapConversion(IfcMapConversion mapConversions) {
         List<String> requiredAttributes = Arrays.asList("SourceCRS", "TargetCRS", "Eastings","Northings", "OrthogonalHeight", "XAxisAbscissa", "XAxisOrdinate", "Scale");
-        validateAttributes(txt, requiredAttributes, mapConversions);
+        validateAttributes(requiredAttributes, mapConversions);
     }
 
-	private void validateIfcGeometricRepresentationContext(StringBuilder txt, IfcGeometricRepresentationContext geometricRepresentationContexts) {
+	private void validateIfcGeometricRepresentationContext(IfcGeometricRepresentationContext geometricRepresentationContexts) {
 		List<String> requiredAttributes = Arrays.asList("WorldCoordinateSystem", "TrueNorth", "HasCoordinateOperation");
-		validateAttributes(txt, requiredAttributes, geometricRepresentationContexts);
+		validateAttributes(requiredAttributes, geometricRepresentationContexts);
 	}
 
-	private void validateIfcCoordinateReferenceSystem(StringBuilder txt, IfcCoordinateReferenceSystem coordinateReferenceSystem) {
-		// printAttributes(txt, coordinateReferenceSystem);
+	private void validateIfcCoordinateReferenceSystem(IfcCoordinateReferenceSystem coordinateReferenceSystem) {
+		// printAttributes(coordinateReferenceSystem);
         List<String> requiredAttributes = Arrays.asList("GeodeticDatum", "VerticalDatum", "HasCoordinateOperation", "MapProjection", "MapZone", "MapUnit");
-        validateAttributes(txt, requiredAttributes, coordinateReferenceSystem);
+        validateAttributes(requiredAttributes, coordinateReferenceSystem);
         // Prüfen, ob im Attributwert von "Name" der IFC-Entität IfcProjectedCRS der EPSG-Code vorhanden ist
         boolean hasEPSGWord = coordinateReferenceSystem.getName().startsWith("EPSG:");
         boolean hasEPSGNumber = Pattern.compile("\\b\\d{4,5}\\b").matcher(coordinateReferenceSystem.getName()).find();

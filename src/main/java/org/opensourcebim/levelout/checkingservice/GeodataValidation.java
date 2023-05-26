@@ -10,30 +10,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class GeodataValidation {
-	IfcSite site;
-	IfcGeometricRepresentationContext context;
+public class GeodataValidation extends Validation {
 
-	public void validateGeodata(StringBuilder txt, IfcModelInterface model) {
+	public GeodataValidation(StringBuilder txt) {
+		this.txt = txt;
+	}
+
+	public void validateGeodata(IfcModelInterface model) {
 		txt.append("Geodata Validation\n-------------------\n");
-		validateGeneral(txt, model);
-		if(context == null) return;
-	    new GeodataLoGeoRef50().validateGeodataLoGeoRef50(txt, context);
-		if(site == null) return;
-	    new GeodataLoGeoRef20_40().validateGeodataLoGeoRef20_40(txt, site, context);
-	}
-	protected void validateGeneral(StringBuilder txt, IfcModelInterface model) {
-		IfcProject project = validateProjects(txt, model);
+		IfcProject project = validateProjects(model);
 		if(project == null) return;
-		site = validateSites(txt, project);
-		if(site == null) return;
-		validateSite(txt, site);
-		context = validateContext(txt, project);
-		if(context == null) return;
-		validateUnits(txt, project);
+		IfcSite site = validateSites(project);
+		if (site == null) return;
+		validateSite(site);
+		IfcGeometricRepresentationContext context = validateContext(project);
+		if (context == null) return;
+		validateUnits(project);
+	    new GeodataLoGeoRef50(txt).validateGeodataLoGeoRef50(context);
+	    new GeodataLoGeoRef20_40(txt).validateGeodataLoGeoRef20_40(site, context);
 	}
 
-	private IfcGeometricRepresentationContext validateContext(StringBuilder txt, IfcProject project) {
+	private IfcGeometricRepresentationContext validateContext(IfcProject project) {
 		txt.append("\t" + "Context Validation" + "\n");
 		EList<IfcRepresentationContext> representationContexts = project.getRepresentationContexts();
 		List<IfcGeometricRepresentationContext> geometricRepresentationContexts = representationContexts.stream()
@@ -55,7 +52,7 @@ public class GeodataValidation {
 		return geometricRepresentationContexts.get(0);
 	}
 
-	protected IfcProject validateProjects(StringBuilder txt, IfcModelInterface model) {
+	protected IfcProject validateProjects(IfcModelInterface model) {
 		txt.append("\t" + "Project Validation" + "\n");
 		List <IfcProject> projects = model.getAll(IfcProject.class); // TODO
 		if (projects.isEmpty()) {
@@ -69,7 +66,7 @@ public class GeodataValidation {
 		return projects.get(0);
 	}
 
-	protected IfcSite validateSites(StringBuilder txt, IfcProject project) {
+	protected IfcSite validateSites(IfcProject project) {
 		txt.append("\t" + "Site Validation" + "\n");
 		List<IfcSite> sites = new ArrayList<>();
 		for (IfcRelAggregates relAggregate : project.getIsDecomposedBy()) {
@@ -89,14 +86,15 @@ public class GeodataValidation {
 		}
 		return sites.get(0);
 	}
-	protected void validateSite(StringBuilder txt, IfcSite site){
+
+	protected void validateSite(IfcSite site){
 		IfcElementCompositionEnum elementCompositionType = site.getCompositionType();
 		if (elementCompositionType == IfcElementCompositionEnum.COMPLEX ||elementCompositionType == IfcElementCompositionEnum.PARTIAL) {
 			txt.append("\t\t" + "The CompositionType attribute for the selected size is " + elementCompositionType.getName() + "\n");
 		}
 	}
 
-	protected void validateUnits(StringBuilder txt, IfcProject project) {
+	protected void validateUnits(IfcProject project) {
 		txt.append("\t" +"Unit Validation" + "\n");
 		//Unit check
 		if (project.getUnitsInContext() != null && project.getUnitsInContext().getUnits() != null) {

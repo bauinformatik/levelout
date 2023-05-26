@@ -10,15 +10,19 @@ import org.eclipse.emf.common.util.EList;
 
 public class GeodataLoGeoRef20_40 extends Validation {
 
-	public void validateGeodataLoGeoRef20_40(StringBuilder txt, IfcSite site, IfcGeometricRepresentationContext context) {
-		txt.append("Validate Level of Georeferencing 20/40 (IFC2x3)." + "\n");
-		validatePosition(txt, site);
-		validateRotation(txt, context);
+	public GeodataLoGeoRef20_40(StringBuilder txt) {
+		this.txt = txt;
 	}
 
-	private void validatePosition(StringBuilder txt, IfcSite site) {
+	public void validateGeodataLoGeoRef20_40(IfcSite site, IfcGeometricRepresentationContext context) {
+		txt.append("Validate Level of Georeferencing 20/40 (IFC2x3)." + "\n");
+		validatePosition(site);
+		validateRotation(context);
+	}
+
+	private void validatePosition(IfcSite site) {
         List<String> validValues = Arrays.asList("RefLatitude", "RefLongitude", "RefElevation");
-        validateAttributes(txt, validValues, site);
+        validateAttributes(validValues, site);
 		EList<Long> refLatitude = site.getRefLatitude();
 		if (refLatitude.size() < 3) {
 			txt.append("Site reference latitude lacking required values for degrees, minutes, seconds.\n");
@@ -33,7 +37,7 @@ public class GeodataLoGeoRef20_40 extends Validation {
 		}
 	}
 
-	private void validateRotation(StringBuilder txt, IfcGeometricRepresentationContext context) {
+	private void validateRotation(IfcGeometricRepresentationContext context) {
 		IfcDirection trueNorth = context.getTrueNorth();
 		if(trueNorth==null) {
 			txt.append("True north not set.\n");
@@ -43,6 +47,6 @@ public class GeodataLoGeoRef20_40 extends Validation {
 			txt.append("Wrong true north dimension.\n");
 		}
 		List<String> validValues = List.of("DirectionRatios");
-        validateAttributes(txt, validValues, trueNorth);
+        validateAttributes(validValues, trueNorth);
 	}
 }
