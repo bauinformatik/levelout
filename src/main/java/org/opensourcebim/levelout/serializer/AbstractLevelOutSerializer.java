@@ -220,7 +220,6 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 
 
 	private List<Corner> getOuterPolygon(GeometryInfo geometry, double elevation) {
-		if (geometry == null) return new ArrayList<>(); // TODO log warning or ignore these rooms/doors?
 		// new IfcTools2D().get2D(space, 1); // only for IFC 2x3
 		Area area = getOutline(getFootprint(geometry, elevation));
 		return getCorners(area);
@@ -232,7 +231,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		}
 		List<Corner> corners = new ArrayList<>();
 		if( area.isEmpty()) {
-			return corners;
+			return corners; // TODO log warning or ignore these rooms/doors?
 		}
 		PathIterator pathIterator = area.getPathIterator(null);
 		float[] coords = new float[6];
@@ -253,7 +252,8 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		Area outline = new Area();
 		double[] coords = new double[6];
 		GeneralPath path = new GeneralPath();
-		for ( PathIterator pathIterator = area.getPathIterator(null); !pathIterator.isDone(); pathIterator.next() ) {
+		PathIterator pathIterator = area.getPathIterator(null);
+		while(!pathIterator.isDone()){
 			int type = pathIterator.currentSegment(coords);
 			if(type == PathIterator.SEG_MOVETO){
 				path.reset();
@@ -266,17 +266,18 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			} else {
 				// TODO unhandled segment type (cubic etc.), should not be the case
 			}
-
+			pathIterator.next();
 		}
 		return outline;
 	}
 
 	private Area getFootprint(GeometryInfo geometry, double elevation) {
+		Area area = new Area();
+		if(geometry == null) return area;
 		int[] indices = GeometryUtils.toIntegerArray(geometry.getData().getIndices().getData());
 		double[] vertices = GeometryUtils.toDoubleArray(geometry.getData().getVertices().getData());
 		double[] matrix = GeometryUtils.toDoubleArray(geometry.getTransformation());
 		int multiplierMillimeters = 1; // TODO necessary? handle units?
-		Area area = new Area();
 		for (int i = 0; i < indices.length; i += 3) {
 			Path2D.Float path = new Path2D.Float();
 			for (int j = 0; j < 3; j++) {
