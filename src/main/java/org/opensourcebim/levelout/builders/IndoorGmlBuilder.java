@@ -149,11 +149,11 @@ public class IndoorGmlBuilder {
 	}
 
 	private void add2DGeometry(CellSpaceType cellSpace, Room room) {
-		add2DGeometry(cellSpace, room.asCoordinateList());
+		if(room.hasGeometry()) add2DGeometry(cellSpace, room.asCoordinateList());
 	}
 
 	private void add2DGeometry(CellSpaceType cellSpace, Door door) {
-		add2DGeometry(cellSpace, door.asCoordinateList());
+		if(door.hasGeometry()) add2DGeometry(cellSpace, door.asCoordinateList());
 
 	}
 
@@ -238,15 +238,15 @@ public class IndoorGmlBuilder {
 	}
 
 	private void setStatePos(StateType state, Room room) {
-		List<Double> centroid = room.computeCentroid();
-		if (centroid != null) {
+		if (room.hasGeometry()) {
+			List<Double> centroid = room.computeCentroid();
 			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
 		}
 	}
 
 	private void setStatePos(StateType state, Door door) {
-		List<Double> centroid = door.computeCentroid();
-		if (centroid != null) {
+		if (door.hasGeometry()) {
+			List<Double> centroid = door.computeCentroid();
 			setStatePos(state, centroid.get(0), centroid.get(1), centroid.get(2));
 		}
 	}
@@ -273,13 +273,13 @@ public class IndoorGmlBuilder {
 
 	public TransitionType createTransition(Door door, Room room) {
 		TransitionType transition = createTransition("door" + door.getId() + room.getId(), roomStateMap.get(room), doorStateMap.get(door));
-		setTransitionPos(transition, door.computeCentroid(), room.computeCentroid());
+		if(door.hasGeometry() && room.hasGeometry()) setTransitionPos(transition, door.computeCentroid(), room.computeCentroid());
 		return transition;
 	}
 
 	private TransitionType createTransitionReverse(Door door, Room room) {
 		TransitionType transition = createTransition("door" + door.getId() + room.getId() + "REVERSE", roomStateMap.get(room), doorStateMap.get(door));
-		setTransitionPos(transition, room.computeCentroid(), door.computeCentroid());
+		if(door.hasGeometry() && room.hasGeometry()) setTransitionPos(transition, room.computeCentroid(), door.computeCentroid());
 		return transition;
 	}
 

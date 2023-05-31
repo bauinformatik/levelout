@@ -34,7 +34,6 @@ public class Room implements Serializable {
 	}
 
 	public List<Double> computeCentroid() {
-
 		Corner roomcentroid = Geometry.computeCentroid(corners);
 		return List.of(roomcentroid.getX(), roomcentroid.getY(), storey == null ? 0 : storey.getZ());
 	}
@@ -61,5 +60,9 @@ public class Room implements Serializable {
 
 	public String getName() {
 		return name;
+	}
+
+	public boolean hasGeometry(){
+		return !corners.isEmpty();
 	}
 }

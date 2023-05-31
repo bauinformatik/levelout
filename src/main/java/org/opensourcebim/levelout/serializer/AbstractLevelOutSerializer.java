@@ -93,7 +93,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 						: getFootprint(opening.getGeometry(), elevation);
                     // TODO warn if no host for opening! This is invalid as per IFC4
 					Door door = new Door( ifcDoor.getName(), getCorners(openingFootprint));
-					if(!(ignoreAbstractElements && door.getCorners().isEmpty())) {
+					if(door.hasGeometry() || !ignoreAbstractElements) {
 						loStorey.addDoors(door);
 						EList<IfcRelSpaceBoundary> doorBoundaries = ifcDoor.getProvidesBoundaries();
 						populateConnectedRooms(roomsMap, door, doorBoundaries); // TODO create door only if successfull?
@@ -107,7 +107,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 								// TODO track processed doors above and use this as fallback?
 								Area openingFootprint = getIntersectionArea(elevation, opening, ifcWall);
 								Door door = new Door( opening.getName(), getCorners(openingFootprint));
-								if(!(ignoreAbstractElements && door.getCorners().isEmpty())){
+								if(door.hasGeometry() || !ignoreAbstractElements ){
 									loStorey.addDoors(door);
 									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
 								}

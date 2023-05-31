@@ -46,14 +46,12 @@ public class OsmBuilder {
 	private void createAndWriteRoom(Room room, List<Tag> levelTags) throws IOException {
 		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all
 		// and write later
+		if(!room.hasGeometry()) return;  // In the following, we can assume geometry.
 		List<Long> nodes = new ArrayList<>();
-		for (Corner genericNode : room.getCorners()) {
-			long nodeId = createAndWriteOsmNode(genericNode);
+		for (Corner corner : room.getCorners()) {
+			long nodeId = createAndWriteOsmNode(corner);
 			nodes.add(nodeId);
 		}
-		if (nodes.size() > 0)
-			nodes.add(nodes.get(0));
-
 		List<OsmTag> tags = new ArrayList<>(List.of(
 				new Tag("indoor", "room"),
 				new Tag("ref", room.getName())));
@@ -64,6 +62,7 @@ public class OsmBuilder {
 	}
 
 	private void createAndWriteDoor(Door door, List<Tag> levelTags) throws IOException {
+		if(!door.hasGeometry()) return;  // In the following, we can assume geometry.
 		List<OsmTag> tags = new ArrayList<>(List.of(
 				new Tag("indoor", "door"),
 				new Tag("door", door.isClosable() ? "yes" : "no")

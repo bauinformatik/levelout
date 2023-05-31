@@ -72,14 +72,14 @@ public class CityGmlBuilder {
 		return new AbstractSpaceBoundaryProperty(thematicSurface);
 	}
 
-	private Polygon createCitygmlPoly(Room room) {
+	private Polygon createPolygon(Room room) {
 		for (Corner corner : room.getCorners()) {
 			envelope.include(corner.getX(), corner.getY());
 		}
 		return geometryFactory.createPolygon(room.asCoordinateList(crs), 3);
 	}
 
-	private Polygon createDegeneratedDoors(Door door) {
+	private Polygon createPolygon(Door door) {
 		return geometryFactory.createPolygon(door.asCoordinateList(crs), 3);
 	}
 
@@ -106,8 +106,8 @@ public class CityGmlBuilder {
 
 	private void addRoomsAndDoors(Storey storey, org.citygml4j.core.model.building.Storey cityGmlStorey) {
 		for (Room room : storey.getRooms()) {
-			if (room.getCorners().size() >= 3) {
-				Polygon poly = createCitygmlPoly(room);
+			if (room.getCorners().size() >= 3) { // TODO why not room without geometry? see IndoorGML
+				Polygon poly = createPolygon(room);
 				// to use for shell
 				BuildingRoom cityGmlRoom = new BuildingRoom();
 				List<AbstractSpaceBoundaryProperty> spaceBoundary = new ArrayList<>();
@@ -119,8 +119,8 @@ public class CityGmlBuilder {
 			}
 		}
 		for (Door door : storey.getDoors()) {
-			if (door.getCorners().size() >= 3) {
-				Polygon poly = createDegeneratedDoors(door);
+			if (door.getCorners().size() >= 3) { // TODO why not door without geometry? see IndoorGML
+				Polygon poly = createPolygon(door);
 				org.citygml4j.core.model.construction.Door doors = new org.citygml4j.core.model.construction.Door();
 				List<AbstractSpaceBoundaryProperty> doorBoundaries = new ArrayList<>();
 				doorBoundaries.add(createDoorSurface(poly));

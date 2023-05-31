@@ -96,4 +96,8 @@ public class Door implements Serializable {
 	public boolean isClosable() {
 		return closable;
 	}
+
+	public boolean hasGeometry(){
+		return !corners.isEmpty();
+	}
 }
