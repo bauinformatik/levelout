@@ -63,11 +63,20 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		}
 		level++;
 		Area storeyFootprint = new Area();
-		double groundFloorElevation = storeys.get(-level).getElevation();
-		EList<IfcRelContainedInSpatialStructure> containments = storeys.get(-level).getContainsElements();
-		if(!containments.isEmpty()) for(IfcProduct element : containments.get(0).getRelatedElements()){
-			Area footprint = getFootprint(element.getGeometry(), groundFloorElevation);
-			storeyFootprint.add(footprint);
+		IfcBuildingStorey groundFloor = storeys.get(-level);
+		for(IfcRelContainedInSpatialStructure containment: groundFloor.getContainsElements()){
+			for(IfcProduct element : containment.getRelatedElements()){
+				Area footprint = getFootprint(element.getGeometry(), groundFloor.getElevation());
+				storeyFootprint.add(footprint);
+			}
+		}
+		for(IfcRelAggregates aggregation: groundFloor.getIsDecomposedBy()){
+			for(IfcObjectDefinition element: aggregation.getRelatedObjects()){
+				if(element instanceof  IfcProduct){
+					Area footprint = getFootprint(((IfcProduct) element).getGeometry(), groundFloor.getElevation());
+					storeyFootprint.add(footprint);
+				}
+			}
 		}
 		List<Storey> loStoreys = new ArrayList<>();
 		Area storeyOutline = getOutline(storeyFootprint);
