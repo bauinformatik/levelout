@@ -37,7 +37,6 @@ public class OsmBuilder {
 	}
 
 	private void createAndWriteOsmNode(List<Double> doorcentroid, List<OsmTag> tags) throws IOException {
-		// TODO Auto-generated method stub
 		CartesianPoint cartesian = new CartesianPoint(doorcentroid.get(0), doorcentroid.get(1), 0);
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node door = new Node(--nodeId, geodetic.longitude, geodetic.latitude, tags);

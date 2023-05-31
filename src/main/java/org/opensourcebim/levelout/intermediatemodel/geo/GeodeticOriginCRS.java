@@ -68,7 +68,6 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		CoordinateTransform geotoGCtrans = ctFactory.createTransform(step1, WGS842);
 		ProjCoordinate geotoGC = geotoGCtrans.transform(new ProjCoordinate(origin.longitude, origin.latitude),
 				new ProjCoordinate());
-
 		System.out.println(geotoGC.x);
 		System.out.println(geotoGC.y);
 		return null;
@@ -79,23 +78,19 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		CartesianPoint rotatedAndScaled = rotateAndScale(cart);
 		double utmPointX = rotatedAndScaled.x + utmOrigin.x;
 		double utmPointY = rotatedAndScaled.y + utmOrigin.y;
-
 		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY),
 				new ProjCoordinate());
-
 		return new GeodeticPoint(wgs84Point.y, wgs84Point.x);
 
 	}
 
 	@Override
 	public double getOriginX() {
-		// TODO Auto-generated method stub
 		return origin.latitude;
 	}
 
 	@Override
 	public double getOriginY() {
-		// TODO Auto-generated method stub
 		return origin.longitude;
 	}
 

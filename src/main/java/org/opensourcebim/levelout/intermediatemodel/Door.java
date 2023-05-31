@@ -46,7 +46,6 @@ public class Door implements Serializable {
 	}
 
 	public List<Double> computeCentroid() {
-
 		Corner doorcentroid = Geometry.computeCentroid(corners);
 		return List.of(doorcentroid.getX(), doorcentroid.getY(), storey == null ? 0 : storey.getZ());
 	}

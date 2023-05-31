@@ -138,12 +138,10 @@ public class CityGmlBuilder {
 
 	public void createAndWriteBuilding(Building building, OutputStream outStream)
 			throws CityGMLContextException, CityGMLWriteException, ParserConfigurationException {
-		;
 		write(outStream, createBuilding(building), createEngineeringCrs(building.getCrs()));
 	}
 
-	private org.citygml4j.core.model.building.Building createBuilding(Building building)
-			throws ParserConfigurationException {
+	private org.citygml4j.core.model.building.Building createBuilding(Building building) {
 		org.citygml4j.core.model.building.Building cityGmlBuilding = new org.citygml4j.core.model.building.Building();
 		this.crs = building.getCrs();
 		// TODO only create groundsurface if building outline is present, check if this
@@ -180,7 +178,7 @@ public class CityGmlBuilder {
 		for (String a : axes) {
 
 			Node csAxis = cartesianCRS.node("axis").node("CoordinateSystemAxis")
-					.attribute("id", "local-axis-" + Integer.toString(i))
+					.attribute("id", "local-axis-" + i)
 					.attribute("uom", "urn:ogc:def:uom:EPSG::9001");
 			csAxis.node("identifier").attribute("codeSpace", "XYZ").text(a);
 			csAxis.node("axisAbbrev").text(a.toLowerCase());
