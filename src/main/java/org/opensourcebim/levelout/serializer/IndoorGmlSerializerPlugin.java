@@ -4,6 +4,10 @@ import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.serializers.Serializer;
 
 public class IndoorGmlSerializerPlugin extends GmlSerializerPlugin {
+    @Override
+    public String getDefaultExtension() {
+        return "indoor.gml";
+    }
 
     @Override
     public Serializer createSerializer(PluginConfiguration pluginConfiguration) {
