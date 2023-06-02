@@ -272,7 +272,7 @@ public class IndoorGmlBuilder {
 	}
 
 	public TransitionType createTransition(Door door, Room room) {
-		TransitionType transition = createTransition("door" + door.getId() + room.getId(), roomStateMap.get(room), doorStateMap.get(door));
+		TransitionType transition = createTransition("door" + door.getId() + room.getId(), doorStateMap.get(door), roomStateMap.get(room));
 		if(door.hasGeometry() && room.hasGeometry()) setTransitionPos(transition, door.computeCentroid(), room.computeCentroid());
 		return transition;
 	}

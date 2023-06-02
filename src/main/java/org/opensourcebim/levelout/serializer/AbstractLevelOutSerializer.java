@@ -52,6 +52,10 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		CoordinateReference crsFromIFC = getCrs(ifcModelInterface);
 		CoordinateReference crs = crsFromIFC != null ? crsFromIFC : new GeodeticOriginCRS(new GeodeticPoint(0, 0), 0); // TODO use some default location in Weimar, Dresden ..
 		List<IfcBuildingStorey> storeys = ifcModelInterface.getAllWithSubTypes(IfcBuildingStorey.class);
+		if(storeys.isEmpty()) {
+			building = new Building(List.of(), List.of(), crs);
+			return;
+		}
 		int level = 0;
 		storeys.sort(Comparator.comparingDouble(IfcBuildingStorey::getElevation));
 		double minDistance = Double.MAX_VALUE;
