@@ -15,16 +15,12 @@ import java.io.OutputStream;
 import java.lang.Boolean;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class IndoorGmlBuilder {
 	private static final net.opengis.indoorgml.core.v_1_0.ObjectFactory indoorObjectFactory = new net.opengis.indoorgml.core.v_1_0.ObjectFactory();
 	private static final net.opengis.gml.v_3_2.ObjectFactory gmlObjectFactory = new net.opengis.gml.v_3_2.ObjectFactory();
 	private final Map<Room, StateType> roomStateMap = new HashMap<>();
 	private final Map<Door, StateType> doorStateMap = new HashMap<>();
-	private final Map<Room, CellSpaceType> roomCellMap = new HashMap<>();
-	private final Map<Door, CellSpaceType> doorCellMap = new HashMap<>();
-	private final Map<StateType, List<TransitionPropertyType>> stateConnectsMap = new HashMap<>();
 	private final Map<CellSpaceType, List<CellSpaceBoundaryPropertyType>> cellspaceboundariesMap = new HashMap<>();
 
 	private PointType createPoint(double x, double y, double z) {
@@ -104,15 +100,11 @@ public class IndoorGmlBuilder {
 	}
 
 	private CellSpaceType createCellSpace(Room room) {
-		CellSpaceType cellSpace = createCellSpace("cs" + room.getId(), room.getName());
-		roomCellMap.put(room, cellSpace);
-		return cellSpace;
+		return createCellSpace("cs" + room.getId(), room.getName());
 	}
 
 	private CellSpaceType createCellSpace(Door door) {
-		CellSpaceType cellSpace = createCellSpace("cs-door" + door.getId(), door.getName());
-		doorCellMap.put(door, cellSpace);
-		return cellSpace;
+		return createCellSpace("cs-door" + door.getId(), door.getName());
 	}
 
 	public CellSpaceBoundaryType createCellspaceBoundary(String id) {
@@ -267,7 +259,7 @@ public class IndoorGmlBuilder {
 		TransitionType transition = createTransition(id);
 		setStateConnects(state1, transition);
 		setStateConnects(state2, transition);
-		setConnectsForTransition(state1, state2, transition);
+		setTransitionConnects(transition, state1, state2);
 		return transition;
 	}
 
@@ -335,23 +327,10 @@ public class IndoorGmlBuilder {
 	private void setStateConnects(StateType state, TransitionType transition) {
 		TransitionPropertyType transitionProp = new TransitionPropertyType();
 		transitionProp.setHref("#" + transition.getId());
-		List<TransitionPropertyType> transProplist = new ArrayList<>(Arrays.asList(transitionProp));
-		if (stateConnectsMap.containsKey(state)) {
-			stateConnectsMap.get(state).add(transitionProp);
-		} else {
-			stateConnectsMap.put(state, transProplist);
-		}
-
+		state.getConnects().add(transitionProp);
 	}
 
-	private void setConnectsForState(Map<StateType, List<TransitionPropertyType>> stateConnectsMap) {
-		for (Entry<StateType, List<TransitionPropertyType>> entry : stateConnectsMap.entrySet()) {
-			entry.getKey().setConnects(entry.getValue());
-		}
-
-	}
-
-	private void setConnectsForTransition(StateType state1, StateType state2, TransitionType transition) {
+	private void setTransitionConnects(TransitionType transition, StateType state1, StateType state2) {
 		StatePropertyType stateProp = new StatePropertyType();
 		stateProp.setHref("#" + state1.getId());
 		StatePropertyType stateProp2 = new StatePropertyType();
@@ -439,8 +418,6 @@ public class IndoorGmlBuilder {
 					}
 				}
 			}
-
-			setConnectsForState(stateConnectsMap);
 		}
 		return indoorFeatures;
 	}
