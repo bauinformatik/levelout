@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opensourcebim.levelout</groupId>
 	<artifactId>LevelOutPlugins</artifactId>
-	<version>0.16</version>
+	<version>0.17-SNAPSHOT</version>
 	<name>LevelOutSerializers</name>
 	<organization>
 		<name>Bauhaus-Universität Weimar</name>
