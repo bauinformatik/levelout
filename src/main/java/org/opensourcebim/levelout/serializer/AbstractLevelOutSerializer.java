@@ -14,6 +14,7 @@ import org.eclipse.emf.common.util.EList;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.geo.*;
 import org.opensourcebim.levelout.samples.IntermediateResidential;
+import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
@@ -165,8 +166,10 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 	private static boolean populateConnectedRooms(Map<IfcSpace, Room> roomsMap, Door door, List<IfcRelSpaceBoundary> openingBoundaries) {
 		List<Room> connectedSpaces = new ArrayList<>();
 		boolean external = false;
+		List<IfcSpace> uniqueSpaces = new ArrayList<>();
 		for (IfcRelSpaceBoundary openingBoundary : openingBoundaries) {
-			if (openingBoundary.getRelatingSpace() instanceof IfcSpace) {
+			if (openingBoundary.getRelatingSpace() instanceof IfcSpace && ! uniqueSpaces.contains(openingBoundary.getRelatingSpace())) {
+				uniqueSpaces.add((IfcSpace) openingBoundary.getRelatingSpace());
 				connectedSpaces.add(roomsMap.get((IfcSpace) openingBoundary.getRelatingSpace()));
 			} else if (openingBoundary.getRelatingSpace() instanceof IfcExternalSpatialElement) {
 				external = true;
@@ -181,7 +184,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		}
 		if(connectedSpaces.size() >= 2){
 			if(connectedSpaces.size()>2){
-				// TODO warning more than 2 connected spaces
+				LoggerFactory.getLogger(AbstractLevelOutSerializer.class).warn("Door or opening connected to  more than two spaces: " + door.getName());
 			}
 			door.setInternal(connectedSpaces.get(0), connectedSpaces.get(1));
 			return true;
