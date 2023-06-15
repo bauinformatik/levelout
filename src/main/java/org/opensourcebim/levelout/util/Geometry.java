@@ -29,10 +29,10 @@ public class Geometry {
 	public static List<Double> asCoordinateList(List<Corner> corners, double z, CoordinateReference crs){
 		List<Corner> rotated = new ArrayList<>();
 		for(Corner corner: corners)	{
-			CartesianPoint rotatedPt = crs.rotateAndScale(new CartesianPoint(corner.getX(), corner.getY(), z));
+			CartesianPoint rotatedPt = crs.rotateAndScale(new CartesianPoint(corner.getX(), corner.getY(), 0));
 			rotated.add(new Corner(rotatedPt.x, rotatedPt.y));
 		}
-		return asCoordinateList(rotated, z);
+		return asCoordinateList(rotated, crs.scale(z));
 	}
 
 	public static double minimumLevel(List<Storey> storeys) {

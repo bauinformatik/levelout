@@ -10,13 +10,11 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 	private static final long serialVersionUID = 4685496957100410339L;
 	private final ProjectedPoint origin;
 	private final String epsg;
-	private final double scale;
 
 	public ProjectedOriginCRS(ProjectedPoint origin, double xAxisAbscissa, double xAxisOrdinate, double scale,
 			String epsg) {
 		super(Math.atan2(xAxisOrdinate, xAxisAbscissa), scale);
 		// TODO just normalize to avoid large products later, no need for trigonometric functions
-		this.scale = scale;
 		this.origin = origin;
 		this.epsg = epsg;
 	}
@@ -28,8 +26,10 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 	@Override
 	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
 		CartesianPoint rotatedAndScaled = rotateAndScale(cart);
-		double eastingsmap = rotatedAndScaled.x + origin.eastings * scale;
-		double northingsmap = rotatedAndScaled.y + origin.northings * scale;
+		// eastings and northings of the project CS origin are given in geospatial CRS units, assuming meters,
+		// could be taken from IFC and doublechecked against EPSG definitions
+		double eastingsmap = rotatedAndScaled.x + origin.eastings;
+		double northingsmap = rotatedAndScaled.y + origin.northings;
 
 		CoordinateReferenceSystem wgs84 = crsFactory.createFromName("epsg:4326");
 		CoordinateReferenceSystem originCRS = crsFactory.createFromName(epsg);

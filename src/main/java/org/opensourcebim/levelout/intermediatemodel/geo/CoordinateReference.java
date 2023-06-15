@@ -12,9 +12,12 @@ public abstract class CoordinateReference implements Serializable {
 	private final double a;
 	private final double b;
 
+	private final double scale;
+
 	protected CoordinateReference(double rotation, double scale) {
 		a = Math.cos(rotation) * scale;
 		b = Math.sin(rotation) * scale;
+		this.scale = scale;
 	}
 
 	public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart);
@@ -23,6 +26,9 @@ public abstract class CoordinateReference implements Serializable {
 		return new CartesianPoint (a * cart.x - b * cart.y, b * cart.x + a * cart.y, 0);
 	}
 
+	public double scale (double height){
+		return height * scale;  // This could become part of CartesianPoint
+	}
 
 	public abstract double getOriginX();
 	public abstract double getOriginY();
