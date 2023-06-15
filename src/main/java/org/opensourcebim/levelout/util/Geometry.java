@@ -29,7 +29,7 @@ public class Geometry {
 	public static List<Double> asCoordinateList(List<Corner> corners, double z, CoordinateReference crs){
 		List<Corner> rotated = new ArrayList<>();
 		for(Corner corner: corners)	{
-			CartesianPoint rotatedPt = crs.rotateAndScale(new CartesianPoint(corner.getX(), corner.getY(), 0));
+			CartesianPoint rotatedPt = crs.rotateAndScale(new CartesianPoint(corner.getX(), corner.getY()));
 			rotated.add(new Corner(rotatedPt.x, rotatedPt.y));
 		}
 		return asCoordinateList(rotated, crs.scale(z));

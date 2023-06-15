@@ -29,7 +29,7 @@ public class OsmBuilder {
 
 
 	private long createAndWriteOsmNode(Corner pt) throws IOException {
-		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY(), 0);
+		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY());
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node node = new Node(--nodeId, geodetic.longitude, geodetic.latitude);
 		osmOutput.write(node);
@@ -37,7 +37,7 @@ public class OsmBuilder {
 	}
 
 	private void createAndWriteOsmNode(List<Double> doorcentroid, List<OsmTag> tags) throws IOException {
-		CartesianPoint cartesian = new CartesianPoint(doorcentroid.get(0), doorcentroid.get(1), 0);
+		CartesianPoint cartesian = new CartesianPoint(doorcentroid.get(0), doorcentroid.get(1));
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node door = new Node(--nodeId, geodetic.longitude, geodetic.latitude, tags);
 		osmOutput.write(door);

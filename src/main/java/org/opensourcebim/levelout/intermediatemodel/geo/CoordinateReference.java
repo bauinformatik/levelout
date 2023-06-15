@@ -23,7 +23,7 @@ public abstract class CoordinateReference implements Serializable {
 	public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart);
 
 	public CartesianPoint rotateAndScale(CartesianPoint cart) {
-		return new CartesianPoint (a * cart.x - b * cart.y, b * cart.x + a * cart.y, 0);
+		return new CartesianPoint (a * cart.x - b * cart.y, b * cart.x + a * cart.y);
 	}
 
 	public double scale (double height){

@@ -28,16 +28,16 @@ public class CoordinateConversionTest {
 
 	@Test
 	public void testHorizontal(){
-		CartesianPoint p1 = new CartesianPoint(10, 5, 0);
-		CartesianPoint p2 = new CartesianPoint(20, 5, 0);
+		CartesianPoint p1 = new CartesianPoint(10, 5);
+		CartesianPoint p2 = new CartesianPoint(20, 5);
 		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56), 0);
 		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.00000001); // ~1 mm
 	}
 
 	@Test
 	public void testVertical(){
-		CartesianPoint p1 = new CartesianPoint(5, 10, 0);
-		CartesianPoint p2 = new CartesianPoint(5, 20, 0);
+		CartesianPoint p1 = new CartesianPoint(5, 10);
+		CartesianPoint p2 = new CartesianPoint(5, 20);
 		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56), Math.PI/2);
 		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.000000001); // ~1 mm
 	}
@@ -63,7 +63,7 @@ public class CoordinateConversionTest {
 		// Ref1 E = 333,780.622 N = 6,246,775.891 MGA GRS80 , Zone : 56 South
 		// Lat = -33.90632062825244, Long = 151.20215639320887
 
-		CartesianPoint pointToTransform = new CartesianPoint(0, 0, 0);
+		CartesianPoint pointToTransform = new CartesianPoint(0, 0);
 		GeodeticPoint csOrigin = new GeodeticPoint(-33.90632062825244, 151.20215639320887);
 		CoordinateReference crs = new GeodeticOriginCRS(csOrigin, -0.13918031137);
 		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
@@ -73,7 +73,7 @@ public class CoordinateConversionTest {
 
 	@Test
 	public void testOriginWGS84viaUTMconvertOtherPoint() {
-		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960, 0);
+		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960);
 		GeodeticPoint csOrigin = new GeodeticPoint(-33.90632062825244, 151.20215639320887);
 		CoordinateReference crs = new GeodeticOriginCRS(csOrigin, -0.13918031137);
 		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
@@ -99,7 +99,7 @@ public class CoordinateConversionTest {
 		// XAxisAbscissa = 0.990330045
 		// XAxisOrdinate = -0.138731399
 		// Scale = 0.999998
-		CartesianPoint pointToTransform = new CartesianPoint(0, 0, 0);
+		CartesianPoint pointToTransform = new CartesianPoint(0, 0);
 		ProjectedPoint csOrigin = new ProjectedPoint(333780.622, 6246775.891);
 		CoordinateReference crs = new ProjectedOriginCRS(csOrigin,0.990330045, -0.138731399, "epsg:28356" );
 		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
@@ -108,7 +108,7 @@ public class CoordinateConversionTest {
 	}
 	@Test
 	public void testOriginArbitraryCRSconvertOtherPoint(){
-		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960, 0);
+		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960);
 		ProjectedPoint csOrigin = new ProjectedPoint(333780.622, 6246775.891);
 		CoordinateReference crs = new ProjectedOriginCRS(csOrigin,0.990330045, -0.138731399, "epsg:28356" );
 		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
