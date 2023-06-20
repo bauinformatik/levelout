@@ -29,6 +29,11 @@ public class StoreyValidation extends Validation {
     	txt.append("\tList of building storeys (Name: Elevation)\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
 			String buildingStoreyName = buildingStorey.getName();
+			String  buildingStoreyElevationString = buildingStorey.getElevationAsString();
+			if (buildingStoreyElevationString == null || buildingStoreyElevationString.equals("null")) {
+				txt.append("\tThe value of the attribute Elevation is missing from building storey: " + buildingStoreyName + "\n");
+				return;
+			}
 			double buildingStoreyElevation = buildingStorey.getElevation();
 			txt.append("\t\t" + buildingStoreyName + ": " + buildingStoreyElevation + "\n");
 		}
