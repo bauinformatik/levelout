@@ -53,6 +53,7 @@ public class GeodataLoGeoRef50 extends Validation {
         validateAttributes(requiredAttributes, coordinateReferenceSystem);
         // Prüfen, ob im Attributwert von "Name" der IFC-Entität IfcProjectedCRS der EPSG-Code vorhanden ist
         boolean hasEPSGWord = coordinateReferenceSystem.getName().startsWith("EPSG:");
+        //TODO coordinateReferenceSystem.getName() kann null werden
         boolean hasEPSGNumber = Pattern.compile("\\b\\d{4,5}\\b").matcher(coordinateReferenceSystem.getName()).find();
 		if (hasEPSGWord || hasEPSGNumber) {
 			txt.append("\n").append("The IFC model contains an EPSG code.\n");

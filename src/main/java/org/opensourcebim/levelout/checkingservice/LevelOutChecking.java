@@ -56,10 +56,13 @@ public class LevelOutChecking extends AbstractAddExtendedDataService {
         new GeodataValidation(txt).validateGeodata(model);
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-        new SpaceBoundaryValidation().validateSpaceBoundary(txt, model);
+        new StoreyValidation(txt).validateStorey(model);
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
         
-        new SpaceValidation().validateSpace(txt, model);
+        new SpaceBoundaryValidation(txt).validateSpaceBoundary(model);
+        txt.append("--------------------------------------\n" + "--------------------------------------\n");
+        
+        new SpaceValidation(txt).validateSpace(model);
         txt.append("--------------------------------------\n" + "--------------------------------------\n");
 
         //The method addExtendedData() is called to add the created test report as extended data to the BIMserver project. The check report is stored in stats.txt.
