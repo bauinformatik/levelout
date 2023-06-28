@@ -15,7 +15,7 @@ public class GeodataLoGeoRef20_40 extends Validation {
 	}
 
 	public void validateGeodataLoGeoRef20_40(IfcSite site, IfcGeometricRepresentationContext context) {
-		txt.append("Validate Level of Georeferencing 20/40 (IFC2x3)." + "\n");
+		txt.append("\tValidate Level of Georeferencing 20/40 (IFC2x3)." + "\n");
 		validatePosition(site);
 		validateRotation(context);
 	}
@@ -25,26 +25,26 @@ public class GeodataLoGeoRef20_40 extends Validation {
         validateAttributes(validValues, site);
 		EList<Long> refLatitude = site.getRefLatitude();
 		if (refLatitude.size() < 3) {
-			txt.append("Site reference latitude lacking required values for degrees, minutes, seconds.\n");
+			txt.append("\tSite reference latitude lacking required values for degrees, minutes, seconds.\n");
 		} else if (refLatitude.size() < 4) {
-			txt.append("Site reference latitude value only precise to the second, probably some default value from CAD software.\n");
+			txt.append("\tSite reference latitude value only precise to the second, probably some default value from CAD software.\n");
 		}
 		EList<Long> refLongitude = site.getRefLongitude();
 		if (refLongitude.size() < 3) {
-			txt.append("Site reference longitude lacking required values for degrees, minutes, seconds.\n");
+			txt.append("\tSite reference longitude lacking required values for degrees, minutes, seconds.\n");
 		} else if (refLongitude.size() < 4) {
-			txt.append("Site reference longitude value only precise to the second, probably some default value from CAD software.\n");
+			txt.append("\tSite reference longitude value only precise to the second, probably some default value from CAD software.\n");
 		}
 	}
 
 	private void validateRotation(IfcGeometricRepresentationContext context) {
 		IfcDirection trueNorth = context.getTrueNorth();
 		if(trueNorth==null) {
-			txt.append("True north not set. Assuming WCS y-axis is north.\n");
+			txt.append("\t\tTrue north not set. Assuming WCS y-axis is north.\n");
 			return;
 		}
 		if (!(trueNorth.getDim() == 2 && trueNorth.getDirectionRatios().size() == 2)) {
-			txt.append("Wrong true north dimension.\n");
+			txt.append("\t\tWrong true north dimension.\n");
 		}
 		List<String> requiredAttributes = List.of("DirectionRatios");
         validateAttributes(requiredAttributes, trueNorth);

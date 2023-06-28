@@ -32,12 +32,12 @@ public class SpaceValidation extends Validation {
 		//Find a solution with relation to the IfcProject
 		List<IfcSpace> spaces = model.getAll(IfcSpace.class);
         if (spaces == null || spaces.isEmpty()) {
-        	txt.append("The IFC entity IfcSpace is missing from the IFC model.\n");
+        	txt.append("\tThe IFC entity IfcSpace is missing from the IFC model.\n");
         	return;
         }
     	//Total number of spaces 
     	long totalNumberOfSpaces = spaces.size();
-    	txt.append("The total number of IfcSpace is: " + totalNumberOfSpaces + "\n");
+    	txt.append("\tThe total number of IfcSpace is: " + totalNumberOfSpaces + "\n");
     	
     	//Number of spaces per storey
     	//Find a solution with relation to the IfcProject
@@ -48,14 +48,14 @@ public class SpaceValidation extends Validation {
 					.filter(space -> space instanceof IfcSpace)
 					.count();
 			}
-    		txt.append("The number of IfcSpace in storey '" + buildingStorey.getName() + "' is: " + numberOfSpaces + "\n");
+    		txt.append("\t\tThe number of IfcSpace in storey '" + buildingStorey.getName() + "' is: " + numberOfSpaces + "\n");
     	}
     	//3D representation of spaces
     	List<IfcProductRepresentation> productRepresentations = new ArrayList<>();
         for (IfcSpace space : spaces) {
             IfcProductRepresentation productRepresentation = space.getRepresentation();
             if (productRepresentation == null) {
-                txt.append("\t\t" + "The representation is unavailable." + "\n");
+                txt.append("\t\t\t" + "The representation is unavailable." + "\n");
                 continue;
                 //TODO Instanzen von IfcSpace herausfiltern, die keine Representation besitzen
             }
@@ -71,7 +71,7 @@ public class SpaceValidation extends Validation {
         for (IfcProductDefinitionShape productDefinitionShape : productDefinitionShapes) {
         	EList<IfcRepresentation> representation = productDefinitionShape.getRepresentations();
         	if (representation == null || representation.isEmpty()) {
-        		 txt.append("\t\t" + "The representation is unavailable." + "\n");
+        		 txt.append("\t\t\t" + "The representation is unavailable." + "\n");
                  continue;
                  //TODO Instanzen von IfcProductDefinitionShape herausfiltern, die keine Representation besitzen
         	}
@@ -86,7 +86,7 @@ public class SpaceValidation extends Validation {
         for (IfcShapeRepresentation shapeRepresentation : shapeRepresentations) {
         	IfcRepresentationContext representationContext = shapeRepresentation.getContextOfItems();
         	if (representationContext == null) {
-        		 txt.append("\t\t" + "The RepresentationIdentifier is unavailable" + "\n");
+        		 txt.append("\t\t\t" + "The RepresentationIdentifier is unavailable" + "\n");
                  continue;
                //TODO Instanzen von (IfcShapeRepresentation herausfiltern, die kein ContextOfItems besitzen
         	}
@@ -102,17 +102,17 @@ public class SpaceValidation extends Validation {
             }
         }
         if (spaces.size() == representationContextsForBody.size()) {
-    		txt.append("\t\t" + "Every instance of IfcSpace contains a 3D representation/Body." + "\n");
+    		txt.append("\n" + "\t" + "Every instance of IfcSpace contains a 3D representation/Body." + "\n");
         } else {
-        	txt.append("\t\t" + "Only " + representationContextsForBody.size() + " instances of IfcSpace out of " + spaces.size() + " contains a 3D representation/Body" + "\n");
+        	txt.append("\n" + "\t\t" + "Only " + representationContextsForBody.size() + " instances of IfcSpace out of " + spaces.size() + " contains a 3D representation/Body" + "\n");
         	List<IfcSpace> spacesWithMissingBody = new ArrayList<>();
         	for (IfcSpace space : spaces) {
                 if (!representationContextsForBody.contains(space)) {
                     spacesWithMissingBody.add(space);
                 }
             } 
-         	txt.append("\t\t" + "The following IfcSpace instances are out of 3D representation/Body: " + spacesWithMissingBody + "\n");
-        	txt.append("\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n");
+         	txt.append("\t" + "The following IfcSpace instances are out of 3D representation/Body: " + spacesWithMissingBody + "\n");
+        	txt.append("\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n\n");
         } 
         //Geometric concept of spaces
         List<IfcShapeRepresentation> shapeRepresentationsForSolidModel = new ArrayList<>();
@@ -128,17 +128,17 @@ public class SpaceValidation extends Validation {
             }
         }
         if (spaces.size() == shapeRepresentationsForSolidModel.size()) {
-    		txt.append("\t\t" + "Every instance of IfcSpace contains a 3D representation/SolidModel." + "\n");
+    		txt.append("\t" + "Every instance of IfcSpace contains a 3D representation/SolidModel." + "\n");
         } else {
-        	txt.append("\t\t" + "Only " + shapeRepresentationsForSolidModel.size() + " instances of IfcSpace out of " + spaces.size() + " contains a 3D representation/SolidModel" + "\n");
+        	txt.append("\t" + "Only " + shapeRepresentationsForSolidModel.size() + " instances of IfcSpace out of " + spaces.size() + " contains a 3D representation/SolidModel" + "\n");
         	List<IfcSpace> spacesWithMissingSolidModel = new ArrayList<>();
         	for (IfcSpace space : spaces) {
                 if (!shapeRepresentationsForSolidModel.contains(space)) {
                     spacesWithMissingSolidModel.add(space);
                 }
             }
-         	txt.append("\t\t" + "The following IfcSpace instances are out of 3D representation/SolidModel: " + spacesWithMissingSolidModel + "\n");
-        	txt.append("\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n");
+         	txt.append("\t\t\t" + "The following IfcSpace instances are out of 3D representation/SolidModel: " + spacesWithMissingSolidModel + "\n");
+        	txt.append("\t\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n");
         }
         //Counts of geometric concept
         List<String> representationTypes = new ArrayList<>();
@@ -153,9 +153,9 @@ public class SpaceValidation extends Validation {
                 representationTypeCounts.add(1);
             }
         }
-        txt.append("\t\t" + "The geometric concept of IfcSpace instances the following counts of values: " + "\n");
+        txt.append("\n" + "\t" + "The geometric concept of IfcSpace instances has the following counts of values: " + "\n");
         for (int i = 0; i < representationTypes.size(); i++) {
-            txt.append("\t\t\t" + "Representation Type: " + representationTypes.get(i) + ", Count: " + representationTypeCounts.get(i) + "\n");
+            txt.append("\t\t" + "Representation Type: " + representationTypes.get(i) + ", Count: " + representationTypeCounts.get(i) + "\n");
         }
         //txt.append("Test value: "  + "\n");
 	}

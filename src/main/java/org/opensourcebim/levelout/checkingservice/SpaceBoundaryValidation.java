@@ -35,16 +35,16 @@ public class SpaceBoundaryValidation extends Validation {
 		//TODO Number of storeys (IfcBuildingStorey), spaces (IfcSpace)/storey, doors(IfcDoor)/storey and  opening element(IfcOpeningElement/storey (evtl. noch IfcVirtualElement)
 		List<IfcBuildingStorey> buildingStoreys = model.getAll(IfcBuildingStorey.class);
         if (buildingStoreys == null || buildingStoreys.isEmpty()) {
-        	txt.append("The IFC entity IfcBuildingStorey is missing from the IFC model.\n");
+        	txt.append("\t" + "The IFC entity IfcBuildingStorey is missing from the IFC model.\n");
         	return;
         }
         //Total number of building storeys 
     	long totalNumberOfBuildingStoreys = buildingStoreys.size();
-    	txt.append("The total number of IfcBuildingStorey is: " + totalNumberOfBuildingStoreys + "\n");
+    	txt.append("\t" + "The total number of IfcBuildingStorey is: " + totalNumberOfBuildingStoreys + "\n");
 		//Total number of spaces per building storey
     	List<IfcSpace> spaces = model.getAll(IfcSpace.class);
         if (spaces == null || spaces.isEmpty()) {
-        	txt.append("The IFC entity IfcSpace is missing from the IFC model.\n");
+        	txt.append("\t" + "The IFC entity IfcSpace is missing from the IFC model.\n");
         	return;
         }
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
@@ -54,12 +54,13 @@ public class SpaceBoundaryValidation extends Validation {
 					.filter(space -> space instanceof IfcSpace)
 					.count();
 			}
-    		txt.append("The number of IfcSpace instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfSpaces + "\n");
+    		txt.append("\t" + "The number of IfcSpace instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfSpaces + "\n");
     	}
     	//Total number of doors per building storey
+    	txt.append("\n");
     	List<IfcDoor> doors = model.getAll(IfcDoor.class);
         if (doors == null || doors.isEmpty()) {
-        	txt.append("The IFC entity IfcDoor is missing from the IFC model.\n");
+        	txt.append("\t" + "The IFC entity IfcDoor is missing from the IFC model.\n");
         	return;
         }
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
@@ -69,12 +70,13 @@ public class SpaceBoundaryValidation extends Validation {
     				.filter(door -> door instanceof IfcDoor)
     				.count();
     		}
-    		txt.append("The number of IfcDoor instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfDoors + "\n");
+    		txt.append("\t" + "The number of IfcDoor instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfDoors + "\n");
     	}
     	//Total number of opening elements per building storey
+    	txt.append("\n");
     	List<IfcOpeningElement> openingElements = model.getAll(IfcOpeningElement.class);
         if (openingElements == null || openingElements.isEmpty()) {
-        	txt.append("The IFC entity IfcOpeningElement is missing from the IFC model.\n");
+        	txt.append("\t" + "The IFC entity IfcOpeningElement is missing from the IFC model.\n");
         	return;
         }
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
@@ -84,13 +86,14 @@ public class SpaceBoundaryValidation extends Validation {
     				.filter(openingElement -> openingElement instanceof IfcDoor)
     				.count();
     		}
-    		txt.append("The number of IfcOpeningElement instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfOpeningElements + "\n");
+    		txt.append("\t" + "The number of IfcOpeningElement instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfOpeningElements + "\n");
     	}
     	//Total number of virtual elements per building storey
     	//TODO Quelltext funktioniert so nicht, es können IfcVirtualElement-Instanzen vorhanden sein, diese stehen jedoch nicht in Beziehung mit IfcBuildingStorey-Instanzen
+    	txt.append("\n");
     	List<IfcVirtualElement> virtualElements = model.getAll(IfcVirtualElement.class);
     	if (virtualElements == null || virtualElements.isEmpty()) {
-    		txt.append("The IFC entity IfcVirtualElement is missing from the IFC model.\n");
+    		txt.append("\t" + "The IFC entity IfcVirtualElement is missing from the IFC model.\n");
     		return;
     	}
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
@@ -100,11 +103,12 @@ public class SpaceBoundaryValidation extends Validation {
     				.filter(virtualElement -> virtualElement instanceof IfcVirtualElement)
     				.count();
     		}
-    		txt.append("The number of IfcVirtualElement instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfVirtualElements + "\n");
+    		txt.append("\t" + "The number of IfcVirtualElement instances in building storey '" + buildingStorey.getName() + "' is: " + numberOfVirtualElements + "\n");
     	}
     	//Liegt folgende Beziehung vor IfcSpace - IfcRelSpaceBoundary (SBL1) - IfcDoor/IfcOpeningElement
     	//Hat die IfcRelSpaceBoundary-Instanz eine Verbindung zu einem Raum und zu einer Tür/Öffnungselement?
     	//Anzahl an jeder Beziehung (z.B. IfcSpace - IfcRelSpaceBoundary und IfcRelSpaceBoundary -IfcDoor/IfcOpeningElement) muss gleich der Anzahl an IfcSpace, IfcDoor/IfcOpeningElement pro IfcBuildingStorey sein
+    	txt.append("\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
     	    long numberOfRelSpaceBoundarys = 0;
     	    for (IfcSpace space : spaces) {
@@ -112,10 +116,11 @@ public class SpaceBoundaryValidation extends Validation {
     	        	 numberOfRelSpaceBoundarys++;
     	        }
     	    }
-    	    txt.append("The number of IfcRelSpaceBoundary instances in building storey '"
+    	    txt.append("\t" + "The number of IfcRelSpaceBoundary instances in building storey '"
     	        + buildingStorey.getName() + "' is: " + numberOfRelSpaceBoundarys + "\n");
     	}
     	//Identification of the number of IfcRelSpaceBoundary instances related to an IfcDoor instances.
+    	txt.append("\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
     	    long numberOfRelSpaceBoundarys = 0;
     	    for (IfcDoor door : doors) { //über Liste Türen pro Geschoss iterieren
@@ -124,9 +129,10 @@ public class SpaceBoundaryValidation extends Validation {
     	        	 //Beachte Türen mit mehr als zwei Raumbegrenzungen möglich
     	        }
     	    }
-    	    txt.append("The number of IfcRelSpaceBoundary instances with a connection to an IfcDoor instance in building storey '"
+    	    txt.append("\t" + "The number of IfcRelSpaceBoundary instances with a connection to an IfcDoor instance in building storey '"
     	        + buildingStorey.getName() + "' is: " + numberOfRelSpaceBoundarys + "\n");
     	}
+    	txt.append("\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
     	    long numberOfRelSpaceBoundarys = 0;
     	    for (IfcOpeningElement openingElement : openingElements) {
@@ -134,10 +140,11 @@ public class SpaceBoundaryValidation extends Validation {
     	        	 numberOfRelSpaceBoundarys++;
     	        }
     	    }
-    	    txt.append("The number of IfcRelSpaceBoundary instances with a connection to an IfcOpeningElement instance in building storey '"
+    	    txt.append("\t" + "The number of IfcRelSpaceBoundary instances with a connection to an IfcOpeningElement instance in building storey '"
     	        + buildingStorey.getName() + "' is: " + numberOfRelSpaceBoundarys + "\n");
     	}
     	//Identification of free-standing doors
+    	txt.append("\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
     		long numberOfFreeStandingDoors = 0;
     		long numberOfDoorsWithOpeningElement = 0;
@@ -170,12 +177,13 @@ public class SpaceBoundaryValidation extends Validation {
     			}
     		}
     		//txt.append("Test value: " + relatingOpeningElements + "\n");
-    		txt.append("The number of free-standing doors in building storey '"
+    		txt.append("\t" + "The number of free-standing doors in building storey '"
     	    	       + buildingStorey.getName() + "' is: " + numberOfFreeStandingDoors + "\n");
-    		txt.append("The number of doors with relating opening elements in building storey '"
+    		txt.append("\t" + "The number of doors with relating opening elements in building storey '"
     				+ buildingStorey.getName() + "' is: " + numberOfDoorsWithOpeningElement + "\n");
     	}
     	//Identification of the IfcRelSpaceboundary-Level via the attribute Name
+    	txt.append("\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
     		long numberOfRelSpaceBoundaryLevel1 = 0;
     		long numberOfRelSpaceBoundaryLevel2 = 0;
@@ -189,11 +197,11 @@ public class SpaceBoundaryValidation extends Validation {
     			}
             	relevantRelSpaceBoundarys.addAll(relevantRelSpaceBoundary);
             }
-    		txt.append("The number of relevant IfcRelSpaceBoundary instances in building storey '"
+    		txt.append("\t" + "The number of relevant IfcRelSpaceBoundary instances in building storey '"
  	    	       + buildingStorey.getName() + "' is: " + relevantRelSpaceBoundarys.size() + "\n");
     		for (IfcRelSpaceBoundary relevantRelSpaceBoundary : relevantRelSpaceBoundarys) {
     			if (relevantRelSpaceBoundary.getName() == null) {
-    				txt.append("No statements can be made about the space boundary levels. "
+    				txt.append("\t" + "No statements can be made about the space boundary levels. "
     						+ "The attribute Name is missing from the IfcRelSpaceBoundary instance (GUID): " + relevantRelSpaceBoundary.getGlobalId() + "\n");
     	        	return;
     			} else if (relevantRelSpaceBoundary.getName().equals("1stLevel")) {
@@ -201,22 +209,23 @@ public class SpaceBoundaryValidation extends Validation {
     			} else if (relevantRelSpaceBoundary.getName().equals("2ndLevel")) {
     				numberOfRelSpaceBoundaryLevel2++;
     			} else {
-    				txt.append("The space boundary level does not correspond to the expected value of '1stLevel' or '2ndLevel'. "
+    				txt.append("\t" + "The space boundary level does not correspond to the expected value of '1stLevel' or '2ndLevel'. "
     						+ "The attribute Name of IfcRelSpaceBoundary instance: " + relevantRelSpaceBoundary.getGlobalId() + "is: " + relevantRelSpaceBoundary.getName() + "\n");
     			}
     		}
-    		txt.append("The number of IfcRelSpaceBoundary space boundary level 1 instances in building storey '"
+    		txt.append("\t" + "The number of IfcRelSpaceBoundary space boundary level 1 instances in building storey '"
     	        + buildingStorey.getName() + "' is: " + numberOfRelSpaceBoundaryLevel1 + "\n");
-    		txt.append("The number of IfcRelSpaceBoundary space boundary level 2 instances in building storey '"
+    		txt.append("\t" + "The number of IfcRelSpaceBoundary space boundary level 2 instances in building storey '"
         	        + buildingStorey.getName() + "' is: " + numberOfRelSpaceBoundaryLevel2 + "\n");
     	}
     	//Identify the presence of the geometry of IfcOpeningElement instances.
+    	txt.append("\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
     		List<IfcProductRepresentation> productRepresentations = new ArrayList<>();
             for (IfcOpeningElement openingElement : openingElements) {
                 IfcProductRepresentation productRepresentation = openingElement.getRepresentation();
                 if (productRepresentation == null) {
-                    txt.append("\t\t" + "The representation is unavailable." + "\n");
+                    txt.append("\t" + "The representation is unavailable." + "\n");
                     continue;
                     //TODO Filter out instances of IfcOpeningElement that do not have a representation.
                 }
@@ -232,7 +241,7 @@ public class SpaceBoundaryValidation extends Validation {
             for (IfcProductDefinitionShape productDefinitionShape : productDefinitionShapes) {
             	EList<IfcRepresentation> representation = productDefinitionShape.getRepresentations();
             	if (representation == null || representation.isEmpty()) {
-            		 txt.append("\t\t" + "The representation is unavailable." + "\n");
+            		 txt.append("\t" + "The representation is unavailable." + "\n");
                      continue;
                      //TODO Instanzen von IfcProductDefinitionShape herausfiltern, die keine Representation besitzen
             	}
@@ -255,17 +264,17 @@ public class SpaceBoundaryValidation extends Validation {
                 }
             }
             if (openingElements.size() == shapeRepresentationsForSolidModel.size()) {
-        		txt.append("\t\t" + "Every instance of IfcOpeningElement contains a 3D representation/SolidModel." + "\n");
+        		txt.append("\t" + "Every instance of IfcOpeningElement contains a 3D representation/SolidModel." + "\n");
             } else {
-            	txt.append("\t\t" + "Only " + shapeRepresentationsForSolidModel.size() + " instances of IfcOpeningElement out of " + openingElements.size() + " contains a 3D representation/SolidModel" + "\n");
+            	txt.append("\t" + "Only " + shapeRepresentationsForSolidModel.size() + " instances of IfcOpeningElement out of " + openingElements.size() + " contains a 3D representation/SolidModel" + "\n");
             	List<IfcOpeningElement> openingElementsWithMissingSolidModel = new ArrayList<>();
             	for (IfcOpeningElement openingElement : openingElements) {
                     if (!shapeRepresentationsForSolidModel.contains(openingElement)) {
                     	openingElementsWithMissingSolidModel.add(openingElement);
                     }
                 }
-             	txt.append("\t\t" + "The following IfcOpeningElement instances are out of 3D representation/SolidModel: " + openingElementsWithMissingSolidModel + "\n");
-            	txt.append("\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n");
+             	txt.append("\t" + "The following IfcOpeningElement instances are out of 3D representation/SolidModel: " + openingElementsWithMissingSolidModel + "\n");
+            	txt.append("\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n");
             }
             //Counts of geometric concept
             List<String> representationTypes = new ArrayList<>();
@@ -280,9 +289,9 @@ public class SpaceBoundaryValidation extends Validation {
                     representationTypeCounts.add(1);
                 }
             }
-            txt.append("\t\t" + "The geometric concept of IfcOpeningElement instances the following counts of values: " + "\n");
+            txt.append("\t" + "The geometric concept of IfcOpeningElement instances the following counts of values: " + "\n");
             for (int i = 0; i < representationTypes.size(); i++) {
-                txt.append("\t\t\t" + "Representation Type: " + representationTypes.get(i) + ", Count: " + representationTypeCounts.get(i) + "\n");
+                txt.append("\t\t" + "Representation Type: " + representationTypes.get(i) + ", Count: " + representationTypeCounts.get(i) + "\n");
             }
     	}
     	//txt.append("Test value: "  + "\n");

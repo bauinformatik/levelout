@@ -12,7 +12,7 @@ public abstract class Validation {
 
 	StringBuilder txt;
 	
-	// Validates the IFC attribute values of a given IFC entity
+	//Validates the IFC attribute values of a given IFC entity
 	protected void validateAttributes(List<String> requiredAttributes, EObject targetObject) {
 		//Check1 for IFC attribute values of value != null
 		EClass eClass = targetObject.eClass();
@@ -21,10 +21,10 @@ public abstract class Validation {
 				.filter(feature -> requiredAttributes.contains(feature.getName()) && targetObject.eGet(feature)==null)
 				.collect(Collectors.toList());
 		if (missingRequiredAttributes.isEmpty()) {
-	        txt.append("The required attributes for ").append(eClass.getName()).append(" are all set.\n");
+	        txt.append("\t\tThe required attributes for ").append(eClass.getName()).append(" are all set.\n");
 	    } else {
-	    	txt.append("The required attributes for ").append(eClass.getName()).append(" are not all set.\n");
-	    	txt.append("The following attributes must be added:\n");
+	    	txt.append("\t\tThe required attributes for ").append(eClass.getName()).append(" are not all set.\n");
+	    	txt.append("\t\tThe following attributes must be added:\n");
             missingRequiredAttributes.forEach(feature -> missingAttributeMessage(eClass.getName(), feature.getName()));
 	    }
 	}

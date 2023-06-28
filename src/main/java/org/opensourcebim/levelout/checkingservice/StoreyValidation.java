@@ -17,16 +17,16 @@ public class StoreyValidation extends Validation {
 		//TODO number of storeys (IfcBuildingStorey)
 		List<IfcBuildingStorey> buildingStoreys = model.getAll(IfcBuildingStorey.class);
         if (buildingStoreys == null || buildingStoreys.isEmpty()) {
-        	txt.append("The IFC entity IfcBuildingStorey is missing from the IFC model.\n");
+        	txt.append("\tThe IFC entity IfcBuildingStorey is missing from the IFC model.\n");
         	return;
         	//TODO solution in case of missing building storeys
         }
         //Total number of building storeys
     	long totalNumberOfBuildingStoreys = buildingStoreys.size();
-    	txt.append("The total number of IfcBuildingStorey instances is: " + totalNumberOfBuildingStoreys + "\n");
+    	txt.append("\tThe total number of IfcBuildingStorey instances is: " + totalNumberOfBuildingStoreys + "\n");
     	//TODO add a information about the unit, e.g. [m], [mm], etc.
 		//List with building storey and elevation attribute
-    	txt.append("\tList of building storeys (Name: Elevation)\n");
+    	txt.append("\n" + "\tList of building storeys (Name: Elevation)\n");
     	for (IfcBuildingStorey buildingStorey : buildingStoreys) {
 			String buildingStoreyName = buildingStorey.getName();
 			String  buildingStoreyElevationString = buildingStorey.getElevationAsString();

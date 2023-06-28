@@ -37,8 +37,7 @@ public class GeodataValidation extends Validation {
 				.filter(feature -> feature instanceof IfcGeometricRepresentationContext
 						&& !(feature instanceof  IfcGeometricRepresentationSubContext)
 						&& "Model".equals(feature.getContextType())
-						&& ((IfcGeometricRepresentationContext) feature).getCoordinateSpaceDimension() == 3
-				)
+						&& ((IfcGeometricRepresentationContext) feature).getCoordinateSpaceDimension() == 3)
 				.map(feature -> (IfcGeometricRepresentationContext) feature)
 				.collect(Collectors.toList());
 		if (geometricRepresentationContexts.isEmpty()) {
@@ -125,7 +124,7 @@ public class GeodataValidation extends Validation {
 					}
 				} else {
 					//in case of an non-SI length unit
-					String noSIUnitmsg = "The SI unit is not METRE, but ";
+					String noSIUnitmsg = "\t\tThe SI unit is not METRE, but ";
 					Object kindOfUnit = unit.get();
 					if (kindOfUnit instanceof IfcContextDependentUnit) {
 						txt.append("\t\t" + noSIUnitmsg + ((IfcContextDependentUnit) kindOfUnit).getName() + "\n");

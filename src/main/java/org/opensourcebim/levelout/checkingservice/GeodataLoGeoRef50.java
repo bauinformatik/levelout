@@ -16,7 +16,7 @@ public class GeodataLoGeoRef50 extends Validation {
 	}
 
 	public void validateGeodataLoGeoRef50(IfcGeometricRepresentationContext context) {
-		txt.append("Validate Level of Georeferencing 50 (IFC4)." + "\n");
+		txt.append("\tValidate Level of Georeferencing 50 (IFC4)." + "\n");
 		validateIfcGeometricRepresentationContext(context);
 		List<IfcCoordinateOperation> coordinateoperations = context.getHasCoordinateOperation();
 		IfcMapConversion mapConversions = coordinateoperations.stream()
@@ -25,13 +25,13 @@ public class GeodataLoGeoRef50 extends Validation {
 				.findFirst()
 				.orElse(null);
 		if (mapConversions == null){
-			txt.append("The IfcMapConversion entity is missing from the IFC model.\n");
+			txt.append("\t\tThe IfcMapConversion entity is missing from the IFC model.\n");
 			return;
 		}
 		validateIfcMapConversion(mapConversions);
 		IfcCoordinateReferenceSystem projectedCRS = mapConversions.getTargetCRS();
 		if(projectedCRS == null){
-			txt.append("The IFC entity IfcProjectedCRS is missing from the IFC model.\n");
+			txt.append("\t\tThe IFC entity IfcProjectedCRS is missing from the IFC model.\n");
 			return;
 		}
 		validateIfcCoordinateReferenceSystem(projectedCRS);
@@ -56,9 +56,9 @@ public class GeodataLoGeoRef50 extends Validation {
         //TODO coordinateReferenceSystem.getName() kann null werden
         boolean hasEPSGNumber = Pattern.compile("\\b\\d{4,5}\\b").matcher(coordinateReferenceSystem.getName()).find();
 		if (hasEPSGWord || hasEPSGNumber) {
-			txt.append("\n").append("The IFC model contains an EPSG code.\n");
+			txt.append("\t\tThe IFC model contains an EPSG code.\n");
 		} else {
-			txt.append("\n").append("The EPSG code is missing in the IFC model.\n");
+			txt.append("\t\tThe EPSG code is missing in the IFC model.\n");
 		}
 	}
 
