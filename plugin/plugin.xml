@@ -28,7 +28,7 @@
         <interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
         <implementationClass>org.opensourcebim.levelout.checkingservice.LevelOutChecking</implementationClass>
         <description>LevelOut Checking Service</description>
-        <name>LevelOut-Checking2</name>
+        <name>LevelOut-Checking</name>
     </JavaPlugin>
     <JavaPlugin>
         <interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
