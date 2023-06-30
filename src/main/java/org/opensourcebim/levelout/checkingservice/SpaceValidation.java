@@ -1,22 +1,16 @@
 package org.opensourcebim.levelout.checkingservice;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.models.ifc4.IfcBuildingStorey;
-import org.bimserver.models.ifc4.IfcLabel;
-import org.bimserver.models.ifc4.IfcObjectDefinition;
 import org.bimserver.models.ifc4.IfcProductDefinitionShape;
 import org.bimserver.models.ifc4.IfcProductRepresentation;
 import org.bimserver.models.ifc4.IfcRelAggregates;
 import org.bimserver.models.ifc4.IfcRepresentation;
 import org.bimserver.models.ifc4.IfcRepresentationContext;
 import org.bimserver.models.ifc4.IfcShapeRepresentation;
-import org.bimserver.models.ifc4.IfcSite;
 import org.bimserver.models.ifc4.IfcSpace;
 import org.eclipse.emf.common.util.EList;
 
@@ -95,7 +89,7 @@ public class SpaceValidation extends Validation {
         List<IfcRepresentationContext> representationContextsForBody = new ArrayList<>();
         List<IfcRepresentationContext> representationContextsWithoutBody = new ArrayList<>();
         for (IfcRepresentationContext representationContext : representationContexts) {
-            if (representationContext.getContextIdentifier().equals("Body")) {
+            if ("Body".equals(representationContext.getContextIdentifier())) {
             	representationContextsForBody.add(representationContext);
             } else {
             	representationContextsWithoutBody.add(representationContext);
@@ -107,10 +101,16 @@ public class SpaceValidation extends Validation {
         	txt.append("\n" + "\t\t" + "Only " + representationContextsForBody.size() + " instances of IfcSpace out of " + spaces.size() + " contains a 3D representation/Body" + "\n");
         	List<IfcSpace> spacesWithMissingBody = new ArrayList<>();
         	for (IfcSpace space : spaces) {
-                if (!representationContextsForBody.contains(space)) {
+                boolean hasBodyRepresentation = false;
+                for (IfcRepresentation representation : space.getRepresentation().getRepresentations()){
+                    if(representationContextsForBody.contains(representation.getContextOfItems())){
+                        hasBodyRepresentation = true; break;
+                    }
+                }
+                if (!hasBodyRepresentation) {
                     spacesWithMissingBody.add(space);
                 }
-            } 
+            }
          	txt.append("\t" + "The following IfcSpace instances are out of 3D representation/Body: " + spacesWithMissingBody + "\n");
         	txt.append("\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n\n");
         } 
@@ -119,9 +119,7 @@ public class SpaceValidation extends Validation {
         List<IfcShapeRepresentation> shapeRepresentationsWithoutSolidModel = new ArrayList<>();
         for (IfcShapeRepresentation shapeRepresentation : shapeRepresentations) {
         	String representationType = shapeRepresentation.getRepresentationType();
-            if (representationType.equals("SweptSolid") || representationType.equals("AdvancedSweptSolid") ||
-                    representationType.equals("Brep") || representationType.equals("AdvancedBrep") ||
-                    representationType.equals("CSG") || representationType.equals("Clipping")) {
+            if (Arrays.asList("SweptSolid", "AdvancedSweptSolid", "Brep", "AdvancedBrep", "CSG", "Clipping").contains(representationType))  {
             	shapeRepresentationsForSolidModel.add(shapeRepresentation);
             } else {
             	shapeRepresentationsWithoutSolidModel.add(shapeRepresentation);
@@ -141,21 +139,17 @@ public class SpaceValidation extends Validation {
         	txt.append("\t\t\t" + "Please check your IFC export in your IFC supporting software or manipuate your IFC model." + "\n");
         }
         //Counts of geometric concept
-        List<String> representationTypes = new ArrayList<>();
-        List<Integer> representationTypeCounts = new ArrayList<>();
+        Map<String, Integer> representationTypeCounts = new HashMap<>();
         for (IfcShapeRepresentation shapeRepresentation : shapeRepresentations) {
             String representationType = shapeRepresentation.getRepresentationType();
-            if (representationTypes.contains(representationType)) {
-                int index = representationTypes.indexOf(representationType);
-                representationTypeCounts.set(index, representationTypeCounts.get(index) + 1);
-            } else {
-                representationTypes.add(representationType);
-                representationTypeCounts.add(1);
+            if (!representationTypeCounts.containsKey(representationType)) {
+                representationTypeCounts.put(representationType, 1);
             }
+            representationTypeCounts.put( representationType, representationTypeCounts.get(representationType) + 1);
         }
         txt.append("\n" + "\t" + "The geometric concept of IfcSpace instances has the following counts of values: " + "\n");
-        for (int i = 0; i < representationTypes.size(); i++) {
-            txt.append("\t\t" + "Representation Type: " + representationTypes.get(i) + ", Count: " + representationTypeCounts.get(i) + "\n");
+        for (Map.Entry<String, Integer> representationTypeCount : representationTypeCounts.entrySet()) {
+            txt.append("\t\t" + "Representation Type: " + representationTypeCount.getKey() + ", Count: " + representationTypeCount.getValue() + "\n");
         }
         //txt.append("Test value: "  + "\n");
 	}
