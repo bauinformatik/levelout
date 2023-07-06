@@ -24,14 +24,14 @@ public abstract class Validation {
 	        txt.append("\t\tThe required attributes for ").append(eClass.getName()).append(" are all set.\n");
 	    } else {
 	    	txt.append("\t\tThe required attributes for ").append(eClass.getName()).append(" are not all set.\n");
-	    	txt.append("\t\tThe following attributes must be added:\n");
+	    	txt.append("\t\t\tThe following attributes must be added:\n");
             missingRequiredAttributes.forEach(feature -> missingAttributeMessage(eClass.getName(), feature.getName()));
 	    }
 	}
 	
 	//Writes a message for the user in case of missing IFC attribute values in the considered submodel
 	private void missingAttributeMessage(String className, String attributeName) {
-		txt.append("\t").append(attributeName).append(" is missing in ").append(className).append("\n");
+		txt.append("\t\t\t\t").append(attributeName).append(" is missing in ").append(className).append("\n");
 	}
 
 	protected void printAttributes(EObject object) {
