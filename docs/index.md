@@ -6,7 +6,7 @@ LevelOut platform with input and output data:
 
 ### Links
 
-* [Source code](https://github.com/bauinformatik/levelout) of BIMserver plugin bundle on Github (work in progress)
-* [Source code](https://github.com/bauinformatik/levelout-web) of LevelOut web app on Github (work in progress)
+* [Source code](https://github.com/bauinformatik/levelout) of BIMserver plugin bundle on Github
+* [Source code](https://github.com/bauinformatik/levelout-web) of LevelOut web app on Github
 * [Project website](https://uni-weimar.de/cce/forschungsprojekte/levelout) at Bauhaus-Universität Weimar
 
