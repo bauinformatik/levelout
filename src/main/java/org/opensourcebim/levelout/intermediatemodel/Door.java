@@ -2,6 +2,8 @@ package org.opensourcebim.levelout.intermediatemodel;
 
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 import org.opensourcebim.levelout.util.Geometry;
+import org.opensourcebim.levelout.util.Topology;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +28,7 @@ public class Door implements Serializable {
 	public  Door(String name, List<Corner> corners, boolean closable) {
 		this.id = ++highestId;
 		this.name = name;
-		this.corners = corners;
+		this.corners = Topology.withoutCollinearCorners(corners);
 		this.closable = closable;
 	}
 

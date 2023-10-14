@@ -3,6 +3,8 @@ package org.opensourcebim.levelout.intermediatemodel;
 
 import org.opensourcebim.levelout.intermediatemodel.geo.CoordinateReference;
 import org.opensourcebim.levelout.util.Geometry;
+import org.opensourcebim.levelout.util.Topology;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +20,7 @@ public class Room implements Serializable {
 	public Room(String name, List<Corner> corners) {
 		this.name = name;
 		this.id = ++highestId;
-		this.corners = corners;
+		this.corners = Topology.withoutCollinearCorners(corners);
 	}
 
 	void setStorey(Storey storey) {
