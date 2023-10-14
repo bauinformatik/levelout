@@ -27,30 +27,30 @@ public class OsmBuilder {
 	private int nodeId;
 
 	private final Topology topology = new Topology();
+	private final Map<Corner, Node> nodeCache = new HashMap<>();
 
-	private long createAndWriteOsmNode(Corner pt) throws IOException {
+	private Node createOsmNode(Corner pt) throws IOException {
+		if(nodeCache.containsKey(pt)) return nodeCache.get(pt);
 		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY());
 		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
 		Node node = new Node(--nodeId, geodetic.longitude, geodetic.latitude);
-		osmOutput.write(node);
-		return node.getId();
+		nodeCache.put(pt, node);
+		return node;
 	}
 
-	private void createAndWriteOsmNode(Corner doorPoint, List<OsmTag> tags) throws IOException {
-		CartesianPoint cartesian = new CartesianPoint(doorPoint.getX(), doorPoint.getY());
-		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
-		Node door = new Node(--nodeId, geodetic.longitude, geodetic.latitude, tags);
-		osmOutput.write(door);
+	private void createOsmNode(Corner point, List<OsmTag> tags) throws IOException {
+		Node node = createOsmNode(point);
+		List<OsmTag> allTags = new ArrayList<>();
+		allTags.addAll(node.getTags());
+		allTags.addAll(tags);
+		node.setTags(allTags);
 	}
 
 	private void createAndWriteRoom(Room room, List<Tag> levelTags) throws IOException {
-		// TODO: cache OSM nodes per LevelOut corner (thin-walled model) or collect all
-		// and write later
 		if(!room.hasGeometry()) return;  // In the following, we can assume geometry.
 		List<Long> nodes = new ArrayList<>();
 		for (Corner corner : topology.roomWithDoors(room)) {
-			long nodeId = createAndWriteOsmNode(corner);
-			nodes.add(nodeId);
+			nodes.add(createOsmNode(corner).getId());
 		}
 		nodes.add(nodes.get(0));
 		List<OsmTag> tags = new ArrayList<>(List.of(
@@ -71,10 +71,11 @@ public class OsmBuilder {
 		if(door.getName()!=null) tags.add(new Tag("ref", door.getName()));
 		tags.add(new Tag("id", Long.toString(door.getId())));
 		tags.addAll(levelTags);
-		createAndWriteOsmNode(topology.getDoorPoint(door), tags);
+		createOsmNode(topology.getDoorPoint(door), tags);
 	}
 
 	private void createAndWriteStorey(Storey storey) throws IOException {
+		nodeCache.clear();
 		topology.init(storey);
 		List<Tag> levelTags = Arrays.asList(
 				new Tag("level", Integer.toString(storey.getLevel())),
@@ -85,6 +86,9 @@ public class OsmBuilder {
 		}
 		for (Door door : storey.getDoors()) {
 			createAndWriteDoor(door, levelTags);
+		}
+		for(Node node: nodeCache.values()){
+			osmOutput.write(node);
 		}
 	}
 
@@ -101,8 +105,8 @@ public class OsmBuilder {
 		this.osmOutput = new OsmXmlOutputStream(outputStream, true);
 		List<Long> nodes = new ArrayList<>();
 		for (Corner corner : building.getCorners()) {
-			long nodeId = createAndWriteOsmNode(corner);
-			nodes.add(nodeId);
+			Node node = createOsmNode(corner);
+			nodes.add(node.getId());
 		}
 		if (!nodes.isEmpty()) nodes.add(nodes.get(0));
 		List<Storey> storeys = building.getStoreys();
