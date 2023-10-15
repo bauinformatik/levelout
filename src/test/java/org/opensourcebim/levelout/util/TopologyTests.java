@@ -42,7 +42,7 @@ public class TopologyTests {
 
         Topology topology = new Topology();
         topology.init(storey);
-        List<Corner> corners1 = topology.roomWithDoors(room1);
+        List<Corner> corners1 = topology.getOutline(room1);
         Assert.assertEquals(9, corners1.size());
         Assert.assertEquals(corners1.get(2), door.getCorners().get(0));
         Assert.assertEquals(corners1.get(3), door.getCorners().get(1));
@@ -50,11 +50,11 @@ public class TopologyTests {
         Assert.assertEquals(corners1.get(4),  doorPoint1);
         Assert.assertEquals(corners1.get(5), door.getCorners().get(2));
         Assert.assertEquals(corners1.get(6), door.getCorners().get(3));
-        Assert.assertEquals(topology.getDoorPoint(door), doorPoint1);
+        Assert.assertEquals(topology.getPoint(door), doorPoint1);
 
         door.setInternal(room2, room1);
         topology.init(storey);
-        List<Corner> corners2 = topology.roomWithDoors(room2);
+        List<Corner> corners2 = topology.getOutline(room2);
         Assert.assertEquals(9, corners2.size());
         Assert.assertEquals(corners2.get(4), door.getCorners().get(2));
         Assert.assertEquals(corners2.get(5), door.getCorners().get(3));
@@ -62,6 +62,6 @@ public class TopologyTests {
         Assert.assertEquals(corners2.get(6), doorPoint2);
         Assert.assertEquals(corners2.get(7), door.getCorners().get(0));
         Assert.assertEquals(corners2.get(8), door.getCorners().get(1));
-        Assert.assertEquals(topology.getDoorPoint(door), doorPoint2);
+        Assert.assertEquals(topology.getPoint(door), doorPoint2);
     }
 }

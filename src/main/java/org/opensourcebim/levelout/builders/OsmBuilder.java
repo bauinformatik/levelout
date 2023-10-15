@@ -49,7 +49,7 @@ public class OsmBuilder {
 	private void createAndWriteRoom(Room room, List<Tag> levelTags) throws IOException {
 		if(!room.hasGeometry()) return;  // In the following, we can assume geometry.
 		List<Long> nodes = new ArrayList<>();
-		for (Corner corner : topology.roomWithDoors(room)) {
+		for (Corner corner : topology.getOutline(room)) {
 			nodes.add(createOsmNode(corner).getId());
 		}
 		nodes.add(nodes.get(0));
@@ -71,7 +71,7 @@ public class OsmBuilder {
 		if(door.getName()!=null) tags.add(new Tag("ref", door.getName()));
 		tags.add(new Tag("id", Long.toString(door.getId())));
 		tags.addAll(levelTags);
-		createOsmNode(topology.getDoorPoint(door), tags);
+		createOsmNode(topology.getPoint(door), tags);
 	}
 
 	private void createAndWriteStorey(Storey storey) throws IOException {

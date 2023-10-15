@@ -13,31 +13,29 @@ import java.util.List;
 import java.util.Map;
 
 public class Topology {
-    private final Map<Room, List<Door>> roomDoors = new HashMap<>();
     private final Map<Door, Corner> doorPoints = new HashMap<>();
     private final Map<Room, List<Corner>> roomOutLines = new HashMap<>();
 
     public void init(Storey storey) {
-        roomDoors.clear();
+        roomOutLines.clear();
+        Map<Room, List<Door>> assignedDoors = new HashMap<>();
         for(Room room: storey.getRooms()){
-            roomDoors.put(room, new ArrayList<>());
+            assignedDoors.put(room, new ArrayList<>());
+            roomOutLines.put(room, room.getCorners());
         }
         for(Door door: storey.getDoors()){
-            if(door.getRoom1()!=null) roomDoors.get(door.getRoom1()).add(door);
+            if(door.getRoom1()!=null) assignedDoors.get(door.getRoom1()).add(door);
+        }
+        for (Room room: storey.getRooms()){
+            List<Corner> roomCorners = roomOutLines.get(room);
+            for(Door door: assignedDoors.get(room)){
+                roomCorners = roomWithDoor(roomCorners, door); // changes the opposite rooms as well
+            }
+            roomOutLines.put(room, roomCorners);
         }
     }
 
-    public List<Corner> roomWithDoors(Room room){
-        List<Door> assignedDoors = roomDoors.get(room);
-        if (assignedDoors.isEmpty()) return room.getCorners();
-        List<Corner> roomCorners = room.getCorners();
-        for(Door door: assignedDoors){
-            roomCorners = roomWithDoor(roomCorners, door);
-        }
-        return roomCorners;
-    }
-
-    List<Corner> roomWithDoor(List<Corner> roomCorners, Door door) {
+    private List<Corner> roomWithDoor(List<Corner> roomCorners, Door door) {
         List<Corner> roomAndDoorCorners = new ArrayList<>();
         List<Corner> doorCorners = door.getCorners();
         int rs = roomCorners.size();
@@ -45,7 +43,7 @@ public class Topology {
         for(int ri = 0; ri< rs; ri++){
             Corner roomCorner1 = roomCorners.get(ri);
             roomAndDoorCorners.add(roomCorner1);
-            Corner roomCorner2 = roomCorners.get((ri+1)% roomCorners.size());
+            Corner roomCorner2 = roomCorners.get((ri+1)% rs);
             for(int di = 0; di< ds; di++){
                 Corner doorCorner1 = doorCorners.get(di);
                 Corner doorCorner2 = doorCorners.get((di+1)% ds);
@@ -62,6 +60,23 @@ public class Topology {
                     roomAndDoorCorners.add(door2);
                     roomAndDoorCorners.add(doorCorners.get((start+ds+(increment*3))% ds));
                     doorPoints.put(door, commonDoorPoint);
+                    if(door.getRoom2()!=null){
+                        List<Corner> oppositeOutline = roomOutLines.get(door.getRoom2());
+                        List<Corner> oppositeOutlineWithDoor = new ArrayList<>();
+                        int r2s = oppositeOutline.size();
+                        for(int r2i = 0; r2i < r2s; r2i++){
+                           Corner opposite1 = oppositeOutline.get(r2i);
+                           oppositeOutlineWithDoor.add(opposite1);
+                            Corner opposite2 = oppositeOutline.get((r2i+1)%r2s);
+                            if(isOnSegment(opposite1, opposite2, door1) && isOnSegment(opposite1, opposite2, door2)){  // also valid for common point
+                                boolean order = isCloser(door1, door2, opposite1); // TODO use predetermined polygon sense insteead
+                                oppositeOutlineWithDoor.add(order ? door1 : door2);
+                                oppositeOutlineWithDoor.add(commonDoorPoint);
+                                oppositeOutlineWithDoor.add(order ? door2 : door1);
+                            }
+                        }
+                        roomOutLines.put(door.getRoom2(), oppositeOutlineWithDoor);
+                    }
                     // TODO leave early, door can only be on one segment
                 }
             }
@@ -92,9 +107,13 @@ public class Topology {
         return segment.ptSegDist(corner.getX(), corner.getY()) == 0;
     }
 
-    public Corner getDoorPoint(Door door) {
+    public Corner getPoint(Door door) {
         Corner onRoomBorder = doorPoints.get(door);
         List<Double> centroid = door.computeCentroid();
         return onRoomBorder!=null ? onRoomBorder : new Corner(centroid.get(0), centroid.get(1));
+    }
+
+    public List<Corner> getOutline(Room room){
+        return roomOutLines.containsKey(room) ? roomOutLines.get(room) : room.getCorners();
     }
 }
