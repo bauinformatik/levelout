@@ -18,70 +18,66 @@ public class Topology {
 
     public void init(Storey storey) {
         roomOutLines.clear();
-        Map<Room, List<Door>> assignedDoors = new HashMap<>();
         for(Room room: storey.getRooms()){
-            assignedDoors.put(room, new ArrayList<>());
             roomOutLines.put(room, room.getCorners());
         }
         for(Door door: storey.getDoors()){
-            if(door.getRoom1()!=null) assignedDoors.get(door.getRoom1()).add(door);
+            enrichRoomOutlines(door);
         }
-        for (Room room: storey.getRooms()){
-            List<Corner> roomCorners = roomOutLines.get(room);
-            for(Door door: assignedDoors.get(room)){
-                roomCorners = roomWithDoor(roomCorners, door); // changes the opposite rooms as well
-            }
-            roomOutLines.put(room, roomCorners);
-        }
-    }
+   }
 
-    private List<Corner> roomWithDoor(List<Corner> roomCorners, Door door) {
-        List<Corner> roomAndDoorCorners = new ArrayList<>();
-        List<Corner> doorCorners = door.getCorners();
-        int rs = roomCorners.size();
-        int ds = doorCorners.size();
+    private void enrichRoomOutlines(Door doorElement) {
+        if(doorElement.getRoom1()==null) return;
+        List<Corner> room = roomOutLines.get(doorElement.getRoom1());
+        List<Corner> roomNew = new ArrayList<>();
+        List<Corner> door = doorElement.getCorners();
+        int rs = room.size();
+        int ds = door.size();
         for(int ri = 0; ri< rs; ri++){
-            Corner roomCorner1 = roomCorners.get(ri);
-            roomAndDoorCorners.add(roomCorner1);
-            Corner roomCorner2 = roomCorners.get((ri+1)% rs);
+            Corner room1 = room.get(ri);
+            roomNew.add(room1);
+            Corner room2 = room.get((ri+1)% rs);
             for(int di = 0; di< ds; di++){
-                Corner doorCorner1 = doorCorners.get(di);
-                Corner doorCorner2 = doorCorners.get((di+1)% ds);
-                if(isOnSegment(roomCorner1, roomCorner2, doorCorner1) && isOnSegment(roomCorner1, roomCorner2, doorCorner2)){
-                    boolean correctOrder = isCloser(doorCorner1, doorCorner2, roomCorner1);
+                Corner door1 = door.get(di);
+                Corner door2 = door.get((di+1)% ds);
+                if(isOnSegment(room1, room2, door1) && isOnSegment(room1, room2, door2)){
+                    boolean correctOrder = isCloser(door1, door2, room1);
                     int increment = correctOrder ? -1 : 1; // TODO use predetermined polygon sense insteead
                     int start = correctOrder ? di : (di+1)%ds ;
-                    Corner door1 = doorCorners.get((start + ds + increment) % ds);
-                    Corner door2 = doorCorners.get((start + ds + (increment * 2)) % ds);
-                    Corner commonDoorPoint = new Corner((door1.getX() +door2.getX())/2, (door1.getY()+door2.getY())/2);
-                    roomAndDoorCorners.add(doorCorners.get(start));
-                    roomAndDoorCorners.add(door1);
-                    roomAndDoorCorners.add(commonDoorPoint);
-                    roomAndDoorCorners.add(door2);
-                    roomAndDoorCorners.add(doorCorners.get((start+ds+(increment*3))% ds));
-                    doorPoints.put(door, commonDoorPoint);
-                    if(door.getRoom2()!=null){
-                        List<Corner> oppositeOutline = roomOutLines.get(door.getRoom2());
-                        List<Corner> oppositeOutlineWithDoor = new ArrayList<>();
-                        int r2s = oppositeOutline.size();
+                    Corner d1 = door.get((start + ds + increment) % ds);
+                    Corner d2 = door.get((start + ds + (increment * 2)) % ds);
+                    Corner common = new Corner((d1.getX() +d2.getX())/2, (d1.getY()+d2.getY())/2);
+                    roomNew.add(door.get(start));
+                    roomNew.add(d1);
+                    roomNew.add(common);
+                    roomNew.add(d2);
+                    roomNew.add(door.get((start+ds+(increment*3))% ds));
+                    doorPoints.put(doorElement, common);
+                    if(doorElement.getRoom2()!=null){
+                        List<Corner> opposite = roomOutLines.get(doorElement.getRoom2());
+                        List<Corner> oppositeNew = new ArrayList<>();
+                        int r2s = opposite.size();
                         for(int r2i = 0; r2i < r2s; r2i++){
-                           Corner opposite1 = oppositeOutline.get(r2i);
-                           oppositeOutlineWithDoor.add(opposite1);
-                            Corner opposite2 = oppositeOutline.get((r2i+1)%r2s);
-                            if(isOnSegment(opposite1, opposite2, door1) && isOnSegment(opposite1, opposite2, door2)){  // also valid for common point
-                                boolean order = isCloser(door1, door2, opposite1); // TODO use predetermined polygon sense insteead
-                                oppositeOutlineWithDoor.add(order ? door1 : door2);
-                                oppositeOutlineWithDoor.add(commonDoorPoint);
-                                oppositeOutlineWithDoor.add(order ? door2 : door1);
+                            Corner opposite1 = opposite.get(r2i);
+                            oppositeNew.add(opposite1);
+                            Corner opposite2 = opposite.get((r2i+1)%r2s);
+                            if(isOnSegment(opposite1, opposite2, d1) && isOnSegment(opposite1, opposite2, d2)){  // also valid for common point
+                                boolean order = isCloser(d1, d2, opposite1); // TODO use predetermined polygon sense insteead
+                                oppositeNew.add(order ? d1 : d2);
+                                oppositeNew.add(common);
+                                oppositeNew.add(order ? d2 : d1);
                             }
                         }
-                        roomOutLines.put(door.getRoom2(), oppositeOutlineWithDoor);
+                        roomOutLines.put(doorElement.getRoom2(), oppositeNew);
                     }
-                    // TODO leave early, door can only be on one segment
+                    for(int rem=ri+1; rem<rs; rem++){ // finish new polygon with existing points
+                        roomNew.add(room.get(rem));
+                    }
+                    roomOutLines.put(doorElement.getRoom1(), roomNew);
+                    return; // leave early, door can only be on one segment
                 }
             }
         }
-        return roomAndDoorCorners;
     }
 
     public static List<Corner> withoutCollinearCorners(List<Corner> roomCorners) {
