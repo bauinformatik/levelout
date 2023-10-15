@@ -44,14 +44,18 @@ public class Topology {
                     boolean correctOrder = isCloser(door1, door2, room1);
                     int increment = correctOrder ? -1 : 1; // TODO use predetermined polygon sense insteead
                     int start = correctOrder ? di : (di+1)%ds ;
-                    Corner d1 = door.get((start + ds + increment) % ds);
-                    Corner d2 = door.get((start + ds + (increment * 2)) % ds);
-                    Corner common = new Corner((d1.getX() +d2.getX())/2, (d1.getY()+d2.getY())/2);
-                    roomNew.add(door.get(start));
+                    Corner d1 = door.get(start);
+                    Corner d3 = door.get((start + ds + increment) % ds);
+                    Corner d2 = midPoint(d1, d3);
+                    Corner d4 = door.get((start + ds + (increment * 2)) % ds);
+                    Corner d6 = door.get((start + ds + (increment * 3)) % ds);
+                    Corner d5 = midPoint(d4, d6);
+                    Corner common = midPoint(d2, d5);
                     roomNew.add(d1);
-                    roomNew.add(common);
                     roomNew.add(d2);
-                    roomNew.add(door.get((start+ds+(increment*3))% ds));
+                    roomNew.add(common);
+                    roomNew.add(d5);
+                    roomNew.add(d6);
                     doorPoints.put(doorElement, common);
                     if(doorElement.getRoom2()!=null){
                         List<Corner> opposite = roomOutLines.get(doorElement.getRoom2());
@@ -61,11 +65,13 @@ public class Topology {
                             Corner opposite1 = opposite.get(r2i);
                             oppositeNew.add(opposite1);
                             Corner opposite2 = opposite.get((r2i+1)%r2s);
-                            if(isOnSegment(opposite1, opposite2, d1) && isOnSegment(opposite1, opposite2, d2)){  // also valid for common point
-                                boolean order = isCloser(d1, d2, opposite1); // TODO use predetermined polygon sense insteead
-                                oppositeNew.add(order ? d1 : d2);
+                            if(isOnSegment(opposite1, opposite2, d3) && isOnSegment(opposite1, opposite2, d4)){  // also valid for common point
+                                boolean order = isCloser(d3, d4, opposite1); // TODO use predetermined polygon sense insteead
+                                oppositeNew.add(order ? d3 : d4);
+                                oppositeNew.add(order ? d2 : d5);
                                 oppositeNew.add(common);
-                                oppositeNew.add(order ? d2 : d1);
+                                oppositeNew.add(order ? d5 : d2);
+                                oppositeNew.add(order ? d4 : d3);
                             }
                         }
                         roomOutLines.put(doorElement.getRoom2(), oppositeNew);
@@ -78,6 +84,10 @@ public class Topology {
                 }
             }
         }
+    }
+
+    private static Corner midPoint(Corner d1, Corner d2) {
+        return new Corner((d1.getX() + d2.getX()) / 2, (d1.getY() + d2.getY()) / 2);
     }
 
     public static List<Corner> withoutCollinearCorners(List<Corner> roomCorners) {

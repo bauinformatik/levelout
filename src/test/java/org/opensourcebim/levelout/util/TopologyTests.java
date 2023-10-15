@@ -40,28 +40,28 @@ public class TopologyTests {
         door.setInternal(room1, room2);
         Storey storey = new Storey(0, 0, "EG", List.of(room1, room2), List.of(door));
 
+        Corner common1 = new Corner(4.0, 1.1);
+        Corner common2 = new Corner(4.0, 1.5);
+        Corner common3 = new Corner(4.0, 1.9);
+
         Topology topology = new Topology();
         topology.init(storey);
         List<Corner> corners1 = topology.getOutline(room1);
         Assert.assertEquals(9, corners1.size());
         Assert.assertEquals(corners1.get(2), door.getCorners().get(0));
-        Assert.assertEquals(corners1.get(3), door.getCorners().get(1));
-        Corner doorPoint1 = new Corner(4.1, 1.5);
-        Assert.assertEquals(corners1.get(4),  doorPoint1);
-        Assert.assertEquals(corners1.get(5), door.getCorners().get(2));
+        Assert.assertEquals(corners1.get(3), common1);
+        Assert.assertEquals(corners1.get(4), common2);
+        Assert.assertEquals(corners1.get(5), common3);
         Assert.assertEquals(corners1.get(6), door.getCorners().get(3));
-        Assert.assertEquals(topology.getPoint(door), doorPoint1);
 
-        door.setInternal(room2, room1);
-        topology.init(storey);
         List<Corner> corners2 = topology.getOutline(room2);
         Assert.assertEquals(9, corners2.size());
         Assert.assertEquals(corners2.get(4), door.getCorners().get(2));
-        Assert.assertEquals(corners2.get(5), door.getCorners().get(3));
-        Corner doorPoint2 = new Corner(3.9, 1.5);
-        Assert.assertEquals(corners2.get(6), doorPoint2);
-        Assert.assertEquals(corners2.get(7), door.getCorners().get(0));
+        Assert.assertEquals(corners2.get(5), common3);
+        Assert.assertEquals(corners2.get(6), common2);
+        Assert.assertEquals(corners2.get(7), common1);
         Assert.assertEquals(corners2.get(8), door.getCorners().get(1));
-        Assert.assertEquals(topology.getPoint(door), doorPoint2);
+
+        Assert.assertEquals(topology.getPoint(door), common2);
     }
 }
