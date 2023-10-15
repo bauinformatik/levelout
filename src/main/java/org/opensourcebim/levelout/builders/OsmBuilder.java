@@ -46,6 +46,13 @@ public class OsmBuilder {
 		node.setTags(allTags);
 	}
 
+	private void writeAndClearNodeCache() throws IOException {
+		for(Node node: nodeCache.values()){
+			osmOutput.write(node);
+		}
+		nodeCache.clear();
+	}
+
 	private void createAndWriteRoom(Room room, List<Tag> levelTags) throws IOException {
 		if(!room.hasGeometry()) return;  // In the following, we can assume geometry.
 		List<Long> nodes = new ArrayList<>();
@@ -75,7 +82,6 @@ public class OsmBuilder {
 	}
 
 	private void createAndWriteStorey(Storey storey) throws IOException {
-		nodeCache.clear();
 		topology.init(storey);
 		List<Tag> levelTags = Arrays.asList(
 				new Tag("level", Integer.toString(storey.getLevel())),
@@ -87,9 +93,7 @@ public class OsmBuilder {
 		for (Door door : storey.getDoors()) {
 			createAndWriteDoor(door, levelTags);
 		}
-		for(Node node: nodeCache.values()){
-			osmOutput.write(node);
-		}
+		writeAndClearNodeCache();
 	}
 
 	public static OsmWay writeWayDetails(long wayid, long[] nodeList, List<OsmTag> osmtag) {
@@ -119,6 +123,7 @@ public class OsmBuilder {
 		}
 		OsmWay way = new Way(--wayId, TLongArrayList.wrap(Longs.toArray(nodes)), tags);
 		this.osmOutput.write(way);
+		writeAndClearNodeCache();
 		for (Storey storey : storeys) {
 			createAndWriteStorey(storey);
 		}
