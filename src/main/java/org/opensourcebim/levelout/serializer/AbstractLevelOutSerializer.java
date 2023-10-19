@@ -14,6 +14,7 @@ import org.eclipse.emf.common.util.EList;
 import org.opensourcebim.levelout.intermediatemodel.*;
 import org.opensourcebim.levelout.intermediatemodel.geo.*;
 import org.opensourcebim.levelout.samples.IntermediateResidential;
+import org.opensourcebim.levelout.util.Topology;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Area;
@@ -93,7 +94,18 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 			Map<IfcSpace, Room> roomsMap = new HashMap<>();
 			for (IfcRelAggregates aggregation : storey.getIsDecomposedBy()) {
 				for (IfcSpace space : aggregation.getRelatedObjects().stream().filter(IfcSpace.class::isInstance).map(IfcSpace.class::cast).toArray(IfcSpace[]::new)) {
-					Room room = new Room(space.getName(), getOuterPolygon(space.getGeometry(), elevation));
+					Area roomArea = getOutline(getFootprint(space.getGeometry(), elevation));
+					for(IfcRelSpaceBoundary boundary : space.getBoundedBy()){
+						// remove room pockets into openings
+						IfcElement wall = boundary.getRelatedBuildingElement();
+						if(wall instanceof IfcWall && !wall.getHasOpenings().isEmpty() && wall.getGeometry() != null){
+							Area wallArea = getFootprint(wall.getGeometry(), elevation);
+							if(wallArea.isSingular()){
+								roomArea.subtract(wallArea);
+							}
+						}
+					}
+					Room room = new Room(space.getName(), getCorners(roomArea));
 					roomsMap.put(space, room); // later needed for assignment to doors
 				}
 			}
@@ -120,7 +132,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 							if(opening.getHasFillings().isEmpty()) {  // doors are already processed, windows ignored, only treat unfilled openings
 								// TODO track processed doors above and use this as fallback?
 								Area openingFootprint = getIntersectionArea(elevation, opening, ifcWall);
-								Door door = new Door( opening.getName(), getCorners(openingFootprint));
+								Door door = new Door( opening.getName(), getCorners(openingFootprint), false);
 								if(door.hasGeometry() || !ignoreAbstractElements ){
 									loStorey.addDoors(door);
 									populateConnectedRooms(roomsMap, door, opening.getProvidesBoundaries());
@@ -206,6 +218,7 @@ public abstract class AbstractLevelOutSerializer implements Serializer {
 		if (ifcRepresentationContextStream.isEmpty() || ! ((IfcGeometricRepresentationContext)ifcRepresentationContextStream.get(0)).isSetTrueNorth()) return null;
 		IfcGeometricRepresentationContext context = (IfcGeometricRepresentationContext) project.get(0).getRepresentationContexts().get(0);
 		double factor = IfcUtils.getLengthUnitPrefix(ifcModelInterface);
+		Topology.precision = context.getPrecision();
 		CoordinateReference cr = getProjectedOriginCRS(context, factor);
 		return (cr != null) ? cr : getGeodeticOriginCRS(site, context, factor);
 	}

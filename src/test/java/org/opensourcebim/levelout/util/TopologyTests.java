@@ -64,4 +64,78 @@ public class TopologyTests {
 
         Assert.assertEquals(topology.getPoint(door), common2);
     }
+    @Test
+    public void testCollinear(){
+        List<Corner> corners = List.of(
+                new Corner(0,1), new Corner(0,1),
+                new Corner(0,-2), new Corner(0,-2), new Corner(1,-2), new Corner(2, -2),
+                new Corner(3,-2),
+                new Corner(3,1), new Corner(0,1) );
+        List<Corner> clean = Topology.withoutCollinearCorners(corners);
+        Assert.assertEquals(4, clean.size() );
+    }
+
+    @Test
+    public void testCollinearThresholdSmall(){
+        List<Corner> clean = Topology.withoutCollinearCorners(List.of(
+                new Corner(0, 0),
+                new Corner(0.00005, 2),
+                new Corner(0, 4),
+                new Corner(3,4)
+        ));
+        Assert.assertEquals(3, clean.size());
+    }
+
+    @Test
+    public void testCollinearThresholdScale(){
+        Topology.precision = 0.0001 / 0.01; // cm
+        List<Corner> clean = Topology.withoutCollinearCorners(List.of(
+                new Corner(0, 0),
+                new Corner(0.005, 200),
+                new Corner(0, 400),
+                new Corner(300,400)
+        ));
+        Assert.assertEquals(3, clean.size());
+        Topology.precision = 0.0001;  // back to meters
+    }
+
+    @Test
+    public void testCollinearThresholdLarger(){
+        List<Corner> clean = Topology.withoutCollinearCorners(List.of(
+                new Corner(0, 0),
+                new Corner(0.001, 2),
+                new Corner(0, 4),
+                new Corner(3,4)
+        ));
+        Assert.assertEquals(4, clean.size());
+    }
+
+    @Test
+    public void testSmiley(){
+        Door door = new Door("Keller 01-1", List.of(
+                new Corner(4.824896812438965, 1.6608097553253174),
+                new Corner(4.924896717071533, 1.660815954208374),
+                new Corner(4.924951553344727, 0.7758159637451172),
+                new Corner(4.824951648712158, 0.7758097648620605)
+        ));
+        Room room1 = new Room("01.0.2", List.of(
+                new Corner(4.924987316131592, 0.20000000298023224),
+                new Corner(4.924862384796143, 2.2100000381469727),
+                new Corner(7.275000095367432, 2.2100000381469727),
+                new Corner(7.275000095367432, 0.20000000298023224)
+        ));
+        Room room2 = new Room("01.0.3", List.of(
+                new Corner(0.20000000298023224, 0.20000000298023224),
+                new Corner(0.20000000298023224, 2.2100000381469727),
+                new Corner(4.824862480163574, 2.2100000381469727),
+                new Corner(4.824987411499023, 0.20000000298023224)
+        ));
+        door.setInternal(room1, room2);
+        Storey storey = new Storey(0, 0, "EG", List.of(room1, room2), List.of(door));
+        Topology topology = new Topology();
+        topology.init(storey);
+        Assert.assertEquals(9, topology.getOutline(room1).size());
+        Assert.assertEquals(9, topology.getOutline(room2).size());
+        Assert.assertTrue(topology.doorPoints.containsKey(door));
+    }
 }

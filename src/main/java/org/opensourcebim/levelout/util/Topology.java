@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Topology {
-    private final Map<Door, Corner> doorPoints = new HashMap<>();
+    protected final Map<Door, Corner> doorPoints = new HashMap<>();
     private final Map<Room, List<Corner>> roomOutLines = new HashMap<>();
+    public static double precision = 0.0001;  // tenth millimeters precision, overriden by precision from IFC
 
     public void init(Storey storey) {
         roomOutLines.clear();
@@ -28,6 +29,7 @@ public class Topology {
 
     private void enrichRoomOutlines(Door doorElement) {
         if(doorElement.getRoom1()==null) return;
+        if(doorElement.getCorners().size()!=4) return;
         List<Corner> room = roomOutLines.get(doorElement.getRoom1());
         List<Corner> roomNew = new ArrayList<>();
         List<Corner> door = doorElement.getCorners();
@@ -91,16 +93,22 @@ public class Topology {
     }
 
     public static List<Corner> withoutCollinearCorners(List<Corner> roomCorners) {
+        if(roomCorners.size()<3) return roomCorners;
         List<Corner> cleanRoomCorners = new ArrayList<>();
+        Corner corner1 = roomCorners.get(roomCorners.size()-1); // last one as reference
         for(int i = 0; i< roomCorners.size(); i++){
-            Corner corner1 = roomCorners.get((i-1+roomCorners.size())% roomCorners.size());
             Corner corner2 = roomCorners.get(i);
             Corner corner3 = roomCorners.get((i+1)% roomCorners.size());
             boolean isOnSegment = isOnSegment(corner1, corner3, corner2);
             if(!isOnSegment){
+                corner1 = corner2; // new reference
                 cleanRoomCorners.add(corner2);
             }
         }
+        Corner last = cleanRoomCorners.get(cleanRoomCorners.size() - 1);
+        Corner first = cleanRoomCorners.get(0);
+        Corner candidate = roomCorners.get(roomCorners.size() - 1);
+        if(!isOnSegment(last, first, candidate)) cleanRoomCorners.add(candidate);
         return cleanRoomCorners;
     }
 
@@ -110,7 +118,7 @@ public class Topology {
     }
     private static boolean isOnSegment(Corner segCorner1, Corner segCorner2, Corner corner) {
         Line2D.Double segment = new Line2D.Double(segCorner1.getX(), segCorner1.getY(), segCorner2.getX(), segCorner2.getY());
-        return segment.ptSegDist(corner.getX(), corner.getY()) == 0;
+        return segment.ptSegDist(corner.getX(), corner.getY()) < precision;
     }
 
     public Corner getPoint(Door door) {

@@ -81,7 +81,6 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 		ProjCoordinate wgs84Point = utmToWgs84.transform(new ProjCoordinate(utmPointX, utmPointY),
 				new ProjCoordinate());
 		return new GeodeticPoint(wgs84Point.y, wgs84Point.x);
-
 	}
 
 	@Override
