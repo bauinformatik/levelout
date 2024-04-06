@@ -37,6 +37,7 @@ public class GeodataValidation extends Validation {
 				.filter(feature -> feature instanceof IfcGeometricRepresentationContext
 						&& !(feature instanceof  IfcGeometricRepresentationSubContext)
 						&& "Model".equals(feature.getContextType())
+						&& "Body".equals(feature.getContextIdentifier())
 						&& ((IfcGeometricRepresentationContext) feature).getCoordinateSpaceDimension() == 3)
 				.map(feature -> (IfcGeometricRepresentationContext) feature)
 				.collect(Collectors.toList());
