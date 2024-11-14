@@ -74,7 +74,8 @@ public class GeodeticOriginCRS extends CoordinateReference implements Serializab
 	}
 
 	@Override
-	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
+	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart, boolean convertEpsg) {
+		if (convertEpsg) return cartesianToGeodeticViaGeoCentric(cart);
 		CartesianPoint rotatedAndScaled = rotateAndScale(cart);
 		double utmPointX = rotatedAndScaled.x + utmOrigin.x;
 		double utmPointY = rotatedAndScaled.y + utmOrigin.y;

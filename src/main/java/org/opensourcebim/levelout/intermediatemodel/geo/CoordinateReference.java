@@ -20,7 +20,7 @@ public abstract class CoordinateReference implements Serializable {
 		this.scale = scale;
 	}
 
-	public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart);
+	public abstract GeodeticPoint cartesianToGeodetic(CartesianPoint cart, boolean convertEpsg);
 
 	public CartesianPoint rotateAndScale(CartesianPoint cart) {
 		return new CartesianPoint (a * cart.x - b * cart.y, b * cart.x + a * cart.y);

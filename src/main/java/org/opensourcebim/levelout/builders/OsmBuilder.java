@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.*;
 
 public class OsmBuilder {
+	private final boolean convertEpsg;
 	private OsmOutputStream osmOutput;
 	private CoordinateReference crs;
 	private int wayId;
@@ -29,10 +30,17 @@ public class OsmBuilder {
 	private final Topology topology = new Topology();
 	private final Map<Corner, Node> nodeCache = new HashMap<>();
 
-	private Node createOsmNode(Corner pt) throws IOException {
+	public OsmBuilder() {
+		this(false);
+	}
+	public OsmBuilder(boolean convertEpsg) {
+		this.convertEpsg = convertEpsg;
+	}
+
+	private Node createOsmNode(Corner pt) {
 		if(nodeCache.containsKey(pt)) return nodeCache.get(pt);
 		CartesianPoint cartesian = new CartesianPoint(pt.getX(), pt.getY());
-		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian);
+		GeodeticPoint geodetic = crs.cartesianToGeodetic(cartesian, false);
 		Node node = new Node(--nodeId, geodetic.longitude, geodetic.latitude);
 		nodeCache.put(pt, node);
 		return node;

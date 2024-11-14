@@ -54,7 +54,7 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
 		return settings;
 	}
 
-	private static ParameterDefinition createBooleanParameter(String identifier, String name, String description, boolean defaultVal) {
+	protected static ParameterDefinition createBooleanParameter(String identifier, String name, String description, boolean defaultVal) {
 		ParameterDefinition parameter = StoreFactory.eINSTANCE.createParameterDefinition();
 		parameter.setIdentifier(identifier);
 		parameter.setDescription(description);
@@ -77,6 +77,6 @@ public abstract class AbstractLevelOutSerializerPlugin extends AbstractSerialize
         public boolean extractionMethod;
         public boolean ignoreAbstractElements;
         public boolean ignoreDeadRooms;
-
-    }
+		public boolean convertEpsg;
+	}
 }

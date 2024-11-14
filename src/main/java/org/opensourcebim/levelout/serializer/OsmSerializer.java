@@ -7,14 +7,16 @@ import org.opensourcebim.levelout.builders.OsmBuilder;
 import java.io.OutputStream;
 
 public class OsmSerializer extends AbstractLevelOutSerializer {
-    OsmSerializer(AbstractLevelOutSerializerPlugin.Options options) {
+    private final boolean convertEpsg;
+    OsmSerializer(AbstractLevelOutSerializerPlugin.Options options, boolean convertEpsg) {
         super(options);
+        this.convertEpsg = convertEpsg;
     }
 
     @Override
     public void writeToOutputStream(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
         try {
-            new OsmBuilder().createAndWriteBuilding(building, outputStream);
+            new OsmBuilder(convertEpsg).createAndWriteBuilding(building, outputStream);
         } catch (Exception e) {
             throw new SerializerException(e);
         }

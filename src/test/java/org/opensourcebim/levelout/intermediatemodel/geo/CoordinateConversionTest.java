@@ -31,7 +31,7 @@ public class CoordinateConversionTest {
 		CartesianPoint p1 = new CartesianPoint(10, 5);
 		CartesianPoint p2 = new CartesianPoint(20, 5);
 		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56), 0);
-		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.00000001); // ~1 mm
+		Assert.assertEquals(crs.cartesianToGeodetic(p1, false).latitude, crs.cartesianToGeodetic(p2, false).latitude, 0.00000001); // ~1 mm
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public class CoordinateConversionTest {
 		CartesianPoint p1 = new CartesianPoint(5, 10);
 		CartesianPoint p2 = new CartesianPoint(5, 20);
 		GeodeticOriginCRS crs = new GeodeticOriginCRS(new GeodeticPoint(45, 56), Math.PI/2);
-		Assert.assertEquals(crs.cartesianToGeodetic(p1).latitude, crs.cartesianToGeodetic(p2).latitude, 0.000000001); // ~1 mm
+		Assert.assertEquals(crs.cartesianToGeodetic(p1, false).latitude, crs.cartesianToGeodetic(p2, false).latitude, 0.000000001); // ~1 mm
 	}
 	@Test
 	public void testEpsgNorth(){
@@ -66,7 +66,7 @@ public class CoordinateConversionTest {
 		CartesianPoint pointToTransform = new CartesianPoint(0, 0);
 		GeodeticPoint csOrigin = new GeodeticPoint(-33.90632062825244, 151.20215639320887);
 		CoordinateReference crs = new GeodeticOriginCRS(csOrigin, -0.13918031137);
-		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
+		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform, false);
 		Assert.assertEquals(csOrigin.longitude, transformed.longitude, 0.000000001);
 		Assert.assertEquals(csOrigin.latitude, transformed.latitude, 0.000000001);
 	}
@@ -76,7 +76,7 @@ public class CoordinateConversionTest {
 		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960);
 		GeodeticPoint csOrigin = new GeodeticPoint(-33.90632062825244, 151.20215639320887);
 		CoordinateReference crs = new GeodeticOriginCRS(csOrigin, -0.13918031137);
-		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
+		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform, false);
 		Assert.assertEquals(-33.9058082188758, transformed.latitude, 0.000000001);
 		Assert.assertEquals(151.203530034203, transformed.longitude, 0.000000001);
 
@@ -102,7 +102,7 @@ public class CoordinateConversionTest {
 		CartesianPoint pointToTransform = new CartesianPoint(0, 0);
 		ProjectedPoint csOrigin = new ProjectedPoint(333780.622, 6246775.891);
 		CoordinateReference crs = new ProjectedOriginCRS(csOrigin,0.990330045, -0.138731399, "epsg:28356" );
-		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
+		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform, false);
 		Assert.assertEquals(151.20215639320887, transformed.longitude, 0.000000001);
 		Assert.assertEquals(-33.90632062825244, transformed.latitude, 0.000000001);
 	}
@@ -111,7 +111,7 @@ public class CoordinateConversionTest {
 		CartesianPoint pointToTransform = new CartesianPoint(116.611, 75.960);
 		ProjectedPoint csOrigin = new ProjectedPoint(333780.622, 6246775.891);
 		CoordinateReference crs = new ProjectedOriginCRS(csOrigin,0.990330045, -0.138731399, "epsg:28356" );
-		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform);
+		GeodeticPoint transformed = crs.cartesianToGeodetic(pointToTransform, false);
 		Assert.assertEquals(151.203530034203, transformed.longitude, 0.000000001);
 		Assert.assertEquals(-33.9058082188758, transformed.latitude, 0.000000001);
 

@@ -24,7 +24,7 @@ public class ProjectedOriginCRS extends CoordinateReference implements Serializa
 	}
 
 	@Override
-	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart) {
+	public GeodeticPoint cartesianToGeodetic(CartesianPoint cart, boolean convertEpsg) {
 		CartesianPoint rotatedAndScaled = rotateAndScale(cart);
 		// eastings and northings of the project CS origin are given in geospatial CRS units, assuming meters,
 		// could be taken from IFC and doublechecked against EPSG definitions
