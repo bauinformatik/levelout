@@ -2,14 +2,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opensourcebim.levelout</groupId>
 	<artifactId>LevelOutPlugins</artifactId>
-	<version>0.21</version>
+	<version>0.22-SNAPSHOT</version>
 	<name>LevelOutSerializers</name>
 	<organization>
 		<name>Bauhaus-Universität Weimar</name>
 		<url>https://www.uni-weimar.de</url>
 	</organization>
 	<properties>
-		<maven.compiler.releaese>11</maven.compiler.releaese>
+		<maven.compiler.release>11</maven.compiler.release>
 		<bimserver.version>1.5.186</bimserver.version>
 	</properties>
 	<build>
