@@ -64,13 +64,13 @@ public class Geometry {
 		double lat2 = Math.toRadians(p2.latitude);
 		double lon1 = Math.toRadians(p1.longitude);
 		double lon2 = Math.toRadians(p2.longitude);
-		var Bx = Math.cos(lat2) * Math.cos(lon2-lon1);
-		var By = Math.cos(lat2) * Math.sin(lon2-lon1);
-		var lat = Math.atan2(
+		double Bx = Math.cos(lat2) * Math.cos(lon2-lon1);
+		double By = Math.cos(lat2) * Math.sin(lon2-lon1);
+		double lat = Math.atan2(
 			Math.sin(lat1)+Math.sin(lat2),
 			Math.sqrt( (Math.cos(lat1)+Bx)*(Math.cos(lat1)+Bx) + By*By )
 		);
-		var lon = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
+		double lon = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
 		return new GeodeticPoint(Math.toDegrees(lat), Math.toDegrees(lon));
 	}
 	public static Direction angleAbsOrd(double lat1d, double lon1d, double lat2d, double lon2d){

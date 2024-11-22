@@ -9,9 +9,8 @@
 		<url>https://www.uni-weimar.de</url>
 	</organization>
 	<properties>
-		<maven.compiler.target>11</maven.compiler.target>
-		<maven.compiler.source>11</maven.compiler.source>
-		<bimserver.version>1.5.184</bimserver.version>
+		<maven.compiler.releaese>11</maven.compiler.releaese>
+		<bimserver.version>1.5.186</bimserver.version>
 	</properties>
 	<build>
 		<resources>
